@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using System.Text;
+using System.IO;
+using System;
 
 public class BrickPlacement : MonoBehaviour
 {
@@ -9,6 +12,7 @@ public class BrickPlacement : MonoBehaviour
     public GameObject actualBrickMesh;
     public GameObject actualBrickPlane;
     public GameObject lineRendererObject;
+    public GameObject seedMarker;
 
     public Material lineMaterial1;
     public Material lineMaterial2;
@@ -17,10 +21,12 @@ public class BrickPlacement : MonoBehaviour
     public Material lineMaterial5;
     public Material lineMaterial6;
 
-    public List<Brick> brickList = new List<Brick>();
-    public List<BrickPlane> planeList = new List<BrickPlane>();
-    public List<BrickPlane> availablePlaneList = new List<BrickPlane>();
-    public List<GraphBranch> branchList = new List<GraphBranch>();
+    List<Brick> brickList = new List<Brick>();
+    List<BrickPlane> planeList = new List<BrickPlane>();
+    List<BrickPlane> availablePlaneList = new List<BrickPlane>();
+    List<GraphBranch> branchList = new List<GraphBranch>();
+
+    List<DataImport> importList = new List<DataImport>();
 
     // brick stack for instantiation
     int width = 4;
@@ -29,6 +35,25 @@ public class BrickPlacement : MonoBehaviour
 
     int numOfBricks;
 
+    // size of coordinate space
+    int gridXCount = 20;
+    int gridYCount = 30;
+    int gridZCount = 41;
+
+
+    Vector3[,,] gridLocation;
+
+    //brick measurements
+    float lengthSpacing = 0.225f;
+    float widthSpacing = 0.1125f;
+    float heightSpacing = 0.0725f;
+
+    float horizontalGridSpacing = 0.05625f;
+    float verticalGridSpacing = 0.0725f;
+
+    Quaternion pointZ = Quaternion.Euler(0, 0, 0);
+    Quaternion pointX = Quaternion.Euler(0, 90, 0);
+
     IEnumerator startBricks;
 
     bool move = false;
@@ -36,6 +61,13 @@ public class BrickPlacement : MonoBehaviour
 
     public Button generateGraphButton;
     public Button hideGraphButton;
+    public Button createStackButton;
+
+    public string brickData;
+
+    Vector3 seedLocation;
+
+    int counter = 1;
 
     void Awake()
     {
@@ -51,34 +83,175 @@ public class BrickPlacement : MonoBehaviour
         Button hideGraphBut = hideGraphButton.GetComponent<Button>();
         hideGraphBut.onClick.AddListener(HideGraph);
 
+        Button createStackBut = createStackButton.GetComponent<Button>();
+        createStackBut.onClick.AddListener(testBrickOrder);
+
+        Load(brickData);
+
+        //generate grid locations
+        generateGrid();
+
+        seedLocation = gridLocation[5, 0, 15]; //+ new Vector3(0.001f,0,0.02f);
+        GameObject seedPoint = Instantiate(seedMarker, seedLocation, Quaternion.identity);
+
         //place bricks
         startBricks = depositBricks();
         StartCoroutine(startBricks);
+
+
     }
+
+    void testBrickOrder()
+    {
+
+        brickList[brickList.Count - counter].brickObject.transform.position += new Vector3(2, 0, 0);
+        counter += 1;
+    }
+
+    List<Brick> reorderBricks(List<Brick> bricksInStructure)
+    {
+        List<Brick> reorderedBrickList = new List<Brick>();
+        float currentClosestDistance;
+        float testDistance;
+        int listLength = bricksInStructure.Count;
+
+        print(listLength);
+
+        for (int currentSearchLayer = 0; currentSearchLayer < 5; currentSearchLayer++)
+        {
+            for (int j = 0; j < listLength; j++)
+            {
+                currentClosestDistance = 100;
+
+                for (int i = 0; i < bricksInStructure.Count; i++) // current closest brick 
+                {
+
+                    if (bricksInStructure[i].idealCurrentPosition.y == seedLocation.y + (currentSearchLayer * verticalGridSpacing)) // if Y is on current search layer
+                    {
+
+                        testDistance = Vector3.Magnitude(seedLocation - bricksInStructure[i].idealCurrentPosition);
+
+                        if (testDistance < currentClosestDistance)
+                        {
+                            currentClosestDistance = testDistance;
+                            print(testDistance);
+                        }
+                    }
+                }
+
+                for (int k = 0; k < bricksInStructure.Count; k++)
+                {
+                    if (currentClosestDistance == Vector3.Magnitude(seedLocation - bricksInStructure[k].idealCurrentPosition))
+                    {
+                        reorderedBrickList.Add(bricksInStructure[k]);
+
+                        for (int h = 0; h < bricksInStructure[k].localPlaneList.Length; h++) // update parent of all brick planes
+                        {
+                            brickList[k].localPlaneList[h].parentBrick = reorderedBrickList[reorderedBrickList.Count - 1];
+                        }
+
+                    }
+
+                }
+                bricksInStructure.Remove(reorderedBrickList[reorderedBrickList.Count - 1]);
+            }
+        }
+
+        print("brickListReordered");
+        print(reorderedBrickList.Count);
+        return reorderedBrickList;
+
+    }
+
+
+    bool Load(String textInput)
+    {
+        string temp_x;
+        string temp_y;
+        string temp_z;
+        string temp_orientation;
+
+        string line;
+
+        // Create a new StreamReader, tell it which file to read and what encoding the file was saved as
+
+        StreamReader theReader = new StreamReader(textInput, Encoding.Default);
+
+        using (theReader)
+        {
+            // While there's lines left in the text file, do this:
+            do
+            {
+                line = theReader.ReadLine();
+
+                if (line != null)
+                {
+                    // split into arguments based on comma
+
+                    string[] entries = line.Split(',');
+                    if (entries.Length > 0)
+                    {
+                        temp_x = entries[0];
+                        temp_y = entries[1];
+                        temp_z = entries[2];
+                        temp_orientation = entries[3];
+
+                        importList.Add(new DataImport(temp_x, temp_y, temp_z, temp_orientation));
+                    }
+                }
+            }
+            while (line != null);
+
+            // Done reading, close the reader and return true to broadcast success  
+            theReader.Close();
+            return true;
+        }
+
+
+    }
+
 
     IEnumerator depositBricks()
     {
         //create bricks
-        for (int h = 0; h < height; h++)
-        {
-            for (int i = 0; i < (numOfBricks / height); i++)
-            {
-                brickList.Add(new Brick(actualBrickMesh, actualBrickPlane, new Vector3((i % width) * 0.1125f, h * 0.0725f, (i - (i % width)) / width * 0.225f), Quaternion.Euler(0, 0, 0)));
-                brickList[i].spawnHeight = h;
+        int originX = 2;
+        int originY = 0;
+        int originZ = 30;
 
-                yield return new WaitForSeconds(0.02f);
-            }
-        }
+        WaitForSeconds time = new WaitForSeconds(0.05f);
 
-        //add planes to overall plane list and assign their parent brick
-        for (int k = 0; k < brickList.Count; k++)
+        for (int i = 0; i < importList.Count; i++)
         {
-            for (int j = 0; j < brickList[k].localPlaneList.Length; j++)
+            brickList.Add(new Brick(actualBrickMesh, actualBrickPlane, gridLocation[importList[i].xCoord + originX, importList[i].yCoord + originY, importList[i].zCoord + originZ], convertOrientation(importList[i].orientation)));
+
+            for (int k = 0; k < brickList.Count; k++)
             {
-                planeList.Add(brickList[k].localPlaneList[j]);
-                brickList[k].localPlaneList[j].parentBrick = brickList[k];
+                //add planes to overall plane list and assign their parent brick
+                for (int j = 0; j < brickList[k].localPlaneList.Length; j++)
+                {
+                    planeList.Add(brickList[k].localPlaneList[j]);
+                    brickList[k].localPlaneList[j].parentBrick = brickList[k];
+                }
             }
+
+            yield return time;
+
         }
+        brickList = reorderBricks(brickList);
+    }
+
+    Quaternion convertOrientation(Boolean _input)
+    {
+        Quaternion output;
+        if (_input == true)
+        {
+            output = pointZ;
+        }
+        else
+        {
+            output = pointX;
+        }
+        return output;
     }
 
     void Update()
@@ -86,7 +259,7 @@ public class BrickPlacement : MonoBehaviour
         MoveBricks();
 
         //update all positions
-        for (int i = 0; i < numOfBricks; i++)
+        for (int i = 0; i < brickList.Count; i++)
         {
             brickList[i].updatePosition();
 
@@ -99,9 +272,21 @@ public class BrickPlacement : MonoBehaviour
         UpdateGraph();
     }
 
-    private void OnMouseDown()
+    void generateGrid()
     {
-        
+        gridLocation = new Vector3[gridXCount, gridYCount, gridZCount];
+
+        for (int z = 0; z < gridZCount; z++)
+        {
+            for (int y = 0; y < gridYCount; y++)
+            {
+                for (int x = 0; x < gridXCount; x++)
+                {
+                    gridLocation[x, y, z] = new Vector3(x * horizontalGridSpacing, y * verticalGridSpacing, z * horizontalGridSpacing);
+                    //print(gridLocation[x, y, z].ToString("F5"));
+                }
+            }
+        }
     }
 
     void MoveBricks()
@@ -113,15 +298,17 @@ public class BrickPlacement : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            for (int i = 0; i < numOfBricks; i++)
+            if (Physics.Raycast(ray, out hit) && move == false)
             {
-
-                if (Physics.Raycast(ray, out hit) && hit.collider.transform.position == brickList[i].position && move == false)
+                for (int i = 0; i < brickList.Count; i++)
                 {
-                    hit.transform.position += Vector3.up;
-                    brickList[i].brickObject.transform.position = new Vector3(brickList[i].brickObject.transform.position.x, (brickList[i].spawnHeight * 0.12f), brickList[i].brickObject.transform.position.z) + new Vector3(0, 0.05f, 1.125f);
-                    print(i);
-                    move = true;
+
+                    if (hit.transform.position == brickList[i].position)
+                    {
+                        brickList[i].brickObject.transform.position = new Vector3(brickList[i].brickObject.transform.position.x, (brickList[i].spawnHeight * 0.12f), brickList[i].brickObject.transform.position.z) + new Vector3(0, 0.05f, 1.125f);
+                        print(i + " hit");
+                        move = true;
+                    }
                 }
 
             }
@@ -193,8 +380,6 @@ public class BrickPlacement : MonoBehaviour
             availablePlaneList[m].isAvailable = true;
         }
 
-        print("Graph2");
-        print(availablePlaneList.Count);
     }
 
     void GenerateGraphBranches()
@@ -265,6 +450,22 @@ public class BrickPlacement : MonoBehaviour
         }
     }
 
+    public class DataImport
+    {
+        public int xCoord;
+        public int yCoord;
+        public int zCoord;
+        public Boolean orientation;
+
+        public DataImport(string _x, string _y, string _z, string _orientation)
+        {
+            xCoord = System.Int32.Parse(_x);
+            yCoord = System.Int32.Parse(_y);
+            zCoord = System.Int32.Parse(_z);
+            orientation = _orientation.Equals("True") ? true : false;
+        }
+    }
+
     public class GraphBranch
     {
         public BrickPlane start;
@@ -317,6 +518,8 @@ public class BrickPlacement : MonoBehaviour
         public Quaternion rotation;
         Vector3 offsetVector;
 
+        public Vector3 idealCurrentPosition;
+
         public BrickPlane[] localPlaneList = new BrickPlane[3];
 
         int brickNumber;
@@ -326,6 +529,8 @@ public class BrickPlacement : MonoBehaviour
         {
             position = _position;
             rotation = _rotation;
+
+            idealCurrentPosition = _position;
 
             brickObject = Instantiate(_brickMesh, position, rotation);
 

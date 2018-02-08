@@ -27,13 +27,15 @@ public class ExtendedFlycam : MonoBehaviour
 	public float slowMoveFactor = 10;
 	public float fastMoveFactor = 30;
 
-	private float rotationX = 0.0f;
-	private float rotationY = 0.0f;
+    private float rotationX;
+	private float rotationY;
 
 	void Start ()
 	{
 		Screen.lockCursor = false;
-	}
+
+        
+    }
 
 	void Update ()
 	{
