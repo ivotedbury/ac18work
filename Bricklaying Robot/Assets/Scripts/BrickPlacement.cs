@@ -91,7 +91,7 @@ public class BrickPlacement : MonoBehaviour
         //generate grid locations
         generateGrid();
 
-        seedLocation = gridLocation[5, 0, 15]; //+ new Vector3(0.001f,0,0.02f);
+        seedLocation = gridLocation[5, 0, 10]; //+ new Vector3(0.001f,0,0.02f);
         GameObject seedPoint = Instantiate(seedMarker, seedLocation, Quaternion.identity);
 
         //place bricks
@@ -114,54 +114,61 @@ public class BrickPlacement : MonoBehaviour
         float currentClosestDistance;
         float testDistance;
         int listLength = bricksInStructure.Count;
+        Brick bestCurrentBrick = null;
+        Boolean betterBrickFound = false;
 
         print(listLength);
+        print(bricksInStructure[27].idealCurrentPosition.ToString("F4"));
+        print(seedLocation.y + (3 * verticalGridSpacing).ToString("F4"));
 
         for (int currentSearchLayer = 0; currentSearchLayer < 5; currentSearchLayer++)
         {
             for (int j = 0; j < listLength; j++)
             {
                 currentClosestDistance = 100;
+                betterBrickFound = false;
 
                 for (int i = 0; i < bricksInStructure.Count; i++) // current closest brick 
                 {
-
-                    if (bricksInStructure[i].idealCurrentPosition.y == seedLocation.y + (currentSearchLayer * verticalGridSpacing)) // if Y is on current search layer
+                    if (bricksInStructure[i].layer == currentSearchLayer) // if Y is on current search layer
                     {
-
                         testDistance = Vector3.Magnitude(seedLocation - bricksInStructure[i].idealCurrentPosition);
 
                         if (testDistance < currentClosestDistance)
                         {
                             currentClosestDistance = testDistance;
-                            print(testDistance);
+                            bestCurrentBrick = bricksInStructure[i];
+                            betterBrickFound = true;
                         }
                     }
+
                 }
 
-                for (int k = 0; k < bricksInStructure.Count; k++)
+                if (betterBrickFound == true)
                 {
-                    if (currentClosestDistance == Vector3.Magnitude(seedLocation - bricksInStructure[k].idealCurrentPosition))
+                    reorderedBrickList.Add(bestCurrentBrick);
+
+                    bricksInStructure.Remove(bestCurrentBrick);
+
+                    for (int h = 0; h < bestCurrentBrick.localPlaneList.Length; h++) // update parent of all brick planes
                     {
-                        reorderedBrickList.Add(bricksInStructure[k]);
-
-                        for (int h = 0; h < bricksInStructure[k].localPlaneList.Length; h++) // update parent of all brick planes
-                        {
-                            brickList[k].localPlaneList[h].parentBrick = reorderedBrickList[reorderedBrickList.Count - 1];
-                        }
-
+                        bestCurrentBrick.localPlaneList[h].parentBrick = bestCurrentBrick;
                     }
-
                 }
-                bricksInStructure.Remove(reorderedBrickList[reorderedBrickList.Count - 1]);
+
             }
+
         }
 
-        print("brickListReordered");
-        print(reorderedBrickList.Count);
         return reorderedBrickList;
 
+        //string serializedJson = JsonConvert.SerializeObject(myself);
+
+        // Print on the screen.  
+        Console.WriteLine(serializedJson);
+
     }
+
 
 
     bool Load(String textInput)
@@ -360,7 +367,11 @@ public class BrickPlacement : MonoBehaviour
             for (int j = 0; j < availablePlaneList.Count; j++)
             {
 
-                if (RoundPosition(availablePlaneList[i].position) + new Vector3(0, 0.0725f, 0) == RoundPosition(availablePlaneList[j].position))
+                if (RoundPosition(availablePlaneList[i].position) + new Vector3(0, verticalGridSpacing, 0) == RoundPosition(availablePlaneList[j].position) ||
+                    RoundPosition(availablePlaneList[i].position) + new Vector3(horizontalGridSpacing, verticalGridSpacing, 0) == RoundPosition(availablePlaneList[j].position) ||
+                    RoundPosition(availablePlaneList[i].position) + new Vector3(-horizontalGridSpacing, verticalGridSpacing, 0) == RoundPosition(availablePlaneList[j].position) ||
+                    RoundPosition(availablePlaneList[i].position) + new Vector3(0, verticalGridSpacing, horizontalGridSpacing) == RoundPosition(availablePlaneList[j].position) ||
+                    RoundPosition(availablePlaneList[i].position) + new Vector3(0, verticalGridSpacing, -horizontalGridSpacing) == RoundPosition(availablePlaneList[j].position))
                 {
                     coveredPlaneList.Add(availablePlaneList[i]);
                 }
@@ -519,6 +530,7 @@ public class BrickPlacement : MonoBehaviour
         Vector3 offsetVector;
 
         public Vector3 idealCurrentPosition;
+        public int layer;
 
         public BrickPlane[] localPlaneList = new BrickPlane[3];
 
@@ -531,6 +543,8 @@ public class BrickPlacement : MonoBehaviour
             rotation = _rotation;
 
             idealCurrentPosition = _position;
+
+            layer = (int)Mathf.Round(_position.y / 0.0725f);
 
             brickObject = Instantiate(_brickMesh, position, rotation);
 
