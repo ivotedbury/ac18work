@@ -22,8 +22,8 @@ namespace BrickManager
         /// </summary>
         public BrickManagerComponent()
           : base("BrickManager", "BrickM",
-              "Construct an Archimedean, or arithmetic, spiral given its radii and number of turns.",
-              "Curve", "Primitive")
+              "Converts Brick Arrangments into Objects and exports as JSon File.",
+              "Brick Manager", "Main")
         {
         }
 
@@ -36,10 +36,18 @@ namespace BrickManager
             // You can often supply default values when creating parameters.
             // All parameters must have the correct access type. If you want 
             // to import lists or trees of values, modify the ParamAccess flag.
-            pManager.AddPlaneParameter("Plane", "P", "Base plane for spiral", GH_ParamAccess.item, Plane.WorldXY);
-            pManager.AddNumberParameter("Inner Radius", "R0", "Inner radius for spiral", GH_ParamAccess.item, 1.0);
-            pManager.AddNumberParameter("Outer Radius", "R1", "Outer radius for spiral", GH_ParamAccess.item, 10.0);
-            pManager.AddIntegerParameter("Turns", "T", "Number of turns between radii", GH_ParamAccess.item, 10);
+            pManager.AddPointParameter("Origin", "O", "Origin for Brick Aggregation", GH_ParamAccess.item, Point3d.Origin);
+            pManager.AddPointParameter("Brick origins", "BO", "Origin of each brick", GH_ParamAccess.item, Point3d.Origin);
+            pManager.AddPointParameter("Brick X", "BX", "X of each brick", GH_ParamAccess.item, new Point3d(0.05125,0,0));
+            pManager.AddPointParameter("Brick Y", "BY", "Y of each brick", GH_ParamAccess.item, new Point3d(0, 0.05625, 0));
+
+            pManager.AddNumberParameter("Grid X", "gX", "Grid X dimension", GH_ParamAccess.item, 0.05625);
+            pManager.AddNumberParameter("Grid Y", "gY", "Grid Y dimension", GH_ParamAccess.item, 0.05625);
+            pManager.AddNumberParameter("Grid Z", "gZ", "Grid Z dimension", GH_ParamAccess.item, 0.0725);
+
+            pManager.AddBooleanParameter("Calculate", "C", "Run the conversion", GH_ParamAccess.item, false);
+
+
 
             // If you want to change properties of certain parameters, 
             // you can use the pManager instance to access them by index:
@@ -53,7 +61,7 @@ namespace BrickManager
         {
             // Use the pManager object to register your output parameters.
             // Output parameters do not have default values, but they too must have the correct access type.
-            pManager.AddCurveParameter("Spiral", "S", "Spiral curve", GH_ParamAccess.item);
+            pManager.AddTextParameter("JSON", "J", "Output JSON file", GH_ParamAccess.item);
 
             // Sometimes you want to hide a specific parameter from the Rhino preview.
             // You can use the HideParameter() method as a quick way:
@@ -69,41 +77,98 @@ namespace BrickManager
         {
             // First, we need to retrieve all data from the input parameters.
             // We'll start by declaring variables and assigning them starting values.
-            Plane plane = Plane.WorldXY;
-            double radius0 = 0.0;
-            double radius1 = 0.0;
-            int turns = 0;
+            Point3d origin = Point3d.Origin;
+            Point3d brickOrigins = Point3d.Origin;
+            Point3d brickX = Point3d.Origin;
+            Point3d brickY = Point3d.Origin;
+
+            double gridDimX = 0.05625;
+            double gridDimY = 0.05625;
+            double gridDimZ = 0.0725;
+
+            Boolean calculate = false; 
+            
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
-            if (!DA.GetData(0, ref plane)) return;
-            if (!DA.GetData(1, ref radius0)) return;
-            if (!DA.GetData(2, ref radius1)) return;
-            if (!DA.GetData(3, ref turns)) return;
+            if (!DA.GetData(0, ref origin)) return;
+            if (!DA.GetData(1, ref brickOrigins)) return;
+            if (!DA.GetData(2, ref brickX)) return;
+            if (!DA.GetData(3, ref brickY)) return;
+
+            if (!DA.GetData(4, ref gridDimX)) return;
+            if (!DA.GetData(5, ref gridDimY)) return;
+            if (!DA.GetData(6, ref gridDimZ)) return;
+
+            if (!DA.GetData(7, ref calculate)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
-            if (radius0 < 0.0)
+            if (gridDimX <= 0.0)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Inner radius must be bigger than or equal to zero");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Grid X dimension must be bigger than zero");
                 return;
             }
-            if (radius1 <= radius0)
+
+            if (gridDimY <= 0.0)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Outer radius must be bigger than the inner radius");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Grid Y dimension must be bigger than zero");
                 return;
             }
-            if (turns <= 0)
+
+            if (gridDimZ <= 0.0)
             {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Spiral turn count must be bigger than or equal to one");
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Grid Z dimension must be bigger than zero");
                 return;
             }
+
 
             // We're set to create the spiral now. To keep the size of the SolveInstance() method small, 
             // The actual functionality will be in a different method:
-            Curve spiral = CreateSpiral(plane, radius0, radius1, turns);
+            String outputData = SerializeBrickArrangement(origin, brickOrigins, brickX, brickY, gridDimX, gridDimY, gridDimZ, calculate);
 
             // Finally assign the spiral to the output parameter.
-            DA.SetData(0, spiral);
+            DA.SetData(0, outputData);
+        }
+
+        private string SerializeBrickArrangement(Point3d _origin, Point3d _brickOrigins, Point3d _brickX, Point3d _brickY, double _gridDimX, double _gridDimY, double _gridDimZ, Boolean _calculate)
+        {
+            string outputString = null;
+            List<Brick> brickList = null;
+            if (_calculate == true)
+            {
+                brickList = GenerateListOfBricks(_origin, _brickOrigins, _brickX, _brickY, _gridDimX, _gridDimY, _gridDimZ);
+            }
+            outputString = CreateString(brickList);
+
+            return outputString;
+        }
+
+        private string CreateString(List <Brick> _brickList)
+        {
+            int listCount = _brickList.Count;
+
+            string list = listCount.ToString();
+
+            return "test";
+        }
+
+        private class Brick
+        {
+            Vector3d gridPosition;
+            Quaternion rotation;
+            string brickType;
+
+           public Brick(Vector3d _gridPos, Quaternion _rotation)
+            {
+                gridPosition = _gridPos;
+                rotation = _rotation;
+                brickType = "Standard";
+            }
+        }
+
+        private List<Brick> GenerateListOfBricks(Point3d _origin, Point3d _brickOrigins, Point3d _brickX, Point3d _brickY, double _gridDimX, double _gridDimY, double _gridDimZ)
+        {
+
         }
 
         private Curve CreateSpiral(Plane plane, double r0, double r1, Int32 turns)
