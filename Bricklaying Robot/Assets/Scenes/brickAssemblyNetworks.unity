@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -292,8 +292,8 @@ GameObject:
   - component: {fileID: 108081159}
   - component: {fileID: 108081158}
   - component: {fileID: 108081163}
-  - component: {fileID: 108081162}
   - component: {fileID: 108081164}
+  - component: {fileID: 108081162}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -372,24 +372,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 108081157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20841be2d24e18f42ac75b591c4173c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d9c4826406765e47ac3a3357947feef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actualBrickMesh: {fileID: 840726099}
-  actualBrickPlane: {fileID: 1917758055}
-  lineRendererObject: {fileID: 10335787}
-  seedMarker: {fileID: 1727209822056110, guid: 72ff804b7e14c7e46a353bf86da5a8bf, type: 2}
-  lineMaterial1: {fileID: 2100000, guid: 09677c8bf0a22cc40b5910e0f46e7445, type: 2}
-  lineMaterial2: {fileID: 2100000, guid: 7cf9eb36e80a4a840bf46506ead11e02, type: 2}
-  lineMaterial3: {fileID: 2100000, guid: c558cdf47f708924a9da9544a14deab0, type: 2}
-  lineMaterial4: {fileID: 2100000, guid: 21adbfd522878374eb1ceda7421a3f73, type: 2}
-  lineMaterial5: {fileID: 2100000, guid: 5d1ee4e0e6c2fff44aa885da0ace351d, type: 2}
-  lineMaterial6: {fileID: 2100000, guid: 06480d418f1e40a48b05a6e494dd9832, type: 2}
-  generateGraphButton: {fileID: 1234850166}
-  hideGraphButton: {fileID: 1342878404}
-  createStackButton: {fileID: 476162061}
-  brickData: C:\Users\Ivo Tedbury\Documents\GitHub\ac18work\Bricklaying Robot\Assets\Data
-    Imports\brickStructure1.txt
+  brickData: {fileID: 4900000, guid: 2c25729e3c428ff4caa951282323fc15, type: 3}
 --- !u!114 &108081163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -401,8 +387,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b211f9223684ae449b572245f279998a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraSensitivity: 50
-  climbSpeed: 3
+  cameraSensitivity: 90
+  climbSpeed: 10
   normalMoveSpeed: 20
   slowMoveFactor: 10
   fastMoveFactor: 30
@@ -417,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: 6bfbc91cd7e17e44ab70b8bb03617b3d, type: 2}
+  profile: {fileID: 0}
 --- !u!1 &140416046
 GameObject:
   m_ObjectHideFlags: 0

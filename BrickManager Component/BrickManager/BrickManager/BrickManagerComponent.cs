@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Grasshopper.Kernel;
@@ -37,9 +38,9 @@ namespace BrickManager
             // All parameters must have the correct access type. If you want 
             // to import lists or trees of values, modify the ParamAccess flag.
             pManager.AddPointParameter("Origin", "O", "Origin for Brick Aggregation", GH_ParamAccess.item, Point3d.Origin);
-            pManager.AddPointParameter("Brick origins", "BO", "Origin of each brick", GH_ParamAccess.item, Point3d.Origin);
-            pManager.AddPointParameter("Brick X", "BX", "X of each brick", GH_ParamAccess.item, new Point3d(0.05125, 0, 0));
-            pManager.AddPointParameter("Brick Y", "BY", "Y of each brick", GH_ParamAccess.item, new Point3d(0, 0.05625, 0));
+            pManager.AddPointParameter("Brick origins", "BO", "Origin of each brick", GH_ParamAccess.list, Point3d.Origin);
+            pManager.AddPointParameter("Brick X", "BX", "X of each brick", GH_ParamAccess.list, new Point3d(0.05125, 0, 0));
+            pManager.AddPointParameter("Brick Y", "BY", "Y of each brick", GH_ParamAccess.list, new Point3d(0, 0.05625, 0));
 
             pManager.AddNumberParameter("Grid X", "gX", "Grid X dimension", GH_ParamAccess.item, 0.05625);
             pManager.AddNumberParameter("Grid Y", "gY", "Grid Y dimension", GH_ParamAccess.item, 0.05625);
@@ -78,9 +79,9 @@ namespace BrickManager
             // First, we need to retrieve all data from the input parameters.
             // We'll start by declaring variables and assigning them starting values.
             Point3d origin = Point3d.Origin;
-            Point3d brickOrigins = Point3d.Origin;
-            Point3d brickX = Point3d.Origin;
-            Point3d brickY = Point3d.Origin;
+            List<Point3d> brickOrigins = new List<Point3d>();
+            List<Point3d> brickX = new List<Point3d>();
+            List<Point3d> brickY = new List<Point3d>();
 
             double gridDimX = 0.05625;
             double gridDimY = 0.05625;
@@ -88,13 +89,14 @@ namespace BrickManager
 
             Boolean calculate = false;
 
+            String outputData = null;
 
             // Then we need to access the input parameters individually. 
             // When data cannot be extracted from a parameter, we should abort this method.
             if (!DA.GetData(0, ref origin)) return;
-            if (!DA.GetData(1, ref brickOrigins)) return;
-            if (!DA.GetData(2, ref brickX)) return;
-            if (!DA.GetData(3, ref brickY)) return;
+            if (!DA.GetDataList(1, brickOrigins)) return;
+            if (!DA.GetDataList(2, brickX)) return;
+            if (!DA.GetDataList(3, brickY)) return;
 
             if (!DA.GetData(4, ref gridDimX)) return;
             if (!DA.GetData(5, ref gridDimY)) return;
@@ -103,6 +105,22 @@ namespace BrickManager
             if (!DA.GetData(7, ref calculate)) return;
 
             // We should now validate the data and warn the user if invalid data is supplied.
+
+            if (brickOrigins.Count != brickX.Count || brickOrigins.Count != brickY.Count)
+            {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "There must be the same number of Brick Origins as Brick X and Y points");
+                return;
+            }
+
+            //for (int i = 0; i < brickOrigins.Count; i++)
+            //{
+            //    if (brickOrigins[i].X % gridDimX != 0 || brickOrigins[i].Y % gridDimY != 0 || brickOrigins[i].Z % gridDimZ != 0)
+            //    {
+            //        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Bricks must be accurately placed on the determined grid about the origin");
+            //        return;
+            //    }
+            //}
+
             if (gridDimX <= 0.0)
             {
                 AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Grid X dimension must be bigger than zero");
@@ -122,102 +140,80 @@ namespace BrickManager
             }
 
 
-            // We're set to create the spiral now. To keep the size of the SolveInstance() method small, 
-            // The actual functionality will be in a different method:
-            String outputData = SerializeBrickArrangement(origin, brickOrigins, brickX, brickY, gridDimX, gridDimY, gridDimZ, calculate);
+            // Functionality and assign the spiral to the output parameter:
 
-            // Finally assign the spiral to the output parameter.
-            DA.SetData(0, outputData);
+            if (calculate)
+            {
+                outputData = SerializeBricks(origin, brickOrigins, brickX, brickY, gridDimX, gridDimY, gridDimZ);
+                DA.SetData(0, outputData);
+            }
         }
 
-        private string SerializeBrickArrangement(Point3d _origin, Point3d _brickOrigins, Point3d _brickX, Point3d _brickY, double _gridDimX, double _gridDimY, double _gridDimZ, Boolean _calculate)
+        private string SerializeBricks(Point3d _origin, List<Point3d> _brickOrigins, List<Point3d> _brickX, List<Point3d> _brickY, double _gridDimX, double _gridDimY, double _gridDimZ)
         {
             string outputString = null;
-           Brick brick = null;
-            if (_calculate == true)
-            {
-                brick = GenerateBrick(_origin, _brickOrigins, _brickX, _brickY, _gridDimX, _gridDimY, _gridDimZ);
-            }
-            outputString = JsonConvert.SerializeObject(brick);
+            List<Brick> outputBrickList = new List<Brick>();
 
+            for (int i = 0; i < _brickOrigins.Count; i++)
+            {
+                outputBrickList.Add(GenerateBrick(_origin, _brickOrigins[i], _brickX[i], _brickY[i], _gridDimX, _gridDimY, _gridDimZ));
+            }
+
+            outputString = "{\"Items\":" + JsonConvert.SerializeObject(outputBrickList) + "}"; //, Formatting.Indented
             return outputString;
         }
 
-        private string CreateString(Brick _brick)
-        {
-            string list = Math.Round(_brick.gridPosition.X).ToString() + ", " + _brick.rotation.ToString();
-
-            return list;
-        }
+        [System.Serializable]
 
         private class Brick
         {
-            public Vector3d gridPosition;
-            public double rotation;
-            string brickType;
+           // public Vector3d gridPosition;
+           
+           // string brickType;
 
-            public Brick(Vector3d _gridPos, double _rotation)
+           public int brickPosX;
+           public int brickPosY;
+           public int brickPosZ;
+
+            public float rotation;
+
+            public Brick(Vector3d _gridPos, float _rotation)
             {
-                gridPosition = _gridPos;
+             //   gridPosition = _gridPos;
+
+                brickPosX = (int)Math.Round(_gridPos.X);
+                brickPosY = (int)Math.Round(_gridPos.Y);
+                brickPosZ = (int)Math.Round(_gridPos.Z);
+
                 rotation = _rotation;
-                brickType = "Standard";
             }
         }
 
         private Brick GenerateBrick(Point3d _origin, Point3d _brickOrigins, Point3d _brickX, Point3d _brickY, double _gridDimX, double _gridDimY, double _gridDimZ)
         {
-            double posX;
-            double posY;
-            double posZ;
+            int posX;
+            int posY;
+            int posZ;
             Vector3d brickPosition;
-            double rotationAngle = 0;
+            float rotationAngle = 0;
 
             Plane brickPlane = new Plane(_brickOrigins, _brickX, _brickY);
 
-            posX = (_brickOrigins.X - _origin.X) / _gridDimX;
-            posY = (_brickOrigins.Y - _origin.Y) / _gridDimY;
-            posZ = (_brickOrigins.Z - _origin.Z) / _gridDimZ;
+            posX = (int)Math.Round((_brickOrigins.X - _origin.X) / _gridDimX);
+            posY = (int)Math.Round((_brickOrigins.Y - _origin.Y) / _gridDimY);
+            posZ = (int)Math.Round((_brickOrigins.Z - _origin.Z) / _gridDimZ);
 
             brickPosition = new Vector3d(posX, posY, posZ);
 
-            rotationAngle = Math.Round(Vector3d.VectorAngle(brickPlane.XAxis, Plane.WorldXY.XAxis) * 180 / Math.PI);
+            rotationAngle = (float) Math.Round(Vector3d.VectorAngle(brickPlane.XAxis, Plane.WorldXY.XAxis) * 180 / Math.PI);
 
             //Vector3d xDirection = new Vector3d(_brickX - _brickOrigins);
             Vector3d yDirection = new Vector3d(_brickY - _brickOrigins);
 
-           
-
-
-
             Brick outputBrick = new Brick(brickPosition, rotationAngle);
 
 
-              return outputBrick;
-        }
-
-        private Curve CreateSpiral(Plane plane, double r0, double r1, Int32 turns)
-        {
-            Line l0 = new Line(plane.Origin + r0 * plane.XAxis, plane.Origin + r1 * plane.XAxis);
-            Line l1 = new Line(plane.Origin - r0 * plane.XAxis, plane.Origin - r1 * plane.XAxis);
-
-            Point3d[] p0;
-            Point3d[] p1;
-
-            l0.ToNurbsCurve().DivideByCount(turns, true, out p0);
-            l1.ToNurbsCurve().DivideByCount(turns, true, out p1);
-
-            PolyCurve spiral = new PolyCurve();
-
-            for (int i = 0; i < p0.Length - 1; i++)
-            {
-                Arc arc0 = new Arc(p0[i], plane.YAxis, p1[i + 1]);
-                Arc arc1 = new Arc(p1[i + 1], -plane.YAxis, p0[i + 1]);
-
-                spiral.Append(arc0);
-                spiral.Append(arc1);
-            }
-
-            return spiral;
+            return outputBrick;
         }
 
         /// <summary>

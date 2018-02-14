@@ -165,7 +165,7 @@ public class BrickPlacement : MonoBehaviour
         //string serializedJson = JsonConvert.SerializeObject(myself);
 
         // Print on the screen.  
-        Console.WriteLine(serializedJson);
+        //Console.WriteLine(serializedJson);
 
     }
 
@@ -312,7 +312,7 @@ public class BrickPlacement : MonoBehaviour
 
                     if (hit.transform.position == brickList[i].position)
                     {
-                        brickList[i].brickObject.transform.position = new Vector3(brickList[i].brickObject.transform.position.x, (brickList[i].spawnHeight * 0.12f), brickList[i].brickObject.transform.position.z) + new Vector3(0, 0.05f, 1.125f);
+                        brickList[i].brickObject.transform.position = new Vector3(brickList[i].brickObject.transform.position.x, (brickList[i].spawnHeight * 0.12f), brickList[i].brickObject.transform.position.z) + new Vector3(0, 0.05f, 8.125f);
                         print(i + " hit");
                         move = true;
                     }
