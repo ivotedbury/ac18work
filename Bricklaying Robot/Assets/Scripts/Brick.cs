@@ -11,12 +11,13 @@ class Brick {
 
     private Grid _grid;
 
-    public Brick(Vector3 _gridPosition, float _inputRotation)
+    public Brick(Cell _inputOriginCell, float _inputRotation)
     {
-        gridPosition = new Vector3Int((int)_gridPosition.x, (int)_gridPosition.y, (int)_gridPosition.x);
-       // originCell = inputOriginCell;
-        rotation = Quaternion.Euler(0, _inputRotation, 0);
+        originCell = _inputOriginCell;
+             rotation = Quaternion.Euler(0, _inputRotation, 0);
 
     }
+
+    
 
 }
