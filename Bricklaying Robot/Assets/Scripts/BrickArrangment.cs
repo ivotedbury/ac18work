@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class BrickArrangment
 {
 
@@ -11,34 +9,47 @@ public class BrickArrangment
     float gridDimY = 0.0725f;
     float gridDimZ = 0.05625f;
 
+    BaseGrid workGrid;
 
+   public List<Brick> bricks = new List<Brick>();
 
     public BrickArrangment(int gridX, int gridY, int gridZ)
     {
-        BaseGrid workGrid = new BaseGrid(new Vector3Int(20, 20, 41));
+        workGrid = new BaseGrid(new Vector3Int(20, 20, 41));
     }
 
-    public BrickImportItem ImportBrickData1(TextAsset brickDataImport)
-    {
-        string jsonTextToConvert = brickDataImport.ToString();
-
-        BrickImportItem importedBrick = JsonUtility.FromJson<BrickImportItem>(jsonTextToConvert);
-        
-
-
-
-       return importedBrick;
-
-    }
-
-
-    public BrickImportItem [] ImportBrickData(TextAsset brickDataImport)
+       public void CreateBricksInArrangment(TextAsset brickDataImport)
     {
         string importDataString = brickDataImport.ToString();
 
-        BrickImportItem [] brickImportArray = JsonHelper.FromJson<BrickImportItem>(importDataString);
+        BrickImportItem[] brickImportArray = JsonHelper.FromJson<BrickImportItem>(importDataString);
 
-           return brickImportArray;
+        for (int i = 0; i < brickImportArray.Length; i++)
+        {
+            bricks.Add(ConvertToBrick(brickImportArray[i]));
+        }
 
+    }
+
+    Brick ConvertToBrick(BrickImportItem importedBrickItem)
+    {
+        Brick convertedBrick = null;
+
+        for (int z = 0; z < workGrid._gridSize.z; z++)
+        {
+            for (int y = 0; y < workGrid._gridSize.y; y++)
+            {
+                for (int x = 0; x < workGrid._gridSize.x; x++)
+                {
+                    if (workGrid._cells[x, y, z].position == new Vector3Int(importedBrickItem.brickPosX, importedBrickItem.brickPosZ, importedBrickItem.brickPosY)) // swap y and z for rhino to unity!
+                    {
+                        convertedBrick = new Brick(workGrid._cells[x, y, z], importedBrickItem.rotation);
+                    }
+                }
+            }
+        }
+        convertedBrick.childCells = workGrid.GetChildren(convertedBrick);
+
+        return convertedBrick;
     }
 }

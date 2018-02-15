@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
- class Cell
+public class Cell
 {
     public Vector3Int position { get; set; }
     public Vector3 worldPosition { get; set; }
+
+    public Cell(Vector3Int cellPosition)
+    {
+        position = cellPosition;
+    }
 }

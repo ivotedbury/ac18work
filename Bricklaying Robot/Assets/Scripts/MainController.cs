@@ -7,16 +7,15 @@ public class MainController : MonoBehaviour
 
     public TextAsset brickData;
 
-    BrickArrangment _brickArrangment =  new BrickArrangment(20,20,41);
+    BrickArrangment _brickArrangement =  new BrickArrangment(20,20,41);
 
     void Start()
     {
-           BrickImportItem [] brickImportArray = _brickArrangment.ImportBrickData(brickData);
-
-
+        _brickArrangement.CreateBricksInArrangment(brickData);
        
-
-        print(brickImportArray.Length);
+        print(_brickArrangement.bricks.Count);
+        print(_brickArrangement.bricks[2].originCell.position);
+        print(_brickArrangement.bricks[2].childCells.Count);
 
         
     }
