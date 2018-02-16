@@ -134,12 +134,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 10335787}
-  m_LocalRotation: {x: 0.29622942, y: 0.33984885, z: -0.11371182, w: 0.88533646}
-  m_LocalPosition: {x: -0.55, y: 0.83, z: -0.52}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_Father: {fileID: 1746372290}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &44553390
 GameObject:
@@ -375,6 +375,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d9c4826406765e47ac3a3357947feef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  brickMesh: {fileID: 840726099}
+  brickCellMesh: {fileID: 1917758055}
+  lineRendererObject: {fileID: 10335787}
+  gateCellMarkerMesh: {fileID: 1727209822056110, guid: 72ff804b7e14c7e46a353bf86da5a8bf,
+    type: 2}
   brickData: {fileID: 4900000, guid: 2c25729e3c428ff4caa951282323fc15, type: 3}
 --- !u!114 &108081163
 MonoBehaviour:
@@ -2864,6 +2869,35 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1645014689}
   m_Mesh: {fileID: 4300012, guid: 458d7dd6a46ee9646a014113881d0c4e, type: 3}
+--- !u!1 &1746372289
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1746372290}
+  m_Layer: 0
+  m_Name: LineRendererParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1746372290
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1746372289}
+  m_LocalRotation: {x: 0.29622942, y: 0.33984885, z: -0.11371182, w: 0.88533646}
+  m_LocalPosition: {x: -0.55, y: 0.83, z: -0.52}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 10335788}
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1790990073
 GameObject:
   m_ObjectHideFlags: 0
@@ -3096,7 +3130,7 @@ GameObject:
   - component: {fileID: 1917758057}
   - component: {fileID: 1917758056}
   m_Layer: 0
-  m_Name: BrickPlane
+  m_Name: BrickCell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
