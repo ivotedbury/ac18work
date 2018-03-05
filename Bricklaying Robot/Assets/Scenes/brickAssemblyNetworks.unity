@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -372,7 +372,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 108081157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d9c4826406765e47ac3a3357947feef, type: 3}
+  m_Script: {fileID: 11500000, guid: a8c35d8370ae3ab4e8a339e12d90301b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   brickMesh: {fileID: 840726099}
@@ -380,8 +380,8 @@ MonoBehaviour:
   lineRendererObject: {fileID: 10335787}
   gateCellMarkerMesh: {fileID: 1727209822056110, guid: 72ff804b7e14c7e46a353bf86da5a8bf,
     type: 2}
-  brickData: {fileID: 4900000, guid: 27721bf0414d58d4f862a0042a967185, type: 3}
-  brickStackTemplate: {fileID: 4900000, guid: b309264b8f5b54d4d8623bc3ecb370de, type: 3}
+  brickData: {fileID: 4900000, guid: eaa9129f54b03b54dbdf94418a5c6d82, type: 3}
+  brickStackTemplate: {fileID: 4900000, guid: 7fe18f5304192164f8b21a7dc6e7136a, type: 3}
   graphMaterial: {fileID: 2100000, guid: 7cf9eb36e80a4a840bf46506ead11e02, type: 2}
   generateGraphButton: {fileID: 1234850166}
   hideGraphButton: {fileID: 1342878404}
