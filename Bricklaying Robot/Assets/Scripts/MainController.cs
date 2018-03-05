@@ -31,11 +31,13 @@ public class MainController : MonoBehaviour
 
     Vector3 lineDisplaySeparator = new Vector3(0, 0.01f, 0);
 
+    Vector3 gateCellOffset = new Vector3(0, 0.1f, 0);
+
     void Start()
     {
         GenerateColours(12);
 
-        print(brickArrangement.SetGateCell(new Vector3Int(2, 0, 18)));
+        print(brickArrangement.SetGateCell(new Vector3Int(2, 0, 14)));
 
         brickArrangement.CreateBricksInArrangment(brickData);
         brickArrangement.CreateStack(brickStackTemplate);
@@ -260,7 +262,7 @@ public class MainController : MonoBehaviour
 
     void UpdateGateCell(BrickArrangement inputBrickArrangement)
     {
-        GameObject gateCellMarker = Instantiate(gateCellMarkerMesh, inputBrickArrangement.GetRealPosition(inputBrickArrangement.gateCell), Quaternion.identity);
+        GameObject gateCellMarker = Instantiate(gateCellMarkerMesh, inputBrickArrangement.GetRealPosition(inputBrickArrangement.gateCell) + gateCellOffset, Quaternion.identity);
     }
 
     void GenerateColours(float gradientSwatches)
