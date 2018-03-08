@@ -4,13 +4,32 @@ using UnityEngine;
 
 public class CellGraph
 {
-
     List<Cell> allCellsInArrangement = new List<Cell>();
     public List<Cell> availableCells = new List<Cell>();
 
     public List<GraphBranch> graphBranches = new List<GraphBranch>();
 
-      public void GenerateCellGraph(List<Cell> _allCellsInArrangement)
+    //horizontalSteps
+    Vector3Int[] horizontalStepTwo = new Vector3Int[] { new Vector3Int(2, 0, 0), new Vector3Int(0, 0, -2), new Vector3Int(-2, 0, 0), new Vector3Int(0, 0, 2) };
+    Vector3Int[] horizontalStepThree = new Vector3Int[] { new Vector3Int(3, 0, 0), new Vector3Int(0, 0, -3), new Vector3Int(-3, 0, 0), new Vector3Int(0, 0, 3) };
+    Vector3Int[] horizontalStepFour = new Vector3Int[] { new Vector3Int(4, 0, 0), new Vector3Int(0, 0, -4), new Vector3Int(-4, 0, 0), new Vector3Int(0, 0, 4) };
+    Vector3Int[] horizontalStepFive = new Vector3Int[] { new Vector3Int(5, 0, 0), new Vector3Int(0, 0, -5), new Vector3Int(-5, 0, 0), new Vector3Int(0, 0, 5) };
+
+    //upSteps
+    Vector3Int[] upStepTwo = new Vector3Int[] { new Vector3Int(2, 1, 0), new Vector3Int(0, 1, -2), new Vector3Int(-2, 1, 0), new Vector3Int(0, 1, 2) };
+    Vector3Int[] upStepThree = new Vector3Int[] { new Vector3Int(3, 1, 0), new Vector3Int(0, 1, -3), new Vector3Int(-3, 1, 0), new Vector3Int(0, 1, 3) };
+    Vector3Int[] upStepFour = new Vector3Int[] { new Vector3Int(4, 1, 0), new Vector3Int(0, 1, -4), new Vector3Int(-4, 1, 0), new Vector3Int(0, 1, 4) };
+    Vector3Int[] upStepFive = new Vector3Int[] { new Vector3Int(5, 1, 0), new Vector3Int(0, 1, -5), new Vector3Int(-5, 1, 0), new Vector3Int(0, 1, 5) };
+
+    //downSteps
+    Vector3Int[] downStepTwo = new Vector3Int[] { new Vector3Int(2, -1, 0), new Vector3Int(0, -1, -2), new Vector3Int(-2, -1, 0), new Vector3Int(0, -1, 2) };
+    Vector3Int[] downStepThree = new Vector3Int[] { new Vector3Int(3, -1, 0), new Vector3Int(0, -1, -3), new Vector3Int(-3, -1, 0), new Vector3Int(0, -1, 3) };
+    Vector3Int[] downStepFour = new Vector3Int[] { new Vector3Int(4, -1, 0), new Vector3Int(0, -1, -4), new Vector3Int(-4, -1, 0), new Vector3Int(0, -1, 4) };
+    Vector3Int[] downStepFive = new Vector3Int[] { new Vector3Int(5, -1, 0), new Vector3Int(0, -1, -5), new Vector3Int(-5, -1, 0), new Vector3Int(0, -1, 5) };
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    public void GenerateCellGraph(List<Cell> _allCellsInArrangement)
     {
         allCellsInArrangement = _allCellsInArrangement;
 
@@ -32,25 +51,7 @@ public class CellGraph
     {
         Vector3Int startToEnd;
 
-        //horizontalSteps
-        Vector3Int[] horizontalStepTwo = new Vector3Int[] { new Vector3Int(2, 0, 0), new Vector3Int(0, 0, -2), new Vector3Int(-2, 0, 0), new Vector3Int(0, 0, 2) };
-        Vector3Int[] horizontalStepThree = new Vector3Int[] { new Vector3Int(3, 0, 0), new Vector3Int(0, 0, -3), new Vector3Int(-3, 0, 0), new Vector3Int(0, 0, 3) };
-        Vector3Int[] horizontalStepFour = new Vector3Int[] { new Vector3Int(4, 0, 0), new Vector3Int(0, 0, -4), new Vector3Int(-4, 0, 0), new Vector3Int(0, 0, 4) };
-        Vector3Int[] horizontalStepFive = new Vector3Int[] { new Vector3Int(5, 0, 0), new Vector3Int(0, 0, -5), new Vector3Int(-5, 0, 0), new Vector3Int(0, 0, 5) };
-
-        //upSteps
-        Vector3Int[] upStepTwo = new Vector3Int[] { new Vector3Int(2, 1, 0), new Vector3Int(0, 1, -2), new Vector3Int(-2, 1, 0), new Vector3Int(0, 1, 2) };
-        Vector3Int[] upStepThree = new Vector3Int[] { new Vector3Int(3, 1, 0), new Vector3Int(0, 1, -3), new Vector3Int(-3, 1, 0), new Vector3Int(0, 1, 3) };
-        Vector3Int[] upStepFour = new Vector3Int[] { new Vector3Int(4, 1, 0), new Vector3Int(0, 1, -4), new Vector3Int(-4, 1, 0), new Vector3Int(0, 1, 4) };
-        Vector3Int[] upStepFive = new Vector3Int[] { new Vector3Int(5, 1, 0), new Vector3Int(0, 1, -5), new Vector3Int(-5, 1, 0), new Vector3Int(0, 1, 5) };
-
-        //downSteps
-        Vector3Int[] downStepTwo = new Vector3Int[] { new Vector3Int(2, -1, 0), new Vector3Int(0, -1, -2), new Vector3Int(-2, -1, 0), new Vector3Int(0, -1, 2) };
-        Vector3Int[] downStepThree = new Vector3Int[] { new Vector3Int(3, -1, 0), new Vector3Int(0, -1, -3), new Vector3Int(-3, -1, 0), new Vector3Int(0, -1, 3) };
-        Vector3Int[] downStepFour = new Vector3Int[] { new Vector3Int(4, -1, 0), new Vector3Int(0, -1, -4), new Vector3Int(-4, -1, 0), new Vector3Int(0, -1, 4) };
-        Vector3Int[] downStepFive = new Vector3Int[] { new Vector3Int(5, -1, 0), new Vector3Int(0, -1, -5), new Vector3Int(-5, -1, 0), new Vector3Int(0, -1, 5) };
-
-        for (int i = 0; i < _availableCells.Count; i++)
+               for (int i = 0; i < _availableCells.Count; i++)
         {
             for (int j = 0; j < _availableCells.Count; j++)
             {
@@ -159,5 +160,37 @@ public class CellGraph
         }
 
         return topCellsOnly;
+    }
+
+    public List<Cell> GetPathFinderNeighbours(Cell testCell)
+    {
+        List<Cell> neighbours = new List<Cell>();
+        neighbours = null;
+        for (int i = 0; i < availableCells.Count; i++)
+        {
+            for (int k = 0; k <= 3; k++)
+            {
+
+                if (availableCells[i].position - testCell.position == horizontalStepTwo[k] ||
+                    availableCells[i].position - testCell.position == horizontalStepThree[k] ||
+                    availableCells[i].position - testCell.position == horizontalStepFour[k] ||
+                    availableCells[i].position - testCell.position == horizontalStepFive[k] ||
+
+                    availableCells[i].position - testCell.position == upStepTwo[k] ||
+                    availableCells[i].position - testCell.position == upStepThree[k] ||
+                    availableCells[i].position - testCell.position == upStepFour[k] ||
+                    availableCells[i].position - testCell.position == upStepFive[k] ||
+
+                    availableCells[i].position - testCell.position == downStepTwo[k] ||
+                    availableCells[i].position - testCell.position == downStepThree[k] ||
+                    availableCells[i].position - testCell.position == downStepFour[k] ||
+                    availableCells[i].position - testCell.position == downStepFive[k])
+
+                {
+                    neighbours.Add(availableCells[i]);
+                }
+            }            
+        }
+        return neighbours;
     }
 }

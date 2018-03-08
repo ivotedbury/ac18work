@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BrickArrangement
 {
-
+    // specific dimensions
     float gridDimX = 0.05625f;
     float gridDimY = 0.0725f;
     float gridDimZ = 0.05625f;
@@ -13,15 +13,18 @@ public class BrickArrangement
     public Vector3Int gateCell;
 
     public BaseGrid workGrid;
-
     public CellGraph arrangementGraph = new CellGraph();
 
     public List<Brick> finalBricks = new List<Brick>();
     public List<Brick> stackBricks = new List<Brick>();
     public List<Brick> allBricks = new List<Brick>();
 
+    //Cell[] path;
+    bool requestANewPath = false;
+
     int placementCounter = 1;
     public bool graphIsGenerated = false;
+
 
     public BrickArrangement(int gridX, int gridY, int gridZ)
     {
@@ -44,11 +47,13 @@ public class BrickArrangement
 
     public void DepositBrick()
     {
-        allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter-1];
-        allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter-1];
+        allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter - 1];
+        //  allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter - 1];
+        RequestPath();
         placementCounter++;
+       
 
-          }
+    }
 
     public void CreateStack(TextAsset stackDataImport)
     {
@@ -68,6 +73,36 @@ public class BrickArrangement
             allBricks.Add(stackBricks[i]);
         }
 
+    }
+
+    void RequestPath()
+    {
+        PathRequestManager.RequestPath(allBricks[allBricks.Count - placementCounter].originCell, finalBricks[placementCounter - 1].originCell, OnPathFound);
+    }
+
+    public void OnPathFound(Cell[] newPath, bool pathSuccessful)
+    {
+        if (pathSuccessful)
+        {
+            ResetPath();
+            //path = newPath;
+        }
+
+        foreach (Cell cell in newPath)
+        {
+            cell.isPath = true;
+        }
+    }
+
+    void ResetPath()
+    {
+        foreach (Brick brick in allBricks)
+        {
+            foreach (Cell cell in brick.childCells)
+            {
+                cell.isPath = false;
+            }
+        }
     }
 
     public bool SetGateCell(Vector3Int gateCellInputLocation)
@@ -193,6 +228,4 @@ public class BrickArrangement
         arrangementGraph.GenerateCellGraph(GetCellsInArrangement(allBricks));
         graphIsGenerated = true;
     }
-
-  
 }

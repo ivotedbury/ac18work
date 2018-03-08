@@ -29,7 +29,7 @@ public class MainController : MonoBehaviour
 
     List<Color> gradientColours = new List<Color>();
 
-    Vector3 lineDisplaySeparator = new Vector3(0, 0.01f, 0);
+    Vector3 lineDisplaySeparator = new Vector3(0, 0.3f, 0); // was 0.01f
 
     Vector3 gateCellOffset = new Vector3(0, 0.1f, 0);
 
@@ -74,6 +74,8 @@ public class MainController : MonoBehaviour
             bricksInScene[i].transform.position = brickArrangement.GetRealBrickPosition(brickArrangement.allBricks[i]);
             bricksInScene[i].transform.rotation = brickArrangement.allBricks[i].rotation;
         }
+
+        //UpdateCellDisplay(brickArrangement);
     }
 
     void GenerateGraph()
@@ -177,7 +179,15 @@ public class MainController : MonoBehaviour
     {
         for (int i = 0; i < brickArrangement.arrangementGraph.availableCells.Count; i++)
         {
-            availableCellsInScene[i].transform.position = inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.availableCells[i]);
+           // availableCellsInScene[i].transform.position = inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.availableCells[i]);
+            if (brickArrangement.arrangementGraph.availableCells[i].isPath == true)
+            {
+                availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.red;
+            }
+            else
+            {
+                availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.green;
+            }
         }
     }
 
