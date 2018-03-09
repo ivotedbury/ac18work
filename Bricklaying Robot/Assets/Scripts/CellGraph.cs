@@ -51,7 +51,7 @@ public class CellGraph
     {
         Vector3Int startToEnd;
 
-               for (int i = 0; i < _availableCells.Count; i++)
+        for (int i = 0; i < _availableCells.Count; i++)
         {
             for (int j = 0; j < _availableCells.Count; j++)
             {
@@ -114,9 +114,7 @@ public class CellGraph
                     }
 
                 }
-
             }
-
         }
     }
 
@@ -165,13 +163,13 @@ public class CellGraph
     public List<Cell> GetPathFinderNeighbours(Cell testCell)
     {
         List<Cell> neighbours = new List<Cell>();
-        neighbours = null;
+        // neighbours = null;
         for (int i = 0; i < availableCells.Count; i++)
         {
             for (int k = 0; k <= 3; k++)
             {
 
-                if (availableCells[i].position - testCell.position == horizontalStepTwo[k] ||
+                if (availableCells[i].position - testCell.position ==  horizontalStepTwo[k] || 
                     availableCells[i].position - testCell.position == horizontalStepThree[k] ||
                     availableCells[i].position - testCell.position == horizontalStepFour[k] ||
                     availableCells[i].position - testCell.position == horizontalStepFive[k] ||
@@ -189,7 +187,7 @@ public class CellGraph
                 {
                     neighbours.Add(availableCells[i]);
                 }
-            }            
+            }
         }
         return neighbours;
     }

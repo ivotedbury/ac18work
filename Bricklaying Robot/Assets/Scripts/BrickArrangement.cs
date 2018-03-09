@@ -25,6 +25,7 @@ public class BrickArrangement
     int placementCounter = 1;
     public bool graphIsGenerated = false;
 
+    PathFinder pathFinder = new PathFinder();
 
     public BrickArrangement(int gridX, int gridY, int gridZ)
     {
@@ -47,9 +48,10 @@ public class BrickArrangement
 
     public void DepositBrick()
     {
+       // FindPath();
         allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter - 1];
-        //  allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter - 1];
-        RequestPath();
+      //  allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter - 1];
+        
         placementCounter++;
        
 
@@ -73,26 +75,43 @@ public class BrickArrangement
             allBricks.Add(stackBricks[i]);
         }
 
+        GenerateGraph();
     }
 
-    void RequestPath()
+    public void FindPath()
     {
-        PathRequestManager.RequestPath(allBricks[allBricks.Count - placementCounter].originCell, finalBricks[placementCounter - 1].originCell, OnPathFound);
-    }
+        Cell startCell = allBricks[allBricks.Count - placementCounter + 1].originCell;
+        Cell targetCell = allBricks[allBricks.Count - placementCounter].originCell;
 
-    public void OnPathFound(Cell[] newPath, bool pathSuccessful)
-    {
-        if (pathSuccessful)
-        {
-            ResetPath();
-            //path = newPath;
-        }
+        startCell.isStart = true;
+        targetCell.isEnd = true;
 
-        foreach (Cell cell in newPath)
+       Cell [] waypoints = pathFinder.FindPath(arrangementGraph, startCell, targetCell);
+
+        foreach (Cell cell in waypoints)
         {
             cell.isPath = true;
         }
     }
+
+    //void RequestPath()
+    //{
+    //    PathRequestManager.RequestPath(allBricks[allBricks.Count - placementCounter].originCell, finalBricks[placementCounter - 1].originCell, OnPathFound);
+    //}
+
+    //public void OnPathFound(Cell[] newPath, bool pathSuccessful)
+    //{
+    //    if (pathSuccessful)
+    //    {
+    //        //ResetPath();
+    //        //path = newPath;
+    //    }
+
+    //    foreach (Cell cell in newPath)
+    //    {
+    //        cell.isPath = true;
+    //    }
+    //}
 
     void ResetPath()
     {

@@ -9,6 +9,9 @@ public class Cell
 
     public bool isAvailable;
     public bool isPath;
+    public bool isStart;
+    public bool isEnd;
+
 
     // pathfinding variables
     public int gCost;
@@ -22,6 +25,8 @@ public class Cell
         position = cellPosition;
         isAvailable = false;
         isPath = false;
+        isStart = false;
+        isEnd = false;
     }
 
     public int fCost

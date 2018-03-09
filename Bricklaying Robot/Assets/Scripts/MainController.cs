@@ -26,6 +26,9 @@ public class MainController : MonoBehaviour
     public Button generateGraphButton;
     public Button hideGraphButton;
     public Button createStackButton;
+    public Button showPathButton;
+
+    bool graphBranchesAreShowing = false;
 
     List<Color> gradientColours = new List<Color>();
 
@@ -57,13 +60,16 @@ public class MainController : MonoBehaviour
         UpdateGateCell(brickArrangement);
 
         Button generateGraphBut = generateGraphButton.GetComponent<Button>();
-        generateGraphBut.onClick.AddListener(GenerateGraph);
+        generateGraphBut.onClick.AddListener(ShowGraph);
 
         Button hideGraphBut = hideGraphButton.GetComponent<Button>();
         hideGraphBut.onClick.AddListener(HideGraph);
 
         Button createStackBut = createStackButton.GetComponent<Button>();
         createStackBut.onClick.AddListener(CreateStack);
+
+        Button showPathBut = showPathButton.GetComponent<Button>();
+        showPathBut.onClick.AddListener(ShowPath);
     }
 
     // Update is called once per frame
@@ -75,12 +81,19 @@ public class MainController : MonoBehaviour
             bricksInScene[i].transform.rotation = brickArrangement.allBricks[i].rotation;
         }
 
-        //UpdateCellDisplay(brickArrangement);
+        UpdateCellDisplay(brickArrangement);
     }
 
-    void GenerateGraph()
+    void ShowPath()
     {
-        brickArrangement.GenerateGraph();
+        brickArrangement.FindPath();
+        print(brickArrangement.arrangementGraph.availableCells.Count);
+        print(brickArrangement.arrangementGraph.GetPathFinderNeighbours(brickArrangement.arrangementGraph.availableCells[20]));
+    }
+
+    void ShowGraph()
+    {
+        //brickArrangement.GenerateGraph();
         InstantiateCellDisplay(brickArrangement);
         InstantiateGraphBranches(brickArrangement);
         UpdateLineDisplay(brickArrangement);
@@ -91,7 +104,8 @@ public class MainController : MonoBehaviour
         DestroyCellDisplay(brickArrangement);
         DestroyGraphBranches(brickArrangement);
 
-        brickArrangement.graphIsGenerated = false;
+        graphBranchesAreShowing = false;
+        //brickArrangement.graphIsGenerated = false;
     }
 
     void InstantiateBricks(BrickArrangement inputBrickArrangement)
@@ -106,10 +120,11 @@ public class MainController : MonoBehaviour
     {
         brickArrangement.DepositBrick();
 
-        if (brickArrangement.graphIsGenerated)
+        if (graphBranchesAreShowing)
         {
             HideGraph();
-            GenerateGraph();
+            brickArrangement.GenerateGraph();
+            ShowGraph();
         }
     }
 
@@ -173,20 +188,33 @@ public class MainController : MonoBehaviour
 
             lines.Add(line);
         }
+
+        graphBranchesAreShowing = true;
     }
 
     void UpdateCellDisplay(BrickArrangement inputBrickArrangement)
     {
-        for (int i = 0; i < brickArrangement.arrangementGraph.availableCells.Count; i++)
+        if (graphBranchesAreShowing == true)
         {
-           // availableCellsInScene[i].transform.position = inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.availableCells[i]);
-            if (brickArrangement.arrangementGraph.availableCells[i].isPath == true)
+            for (int i = 0; i < brickArrangement.arrangementGraph.availableCells.Count; i++)
             {
-                availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.red;
-            }
-            else
-            {
-                availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.green;
+                // availableCellsInScene[i].transform.position = inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.availableCells[i]);
+                if (brickArrangement.arrangementGraph.availableCells[i].isPath == true)
+                {
+                    availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.yellow;
+                }
+                else if(brickArrangement.arrangementGraph.availableCells[i].isStart == true)
+                {
+                    availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.green;
+                }
+                else if (brickArrangement.arrangementGraph.availableCells[i].isEnd == true)
+                {
+                    availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.red;
+                }
+                else
+                {
+                    availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.grey;
+                }
             }
         }
     }
@@ -264,8 +292,8 @@ public class MainController : MonoBehaviour
                 lines[i].material.color = gradientColours[3];
             }
 
-            lines[i].SetPosition(0, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].start) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor);
-            lines[i].SetPosition(1, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].end) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor);
+            lines[i].SetPosition(0, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].start) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor      + new Vector3(0,0.5f,0));
+            lines[i].SetPosition(1, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].end) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.5f, 0));
 
         }
     }

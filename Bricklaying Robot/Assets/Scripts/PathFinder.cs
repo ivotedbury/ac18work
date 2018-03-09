@@ -4,24 +4,33 @@ using UnityEngine;
 
 public class PathFinder : MonoBehaviour
 {
-    PathRequestManager requestManager;
-    BrickArrangement brickArrangement;
+    // PathRequestManager requestManager;
 
-    void Awake()
-    {
-        requestManager = GetComponent<PathRequestManager>();
-        brickArrangement = GetComponent<BrickArrangement>();
-    }
+    //CellGraph cellGraph;
+   
+       
+    //public void StartFindPath(BrickArrangement inputBrickArrangement, Cell _startCell, Cell _targetCell)
+    //{
+    //    Cell[] waypoints = FindPath(_startCell, _targetCell));
+    //}
 
-    public void StartFindPath(Cell _startCell, Cell _targetCell)
+   public Cell [] FindPath(CellGraph inputCellGraph, Cell _startCell, Cell _targetCell)
     {
-        StartCoroutine(FindPath(_startCell, _targetCell));
-    }
+        //BrickArrangement brickArrangement = _inputBrickArrangement;
 
-    IEnumerator FindPath(Cell _startCell, Cell _targetCell)
-    {
+        //List<Cell> availableCells = new List<Cell>();
+
+        //foreach (Brick brick in inputAllBricks)
+        //{
+        //    foreach (Cell cell in brick.childCells)
+        //    {
+        //        availableCells.Add(cell);
+        //    }
+        //}
+
         Cell startCell = _startCell;
         Cell targetCell = _targetCell;
+
 
         Cell[] wayPoints = new Cell[0];
         bool pathSuccess = false;
@@ -53,7 +62,7 @@ public class PathFinder : MonoBehaviour
                 break;
             }
 
-            foreach (Cell neighbour in brickArrangement.arrangementGraph.GetPathFinderNeighbours(cell))
+            foreach (Cell neighbour in inputCellGraph.GetPathFinderNeighbours(cell))
             {
                 if (!neighbour.isAvailable || closedSet.Contains(neighbour))
                 {
@@ -74,12 +83,14 @@ public class PathFinder : MonoBehaviour
                 }
             }
         }
-        yield return null;
+      //  yield return null;
         if (pathSuccess)
         {
             wayPoints = RetracePath(startCell, targetCell);
         }
-        requestManager.FinishedProcessingPath(wayPoints, pathSuccess);
+        // requestManager.FinishedProcessingPath(wayPoints, pathSuccess);
+
+        return wayPoints;
     }
 
     Cell[] RetracePath(Cell _startCell, Cell _endCell)
