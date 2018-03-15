@@ -26,10 +26,11 @@ public class BrickArrangement
     //Cell[] path;
     bool requestANewPath = false;
 
+    int currentDirection = 0;
     int placementCounter = 1;
     public bool graphIsGenerated = false;
 
-    PathFinder pathFinder = new PathFinder();
+    public PathFinder pathFinder = new PathFinder();
 
     public BrickArrangement(int gridX, int gridY, int gridZ)
     {
@@ -85,7 +86,6 @@ public class BrickArrangement
         Cell startCell = FindBestDropCell(stackBricks[stackBricks.Count-1], toDeliver);
         Cell targetCell = FindBestDropCell(finalBricks[placementCounter - 1], toDeliver);
 
-        
        // Cell previousTargetCell;
 
         if (toDeliver)
@@ -104,19 +104,17 @@ public class BrickArrangement
             targetCell = FindBestDropCell(stackBricks[stackBricks.Count - placementCounter - 1], toDeliver);
           //  previousPickup = targetCell;
         }
-        
 
         startCell.isStart = true;
         targetCell.isEnd = true;
 
-        List<Cell> waypoints = pathFinder.FindPath(arrangementGraph, startCell, targetCell);
+        List<Cell> waypoints = pathFinder.FindPath(arrangementGraph, startCell, targetCell, currentDirection);
         currentPath = waypoints;
 
         foreach (Cell cell in waypoints)
         {
             cell.isPath = true;
         }
-
     }
 
     public Cell FindBestDropCell(Brick _brickToPlace, bool _onDelivery)

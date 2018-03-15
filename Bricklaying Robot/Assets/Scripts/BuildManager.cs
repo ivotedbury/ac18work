@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildManager {
+public class BuildManager
+{
 
     BrickArrangement brickArrangement;
 
-   public bool onDelivery = true;
+    public bool onDelivery = true;
+
 
     public BuildManager(BrickArrangement _inputBrickArrangment)
     {
@@ -15,20 +17,21 @@ public class BuildManager {
 
     public void NextBuildStep()
     {
-        
+        brickArrangement.GenerateGraph();
+
         brickArrangement.FindPath(onDelivery);
+
         if (!onDelivery)
         {
             brickArrangement.DepositBrick();
         }
-       
-               onDelivery = !onDelivery;
-        brickArrangement.GenerateGraph();
+
+        onDelivery = !onDelivery;
     }
 
     public void LayNextBrick()
     {
-       
+
     }
 
     public void PickUpNextBrick()
@@ -36,3 +39,9 @@ public class BuildManager {
 
     }
 }
+/* 
+ if(!pathComplete)
+{
+ bestOption = pathFinder.
+
+*/

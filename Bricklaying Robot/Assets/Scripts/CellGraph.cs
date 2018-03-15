@@ -57,6 +57,11 @@ public class CellGraph
 
     }
 
+    //public void CheckGraphConnectivity(List<GraphBranch> _graphBranches)
+    //{
+    //    for ()
+    //}
+
     public void MakeGraphBranches(List<Cell> _availableCells)
     {
         Vector3Int startToEnd;
@@ -211,30 +216,34 @@ public class CellGraph
     public Cell FindBestNeighbour(Brick brickToPlace, bool _onDelivery)
     {
         Cell bestNeighbour = null;
-      //  bool onDelivery;
+
         Vector3Int differenceVector;
 
-        for (int i = 0; i < availableCells.Count; i++)
+        List<Cell> availableCellsReordered = new List<Cell>();
+        availableCellsReordered = availableCells;
+        availableCellsReordered.Reverse();
+
+        for (int i = 0; i < availableCellsReordered.Count; i++)
         {
             for (int k = 0; k <= 3; k++)
             {
-                differenceVector = brickToPlace.originCell.position - availableCells[i].position;
+                differenceVector = brickToPlace.originCell.position - availableCellsReordered[i].position;
 
                 if (!_onDelivery)
                 {
                     if (differenceVector == horizontalStepTwo[k] || differenceVector == horizontalStepThree[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
                     else if (differenceVector == downStepTwo[k] || differenceVector == downStepThree[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
-                   else if (differenceVector == upStepTwo[k] || differenceVector == upStepThree[k])
+                    else if (differenceVector == upStepTwo[k] || differenceVector == upStepThree[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
                 }
@@ -244,41 +253,38 @@ public class CellGraph
 
                     if (differenceVector == horizontalStepTwo[k] || differenceVector == horizontalStepThree[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
                     else if (differenceVector == downStepTwo[k] || differenceVector == downStepThree[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
                     else if (differenceVector == upStepTwo[k] || differenceVector == upStepThree[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
                     else if (differenceVector == diagonalHorizontalStepTwoA[k] || differenceVector == diagonalHorizontalStepTwoB[k])
                     {
-                        bestNeighbour = availableCells[i];
+                        bestNeighbour = availableCellsReordered[i];
                         return bestNeighbour;
                     }
                 }
-               
-                //else if (differenceVector == diagonalUpStepTwoA[k] || differenceVector == diagonalUpStepTwoB[k])
-                //{
-                //    bestNeighbour = availableCells[i];
-                //    return bestNeighbour;
-                //}
-                //else if (differenceVector == diagonalDownStepTwoA[k] || differenceVector == diagonalDownStepTwoB[k])
-                //{
-                //    bestNeighbour = availableCells[i];
-                //    return bestNeighbour;
-                //}
-
             }
         }
         return bestNeighbour;
 
+    }
+
+    public bool checkPathComplete()
+    {
+        bool pathIsComplete = false;
+
+
+
+    return pathIsComplete;
     }
 }
 

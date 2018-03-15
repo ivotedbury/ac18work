@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -273,7 +273,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 01/03/18 From Stack to Object with Graph Analysis
+  m_Text: 15/03/18 Brick Placement with A* Out and Back
 --- !u!222 &63879732
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -372,7 +372,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 108081157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d9c4826406765e47ac3a3357947feef, type: 3}
+  m_Script: {fileID: 11500000, guid: a8c35d8370ae3ab4e8a339e12d90301b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   brickMesh: {fileID: 840726099}
@@ -380,14 +380,15 @@ MonoBehaviour:
   lineRendererObject: {fileID: 10335787}
   gateCellMarkerMesh: {fileID: 1727209822056110, guid: 72ff804b7e14c7e46a353bf86da5a8bf,
     type: 2}
-  brickData: {fileID: 4900000, guid: 27721bf0414d58d4f862a0042a967185, type: 3}
-  brickStackTemplate: {fileID: 4900000, guid: b309264b8f5b54d4d8623bc3ecb370de, type: 3}
+  brickData: {fileID: 4900000, guid: eaa9129f54b03b54dbdf94418a5c6d82, type: 3}
+  brickStackTemplate: {fileID: 4900000, guid: d92404fbe45ca5b4981538ac5363540f, type: 3}
   graphMaterial: {fileID: 2100000, guid: 09677c8bf0a22cc40b5910e0f46e7445, type: 2}
   showGraphButton: {fileID: 1234850166}
   hideGraphButton: {fileID: 1342878404}
   placeNextButton: {fileID: 476162061}
   showPathButton: {fileID: 1588463917}
   onDeliveryToggle: {fileID: 479011522}
+  journeyTime: {fileID: 234167155}
 --- !u!114 &108081163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,6 +636,80 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 228723298}
   m_Mesh: {fileID: 4300004, guid: 458d7dd6a46ee9646a014113881d0c4e, type: 3}
+--- !u!1 &234167153
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 234167154}
+  - component: {fileID: 234167156}
+  - component: {fileID: 234167155}
+  m_Layer: 5
+  m_Name: JourneyTime
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &234167154
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 234167153}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1010125648}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 102.96, y: 90}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &234167155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 234167153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 194bdca19d4e099418af34ed5182fe90, type: 3}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Journey Time: -'
+--- !u!222 &234167156
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 234167153}
 --- !u!1 &360873646
 GameObject:
   m_ObjectHideFlags: 0
@@ -861,9 +936,9 @@ RectTransform:
   m_Father: {fileID: 1010125648}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -308.8, y: -195}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 100.6, y: 70}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &479011522
@@ -1277,6 +1352,7 @@ RectTransform:
   - {fileID: 476162060}
   - {fileID: 1588463916}
   - {fileID: 479011521}
+  - {fileID: 234167154}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

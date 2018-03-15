@@ -32,6 +32,7 @@ public class MainController : MonoBehaviour
     public Button placeNextButton;
     public Button showPathButton;
     public Toggle onDeliveryToggle;
+    public Text journeyTime;
 
     bool graphBranchesAreShowing = false;
 
@@ -92,17 +93,23 @@ public class MainController : MonoBehaviour
 
         UpdateCellDisplay(brickArrangement);
         UpdateToggle();
+       UpdateJourneyTimeText();
+    }
+
+    void UpdateJourneyTimeText()
+    {
+        journeyTime.text = "Journey Time: " + brickArrangement.pathFinder.totalCostofTrip.ToString();
     }
 
     void UpdateToggle()
     {
         Toggle onDeliveryTog = onDeliveryToggle.GetComponent<Toggle>();
 
-        if (buildManager.onDelivery)
+        if (!buildManager.onDelivery)
         {
             onDeliveryTog.isOn = true;
         }
-        else if (!buildManager.onDelivery)
+        else if (buildManager.onDelivery)
         {
             onDeliveryTog.isOn = false;
         }
@@ -198,7 +205,7 @@ public class MainController : MonoBehaviour
     void PlaceNextBrick()
     {
         buildManager.NextBuildStep();
-
+        print(brickArrangement.pathFinder.pathIsIncomplete);
 
         if (graphBranchesAreShowing)
         {

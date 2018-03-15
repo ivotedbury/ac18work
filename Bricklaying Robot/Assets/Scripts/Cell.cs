@@ -18,7 +18,7 @@ public class Cell
     public int hCost;
     public Cell parent;
 
-
+    public int currentDirection;
 
     public Cell(Vector3Int cellPosition)
     {
