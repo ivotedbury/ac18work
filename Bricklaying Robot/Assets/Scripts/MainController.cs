@@ -14,30 +14,37 @@ public class MainController : MonoBehaviour
     List<GameObject> bricksInScene = new List<GameObject>();
     List<GameObject> availableCellsInScene = new List<GameObject>();
     List<GameObject> graphBranchesInScene = new List<GameObject>();
+    List<GameObject> pathLinesInScene = new List<GameObject>();
 
-    List<LineRenderer> lines = new List<LineRenderer>();
+    List<LineRenderer> graphLines = new List<LineRenderer>();
+    List<LineRenderer> pathLines = new List<LineRenderer>();
 
     public TextAsset brickData;
     public TextAsset brickStackTemplate;
     public Material graphMaterial;
 
     BrickArrangement brickArrangement = new BrickArrangement(20, 20, 41);
+    BuildManager buildManager;
 
-    public Button generateGraphButton;
+
+    public Button showGraphButton;
     public Button hideGraphButton;
-    public Button createStackButton;
+    public Button placeNextButton;
     public Button showPathButton;
+    public Toggle onDeliveryToggle;
 
     bool graphBranchesAreShowing = false;
 
     List<Color> gradientColours = new List<Color>();
 
-    Vector3 lineDisplaySeparator = new Vector3(0, 0.3f, 0); // was 0.01f
+    Vector3 lineDisplaySeparator = new Vector3(0, 0.01f, 0); // was 0.01f
 
     Vector3 gateCellOffset = new Vector3(0, 0.1f, 0);
 
     void Start()
     {
+        buildManager = new BuildManager(brickArrangement);
+
         GenerateColours(12);
 
         print(brickArrangement.SetGateCell(new Vector3Int(2, 0, 14)));
@@ -59,17 +66,19 @@ public class MainController : MonoBehaviour
 
         UpdateGateCell(brickArrangement);
 
-        Button generateGraphBut = generateGraphButton.GetComponent<Button>();
-        generateGraphBut.onClick.AddListener(ShowGraph);
+        Button showGraphBut = showGraphButton.GetComponent<Button>();
+        showGraphBut.onClick.AddListener(ShowGraph);
 
         Button hideGraphBut = hideGraphButton.GetComponent<Button>();
         hideGraphBut.onClick.AddListener(HideGraph);
 
-        Button createStackBut = createStackButton.GetComponent<Button>();
-        createStackBut.onClick.AddListener(CreateStack);
+        Button placeNextkBut = placeNextButton.GetComponent<Button>();
+        placeNextkBut.onClick.AddListener(PlaceNextBrick);
 
         Button showPathBut = showPathButton.GetComponent<Button>();
         showPathBut.onClick.AddListener(ShowPath);
+
+
     }
 
     // Update is called once per frame
@@ -82,13 +91,80 @@ public class MainController : MonoBehaviour
         }
 
         UpdateCellDisplay(brickArrangement);
+        UpdateToggle();
+    }
+
+    void UpdateToggle()
+    {
+        Toggle onDeliveryTog = onDeliveryToggle.GetComponent<Toggle>();
+
+        if (buildManager.onDelivery)
+        {
+            onDeliveryTog.isOn = true;
+        }
+        else if (!buildManager.onDelivery)
+        {
+            onDeliveryTog.isOn = false;
+        }
     }
 
     void ShowPath()
     {
-        brickArrangement.FindPath();
+        //  brickArrangement.FindPath();
+
+        DestroyPathLines();
+        DrawPathLine(brickArrangement.currentPath);
+
         print(brickArrangement.arrangementGraph.availableCells.Count);
-        print(brickArrangement.arrangementGraph.GetPathFinderNeighbours(brickArrangement.arrangementGraph.availableCells[20]));
+        print(brickArrangement.arrangementGraph.GetPathFinderNeighbours(brickArrangement.arrangementGraph.availableCells[1]).Count);
+    }
+
+    void DrawPathLine(List<Cell> pathCellList)
+    {
+        for (int i = 0; i < pathCellList.Count - 1; i++)
+        {
+            pathLinesInScene.Add(Instantiate(lineRendererObject, lineRendererObject.transform.parent));
+        }
+
+        for (int i = 0; i < pathLinesInScene.Count; i++)
+        {
+            var line = pathLinesInScene[i].AddComponent<LineRenderer>();
+            line.material = graphMaterial;
+            line.widthMultiplier = 0.02f;
+            line.positionCount = 2;
+
+            if (buildManager.onDelivery)
+            {
+                line.material.color = Color.green;
+            }
+            else
+            {
+                line.material.color = Color.red;
+            }
+
+            pathLines.Add(line);
+
+
+            line.SetPosition(0, brickArrangement.GetRealCellPosition(pathCellList[i]) + brickArrangement.displayCellOffset + new Vector3(0, 0.05f, 0));
+            line.SetPosition(1, brickArrangement.GetRealCellPosition(pathCellList[i + 1]) + brickArrangement.displayCellOffset + new Vector3(0, 0.05f, 0));
+        }
+    }
+
+    void DestroyPathLines()
+    {
+        foreach (LineRenderer pathLine in pathLines)
+        {
+            Destroy(pathLine);
+        }
+
+        pathLines.Clear();
+
+        foreach (GameObject pathLine in pathLinesInScene)
+        {
+            Destroy(pathLine);
+        }
+
+        pathLinesInScene.Clear();
     }
 
     void ShowGraph()
@@ -101,11 +177,11 @@ public class MainController : MonoBehaviour
 
     void HideGraph()
     {
-        DestroyCellDisplay(brickArrangement);
+        // DestroyCellDisplay(brickArrangement);
         DestroyGraphBranches(brickArrangement);
 
         graphBranchesAreShowing = false;
-        //brickArrangement.graphIsGenerated = false;
+
     }
 
     void InstantiateBricks(BrickArrangement inputBrickArrangement)
@@ -114,11 +190,15 @@ public class MainController : MonoBehaviour
         {
             bricksInScene.Add(Instantiate(brickMesh, inputBrickArrangement.GetRealBrickPosition(brick), brick.rotation, brickMesh.transform.parent));
         }
+        brickArrangement.GenerateGraph();
+
+        InstantiateCellDisplay(inputBrickArrangement);
     }
 
-    void CreateStack()
+    void PlaceNextBrick()
     {
-        brickArrangement.DepositBrick();
+        buildManager.NextBuildStep();
+
 
         if (graphBranchesAreShowing)
         {
@@ -126,6 +206,12 @@ public class MainController : MonoBehaviour
             brickArrangement.GenerateGraph();
             ShowGraph();
         }
+
+        brickArrangement.GenerateGraph();
+        DestroyCellDisplay(brickArrangement);
+        InstantiateCellDisplay(brickArrangement);
+        ShowPath();
+
     }
 
     void UpdateBricks(BrickArrangement inputBrickArrangement)
@@ -157,12 +243,12 @@ public class MainController : MonoBehaviour
 
     void DestroyGraphBranches(BrickArrangement inputBrickArrangement)
     {
-        foreach (LineRenderer line in lines)
+        foreach (LineRenderer line in graphLines)
         {
             Destroy(line);
         }
 
-        lines.Clear();
+        graphLines.Clear();
 
         foreach (GameObject graphBranch in graphBranchesInScene)
         {
@@ -183,10 +269,10 @@ public class MainController : MonoBehaviour
         {
             var line = graphBranchesInScene[i].AddComponent<LineRenderer>();
             line.material = graphMaterial;
-            line.widthMultiplier = 0.01f;
+            line.widthMultiplier = 0.005f;
             line.positionCount = 2;
 
-            lines.Add(line);
+            graphLines.Add(line);
         }
 
         graphBranchesAreShowing = true;
@@ -203,7 +289,7 @@ public class MainController : MonoBehaviour
                 {
                     availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.yellow;
                 }
-                else if(brickArrangement.arrangementGraph.availableCells[i].isStart == true)
+                else if (brickArrangement.arrangementGraph.availableCells[i].isStart == true)
                 {
                     availableCellsInScene[i].GetComponent<Renderer>().material.color = Color.green;
                 }
@@ -221,7 +307,7 @@ public class MainController : MonoBehaviour
 
     void UpdateLineDisplay(BrickArrangement inputBrickArrangement)
     {
-        for (int i = 0; i < lines.Count; i++)
+        for (int i = 0; i < graphLines.Count; i++)
         {
             Vector3 lineDisplaySeparatorFactor = new Vector3(0, 0, 0);
 
@@ -241,59 +327,59 @@ public class MainController : MonoBehaviour
             // horizontalSteps
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 2)
             {
-                lines[i].material.color = gradientColours[4];
+                graphLines[i].material.color = gradientColours[4];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 3)
             {
-                lines[i].material.color = gradientColours[5];
+                graphLines[i].material.color = gradientColours[5];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 4)
             {
-                lines[i].material.color = gradientColours[6];
+                graphLines[i].material.color = gradientColours[6];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 5)
             {
-                lines[i].material.color = gradientColours[7];
+                graphLines[i].material.color = gradientColours[7];
             }
 
             // upSteps
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 12)
             {
-                lines[i].material.color = gradientColours[8];
+                graphLines[i].material.color = gradientColours[8];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 13)
             {
-                lines[i].material.color = gradientColours[9];
+                graphLines[i].material.color = gradientColours[9];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 14)
             {
-                lines[i].material.color = gradientColours[10];
+                graphLines[i].material.color = gradientColours[10];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == 15)
             {
-                lines[i].material.color = gradientColours[11];
+                graphLines[i].material.color = gradientColours[11];
             }
 
             // downSteps
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == -2)
             {
-                lines[i].material.color = gradientColours[0];
+                graphLines[i].material.color = gradientColours[0];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == -3)
             {
-                lines[i].material.color = gradientColours[1];
+                graphLines[i].material.color = gradientColours[1];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == -4)
             {
-                lines[i].material.color = gradientColours[2];
+                graphLines[i].material.color = gradientColours[2];
             }
             if (inputBrickArrangement.arrangementGraph.graphBranches[i].type == -5)
             {
-                lines[i].material.color = gradientColours[3];
+                graphLines[i].material.color = gradientColours[3];
             }
 
-            lines[i].SetPosition(0, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].start) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor      + new Vector3(0,0.5f,0));
-            lines[i].SetPosition(1, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].end) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.5f, 0));
+            graphLines[i].SetPosition(0, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].start) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.5f, 0));
+            graphLines[i].SetPosition(1, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].end) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.5f, 0));
 
         }
     }

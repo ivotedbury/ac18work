@@ -2,19 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathFinder : MonoBehaviour
+public class PathFinder
 {
-    // PathRequestManager requestManager;
 
-    //CellGraph cellGraph;
-   
-       
-    //public void StartFindPath(BrickArrangement inputBrickArrangement, Cell _startCell, Cell _targetCell)
-    //{
-    //    Cell[] waypoints = FindPath(_startCell, _targetCell));
-    //}
-
-   public Cell [] FindPath(CellGraph inputCellGraph, Cell _startCell, Cell _targetCell)
+    public List<Cell> FindPath(CellGraph inputCellGraph, Cell _startCell, Cell _targetCell)
     {
         //BrickArrangement brickArrangement = _inputBrickArrangement;
 
@@ -32,12 +23,14 @@ public class PathFinder : MonoBehaviour
         Cell targetCell = _targetCell;
 
 
-        Cell[] wayPoints = new Cell[0];
+        List<Cell> wayPoints = new List<Cell>();
         bool pathSuccess = false;
 
         List<Cell> openSet = new List<Cell>(); // the set of cells to be evaluated
         HashSet<Cell> closedSet = new HashSet<Cell>(); // the set of cells ALREADY evaluated
+
         openSet.Add(startCell);
+       
 
         while (openSet.Count > 0)
         {
@@ -83,17 +76,17 @@ public class PathFinder : MonoBehaviour
                 }
             }
         }
-      //  yield return null;
+
         if (pathSuccess)
         {
             wayPoints = RetracePath(startCell, targetCell);
         }
-        // requestManager.FinishedProcessingPath(wayPoints, pathSuccess);
+
 
         return wayPoints;
     }
 
-    Cell[] RetracePath(Cell _startCell, Cell _endCell)
+    List<Cell> RetracePath(Cell _startCell, Cell _endCell)
     {
         List<Cell> path = new List<Cell>();
         Cell currentCell = _endCell;
@@ -103,20 +96,22 @@ public class PathFinder : MonoBehaviour
             path.Add(currentCell);
             currentCell = currentCell.parent;
         }
+        path.Add(_startCell);
+
         path.Reverse();
 
-        return path.ToArray();
+        return path;
     }
 
     int GetDistance(Cell cellA, Cell cellB)
     {
-        int distX = cellA.position.x - cellB.position.x;
-        int distY = cellA.position.y - cellB.position.y;
-        int distZ = cellA.position.z - cellB.position.z;
+        int distX = Mathf.Abs(cellA.position.x - cellB.position.x);
+        int distY = Mathf.Abs(cellA.position.y - cellB.position.y);
+        int distZ = Mathf.Abs(cellA.position.z - cellB.position.z);
 
         if (distY != 0)
         {
-            return ((10 * distY) + distX + distZ);
+            return ((20 * distY) + (1*distX) + (1*distZ));
         }
         else
         {

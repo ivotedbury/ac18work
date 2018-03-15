@@ -27,6 +27,16 @@ public class CellGraph
     Vector3Int[] downStepFour = new Vector3Int[] { new Vector3Int(4, -1, 0), new Vector3Int(0, -1, -4), new Vector3Int(-4, -1, 0), new Vector3Int(0, -1, 4) };
     Vector3Int[] downStepFive = new Vector3Int[] { new Vector3Int(5, -1, 0), new Vector3Int(0, -1, -5), new Vector3Int(-5, -1, 0), new Vector3Int(0, -1, 5) };
 
+    //specialPlacementOnlySteps
+    Vector3Int[] diagonalHorizontalStepTwoA = new Vector3Int[] { new Vector3Int(2, 0, 1), new Vector3Int(2, 0, -1), new Vector3Int(-2, 0, -1), new Vector3Int(-2, 0, 1) };
+    Vector3Int[] diagonalHorizontalStepTwoB = new Vector3Int[] { new Vector3Int(1, 0, 2), new Vector3Int(1, 0, -2), new Vector3Int(-1, 0, -2), new Vector3Int(-1, 0, 2) };
+
+    Vector3Int[] diagonalUpStepTwoA = new Vector3Int[] { new Vector3Int(2, 1, 1), new Vector3Int(2, 1, -1), new Vector3Int(-2, 1, -1), new Vector3Int(-2, 1, 1) };
+    Vector3Int[] diagonalUpStepTwoB = new Vector3Int[] { new Vector3Int(1, 1, 2), new Vector3Int(1, 1, -2), new Vector3Int(-1, 1, -2), new Vector3Int(-1, 1, 2) };
+
+    Vector3Int[] diagonalDownStepTwoA = new Vector3Int[] { new Vector3Int(2, -1, 1), new Vector3Int(2, -1, -1), new Vector3Int(-2, -1, -1), new Vector3Int(-2, -1, 1) };
+    Vector3Int[] diagonalDownStepTwoB = new Vector3Int[] { new Vector3Int(1, -1, 2), new Vector3Int(1, -1, -2), new Vector3Int(-1, -1, -2), new Vector3Int(-1, -1, 2) };
+
     //////////////////////////////////////////////////////////////////////////////////////////
 
     public void GenerateCellGraph(List<Cell> _allCellsInArrangement)
@@ -152,9 +162,14 @@ public class CellGraph
             }
         }
 
-        for (int i = 0; i < coveredCells.Count; i++)
+        foreach (Cell topCell in topCellsOnly)
         {
-            coveredCells[i].isAvailable = true;
+            topCell.isAvailable = true;
+        }
+
+        foreach (Cell coveredCell in coveredCells)
+        {
+            coveredCell.isAvailable = false;
         }
 
         return topCellsOnly;
@@ -163,26 +178,26 @@ public class CellGraph
     public List<Cell> GetPathFinderNeighbours(Cell testCell)
     {
         List<Cell> neighbours = new List<Cell>();
-        // neighbours = null;
+
         for (int i = 0; i < availableCells.Count; i++)
         {
             for (int k = 0; k <= 3; k++)
             {
 
-                if (availableCells[i].position - testCell.position ==  horizontalStepTwo[k] || 
-                    availableCells[i].position - testCell.position == horizontalStepThree[k] ||
-                    availableCells[i].position - testCell.position == horizontalStepFour[k] ||
-                    availableCells[i].position - testCell.position == horizontalStepFive[k] ||
+                if (testCell.position - availableCells[i].position == horizontalStepTwo[k] ||
+                    testCell.position - availableCells[i].position == horizontalStepThree[k] ||
+                    testCell.position - availableCells[i].position == horizontalStepFour[k] ||
+                    testCell.position - availableCells[i].position == horizontalStepFive[k] ||
 
-                    availableCells[i].position - testCell.position == upStepTwo[k] ||
-                    availableCells[i].position - testCell.position == upStepThree[k] ||
-                    availableCells[i].position - testCell.position == upStepFour[k] ||
-                    availableCells[i].position - testCell.position == upStepFive[k] ||
+                    testCell.position - availableCells[i].position == upStepTwo[k] ||
+                    testCell.position - availableCells[i].position == upStepThree[k] ||
+                    testCell.position - availableCells[i].position == upStepFour[k] ||
+                    testCell.position - availableCells[i].position == upStepFive[k] ||
 
-                    availableCells[i].position - testCell.position == downStepTwo[k] ||
-                    availableCells[i].position - testCell.position == downStepThree[k] ||
-                    availableCells[i].position - testCell.position == downStepFour[k] ||
-                    availableCells[i].position - testCell.position == downStepFive[k])
+                    testCell.position - availableCells[i].position == downStepTwo[k] ||
+                    testCell.position - availableCells[i].position == downStepThree[k] ||
+                    testCell.position - availableCells[i].position == downStepFour[k] ||
+                    testCell.position - availableCells[i].position == downStepFive[k])
 
                 {
                     neighbours.Add(availableCells[i]);
@@ -191,4 +206,95 @@ public class CellGraph
         }
         return neighbours;
     }
+
+
+    public Cell FindBestNeighbour(Brick brickToPlace, bool _onDelivery)
+    {
+        Cell bestNeighbour = null;
+      //  bool onDelivery;
+        Vector3Int differenceVector;
+
+        for (int i = 0; i < availableCells.Count; i++)
+        {
+            for (int k = 0; k <= 3; k++)
+            {
+                differenceVector = brickToPlace.originCell.position - availableCells[i].position;
+
+                if (!_onDelivery)
+                {
+                    if (differenceVector == horizontalStepTwo[k] || differenceVector == horizontalStepThree[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                    else if (differenceVector == downStepTwo[k] || differenceVector == downStepThree[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                   else if (differenceVector == upStepTwo[k] || differenceVector == upStepThree[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                }
+
+                if (_onDelivery)
+                {
+
+                    if (differenceVector == horizontalStepTwo[k] || differenceVector == horizontalStepThree[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                    else if (differenceVector == downStepTwo[k] || differenceVector == downStepThree[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                    else if (differenceVector == upStepTwo[k] || differenceVector == upStepThree[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                    else if (differenceVector == diagonalHorizontalStepTwoA[k] || differenceVector == diagonalHorizontalStepTwoB[k])
+                    {
+                        bestNeighbour = availableCells[i];
+                        return bestNeighbour;
+                    }
+                }
+               
+                //else if (differenceVector == diagonalUpStepTwoA[k] || differenceVector == diagonalUpStepTwoB[k])
+                //{
+                //    bestNeighbour = availableCells[i];
+                //    return bestNeighbour;
+                //}
+                //else if (differenceVector == diagonalDownStepTwoA[k] || differenceVector == diagonalDownStepTwoB[k])
+                //{
+                //    bestNeighbour = availableCells[i];
+                //    return bestNeighbour;
+                //}
+
+            }
+        }
+        return bestNeighbour;
+
+    }
 }
+
+
+
+//(availableCells[i].position - testCell.position ==  horizontalStepTwo[k] || 
+//                    availableCells[i].position - testCell.position == horizontalStepThree[k] ||
+//                    availableCells[i].position - testCell.position == horizontalStepFour[k] ||
+//                    availableCells[i].position - testCell.position == horizontalStepFive[k] ||
+
+//                    availableCells[i].position - testCell.position == upStepTwo[k] ||
+//                    availableCells[i].position - testCell.position == upStepThree[k] ||
+//                    availableCells[i].position - testCell.position == upStepFour[k] ||
+//                    availableCells[i].position - testCell.position == upStepFive[k] ||
+
+//                    availableCells[i].position - testCell.position == downStepTwo[k] ||
+//                    availableCells[i].position - testCell.position == downStepThree[k] ||
+//                    availableCells[i].position - testCell.position == downStepFour[k] ||
+//                    availableCells[i].position - testCell.position == downStepFive[k])
