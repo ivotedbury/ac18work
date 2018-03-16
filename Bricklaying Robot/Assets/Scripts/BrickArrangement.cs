@@ -79,14 +79,47 @@ public class BrickArrangement
         GenerateGraph();
     }
 
+    public bool CheckPath()
+    {
+       bool pathFound = false;
+
+        Cell startCell = stackBricks[stackBricks.Count - placementCounter].originCell;
+        Cell targetCell = finalBricks[placementCounter - 1].originCell;
+
+        // Cell previousTargetCell;
+
+        //if (toDeliver)
+        //{
+        //    Brick brickToPlace = finalBricks[placementCounter - 1];
+        //    Brick brickToPickup = stackBricks[stackBricks.Count - placementCounter];
+
+        //    startCell = FindBestDropCell(brickToPickup, !toDeliver);
+        //    targetCell = FindBestDropCell(brickToPlace, toDeliver);
+        //    previousTarget = targetCell;
+        //}
+
+        //else
+        //{
+        //    startCell = previousTarget;
+        //    targetCell = FindBestDropCell(stackBricks[stackBricks.Count - placementCounter - 1], toDeliver);
+        //    //  previousPickup = targetCell;
+        //}
+
+        startCell.isStart = true;
+        targetCell.isEnd = true;
+
+        pathFound = pathFinder.CheckPath(arrangementGraph, startCell, targetCell);
+        return pathFound;
+    }
+
     public void FindPath(bool toDeliver)
     {
         ResetPath();
 
-        Cell startCell = FindBestDropCell(stackBricks[stackBricks.Count-1], toDeliver);
+        Cell startCell = FindBestDropCell(stackBricks[stackBricks.Count - 1], toDeliver);
         Cell targetCell = FindBestDropCell(finalBricks[placementCounter - 1], toDeliver);
 
-       // Cell previousTargetCell;
+        // Cell previousTargetCell;
 
         if (toDeliver)
         {
@@ -102,7 +135,7 @@ public class BrickArrangement
         {
             startCell = previousTarget;
             targetCell = FindBestDropCell(stackBricks[stackBricks.Count - placementCounter - 1], toDeliver);
-          //  previousPickup = targetCell;
+            //  previousPickup = targetCell;
         }
 
         startCell.isStart = true;

@@ -204,20 +204,26 @@ public class MainController : MonoBehaviour
 
     void PlaceNextBrick()
     {
-        buildManager.NextBuildStep();
-        print(brickArrangement.pathFinder.pathIsIncomplete);
+        bool pathFound = buildManager.CheckPath();
+        print(pathFound);
 
-        if (graphBranchesAreShowing)
+        if (pathFound)
         {
-            HideGraph();
-            brickArrangement.GenerateGraph();
-            ShowGraph();
-        }
+            buildManager.NextBuildStep();
+            //print(brickArrangement.pathFinder.pathIsIncomplete);
 
-        brickArrangement.GenerateGraph();
-        DestroyCellDisplay(brickArrangement);
-        InstantiateCellDisplay(brickArrangement);
-        ShowPath();
+            if (graphBranchesAreShowing)
+            {
+                HideGraph();
+                brickArrangement.GenerateGraph();
+                ShowGraph();
+            }
+
+            brickArrangement.GenerateGraph();
+            DestroyCellDisplay(brickArrangement);
+            InstantiateCellDisplay(brickArrangement);
+            ShowPath();
+        }
 
     }
 

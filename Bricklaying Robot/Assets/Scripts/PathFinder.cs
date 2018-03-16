@@ -6,7 +6,107 @@ public class PathFinder
 {
     public bool pathIsIncomplete;
     public int totalCostofTrip;
-    int counterLimit = 1000;
+    int counterLimit = 100000;
+
+    public Cell bestCurrentCell;
+
+    public bool CheckPath(CellGraph inputCellGraph, Cell _startCell, Cell _targetCell)
+    {
+        // pathIsIncomplete = false;
+
+
+
+        Cell startCell = _startCell;
+        Cell targetCell = _targetCell;
+
+        List<Cell> wayPoints = new List<Cell>();
+        bool pathSuccess = false;
+        int counter = 0;
+        bestCurrentCell = startCell;
+
+        List<Cell> openSet = new List<Cell>(); // the set of cells to be evaluated
+        List<Cell> closedSet = new List<Cell>(); // the set of cells ALREADY evaluated (used to be a hashset)
+
+        //if (!inputCellGraph.availableCells.Contains(_targetCell))
+        //{
+        //    pathSuccess = true;
+        //}
+
+        foreach (Cell cell in inputCellGraph.availableCells) // reset the costs from previous searches
+        {
+            cell.gCost = 0;
+            cell.hCost = 0;
+        }
+
+        openSet.Add(startCell);
+
+        while (openSet.Count > 0 && counter < counterLimit)
+        {
+            Cell cell = openSet[0];
+            for (int i = 1; i < openSet.Count; i++)
+            {
+                if (openSet[i].fCost < cell.fCost || openSet[i].fCost == cell.fCost)
+                {
+                    if (openSet[i].hCost < cell.hCost)
+                    {
+                        cell = openSet[i];
+                    }
+                }
+            }
+
+            openSet.Remove(cell);
+            closedSet.Add(cell);
+
+            if (cell == targetCell)
+            {
+                pathSuccess = true;
+            }
+
+            foreach (Cell neighbour in inputCellGraph.GetPathFinderNeighbours(cell))
+            {
+                if (!neighbour.isAvailable || closedSet.Contains(neighbour))
+                {
+                    continue;
+                }
+
+                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour, GetDirection(cell, neighbour), true);
+                if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+                {
+                    neighbour.gCost = newCostToNeighbour;
+                    neighbour.hCost = GetDistance(neighbour, targetCell, GetDirection(cell, neighbour), true);
+                    neighbour.parent = cell;
+
+                    if (!openSet.Contains(neighbour))
+                    {
+                        openSet.Add(neighbour);
+                    }
+                }
+            }
+            counter++;
+        }
+
+        if (pathSuccess)
+        {
+            //  wayPoints = RetracePath(startCell, targetCell);
+            // bestCurrentCell = wayPoints[wayPoints.Count - 1];
+            return pathSuccess;
+            // totalCostofTrip = wayPoints[wayPoints.Count - 1].gCost;
+        }
+
+        else // if the counter limit has expired - suggesting there is no complete path
+        {
+            int bestFCost = 10000000; //bench mark large number
+            for (int i = 0; i < closedSet.Count; i++)
+            {
+                if (closedSet[i].fCost < bestFCost)
+                {
+                    bestCurrentCell = closedSet[i]; // find the cell with the best fcost explored so far in the search
+                }
+            }
+            //wayPoints = RetracePath(startCell, bestCurrentCell); // assemble the waypoints to the best current cell - will try adding more bricks around the last brick and try again
+            return pathSuccess;
+        }
+    }
 
 
     public List<Cell> FindPath(CellGraph inputCellGraph, Cell _startCell, Cell _targetCell, int _currentDirection)
@@ -76,7 +176,7 @@ public class PathFinder
                     }
                 }
             }
-                        counter++;
+            counter++;
         }
 
         if (pathSuccess)

@@ -29,14 +29,19 @@ public class BuildManager
         onDelivery = !onDelivery;
     }
 
-    public void LayNextBrick()
+    public bool CheckPath()
     {
+        bool pathFound = false;
+        brickArrangement.GenerateGraph();
+        
+        pathFound = brickArrangement.CheckPath();
 
+        return pathFound;
     }
 
     public void PickUpNextBrick()
     {
-
+        
     }
 }
 /* 
