@@ -207,8 +207,8 @@ public class MainController : MonoBehaviour
         bool pathFound = buildManager.CheckPath();
         print(pathFound);
 
-        if (pathFound)
-        {
+        //if (pathFound)
+        //{
             buildManager.NextBuildStep();
             //print(brickArrangement.pathFinder.pathIsIncomplete);
 
@@ -223,7 +223,7 @@ public class MainController : MonoBehaviour
             DestroyCellDisplay(brickArrangement);
             InstantiateCellDisplay(brickArrangement);
             ShowPath();
-        }
+        //}
 
     }
 

@@ -57,10 +57,33 @@ public class CellGraph
 
     }
 
-    //public void CheckGraphConnectivity(List<GraphBranch> _graphBranches)
-    //{
-    //    for ()
-    //}
+    public void SetGraphConnectivity(List<GraphBranch> _graphBranches) ////////////////////////////////////////
+    {
+        _graphBranches[0].start.graphIsland = 0;
+        _graphBranches[0].end.graphIsland = 0;
+
+        for (int islandIndex = 0; islandIndex < 2; islandIndex++) // assume there are only 2 islands
+        {
+            for (int i = 0; i < _graphBranches.Count; i++)
+            {
+                if (_graphBranches[i].start.graphIsland == islandIndex || _graphBranches[i].end.graphIsland == islandIndex)
+                {
+                    for (int j = 0; j < _graphBranches.Count; j++)
+                    {
+                        if (_graphBranches[i].start == _graphBranches[j].start ||
+                            _graphBranches[i].end == _graphBranches[j].start ||
+                            _graphBranches[i].start == _graphBranches[j].end ||
+                            _graphBranches[i].start == _graphBranches[j].start)
+                        {
+                            _graphBranches[j].start.graphIsland = islandIndex;
+                            _graphBranches[j].end.graphIsland = islandIndex;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     public void MakeGraphBranches(List<Cell> _availableCells)
     {
@@ -180,6 +203,33 @@ public class CellGraph
         return topCellsOnly;
     }
 
+    public List<Cell> GetPossibleDeliveryCells(Cell targetCell, List<Cell> cellsInGrid)
+    {
+        List<Cell> possibleDeliveryCells = new List<Cell>();
+
+        for (int i = 0; i < cellsInGrid.Count; i++)
+        {
+            for (int k = 0; k <= 3; k++)
+            {
+
+                if (targetCell.position - cellsInGrid[i].position == horizontalStepTwo[k] ||
+                    targetCell.position - cellsInGrid[i].position == horizontalStepThree[k] ||
+
+                    targetCell.position - cellsInGrid[i].position == upStepTwo[k] ||
+                    targetCell.position - cellsInGrid[i].position == upStepThree[k] ||
+
+                    targetCell.position - cellsInGrid[i].position == downStepTwo[k] ||
+                    targetCell.position - cellsInGrid[i].position == downStepThree[k])
+
+                {
+                    possibleDeliveryCells.Add(availableCells[i]);
+                }
+            }
+        }
+
+        return possibleDeliveryCells;
+    }
+
     public List<Cell> GetPathFinderNeighbours(Cell testCell)
     {
         List<Cell> neighbours = new List<Cell>();
@@ -284,7 +334,7 @@ public class CellGraph
 
 
 
-    return pathIsComplete;
+        return pathIsComplete;
     }
 }
 

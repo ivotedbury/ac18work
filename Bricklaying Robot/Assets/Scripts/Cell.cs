@@ -12,6 +12,9 @@ public class Cell
     public bool isStart;
     public bool isEnd;
 
+    // graph properties
+
+    public int graphIsland;
 
     // pathfinding variables
     public int gCost;
@@ -27,6 +30,8 @@ public class Cell
         isPath = false;
         isStart = false;
         isEnd = false;
+
+        graphIsland = -1;
     }
 
     public int fCost
