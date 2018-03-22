@@ -39,6 +39,38 @@ public class CellGraph
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
+
+    List<GraphBranch> exploredBranches = new List<GraphBranch>();
+    public List<Cell> exploredCells = new List<Cell>();
+    Queue<Cell> cellsToCheck = new Queue<Cell>();
+
+
+
+    public void DepthFirstSearch(Cell startNode)
+    {
+        exploredCells.Clear();
+
+        IterateDepthFirstSearch(startNode);
+    }
+
+    private void IterateDepthFirstSearch(Cell cell) ////////////////////////////////////////
+    {
+        exploredCells.Add(cell);
+
+        for (int i = 0; i < cell.graphBranches.Count; i++)
+        {
+            if (!exploredCells.Contains(cell.graphBranches[i].end))
+            {
+                IterateDepthFirstSearch(cell.graphBranches[i].end);
+            }
+            else
+            {
+                exploredCells.Add(cell);
+            }
+        }
+
+    }
+
     public void GenerateCellGraph(List<Cell> _allCellsInArrangement)
     {
         allCellsInArrangement = _allCellsInArrangement;
@@ -49,6 +81,7 @@ public class CellGraph
     public void ComputeCellGraph(List<Cell> _allCellsInArrangement)
     {
 
+
         availableCells.Clear();
         availableCells = FilterTopCells(_allCellsInArrangement);
 
@@ -57,31 +90,19 @@ public class CellGraph
 
     }
 
-    public void SetGraphConnectivity(List<GraphBranch> _graphBranches) ////////////////////////////////////////
+    List<Cell> GetCellsFromBranches(List<GraphBranch> _inputGraphBranches)
     {
-        _graphBranches[0].start.graphIsland = 0;
-        _graphBranches[0].end.graphIsland = 0;
+        List<Cell> outputCells = new List<Cell>();
 
-        for (int islandIndex = 0; islandIndex < 2; islandIndex++) // assume there are only 2 islands
+        foreach (GraphBranch branch in _inputGraphBranches)
         {
-            for (int i = 0; i < _graphBranches.Count; i++)
+            if (!outputCells.Contains(branch.start))
             {
-                if (_graphBranches[i].start.graphIsland == islandIndex || _graphBranches[i].end.graphIsland == islandIndex)
-                {
-                    for (int j = 0; j < _graphBranches.Count; j++)
-                    {
-                        if (_graphBranches[i].start == _graphBranches[j].start ||
-                            _graphBranches[i].end == _graphBranches[j].start ||
-                            _graphBranches[i].start == _graphBranches[j].end ||
-                            _graphBranches[i].start == _graphBranches[j].start)
-                        {
-                            _graphBranches[j].start.graphIsland = islandIndex;
-                            _graphBranches[j].end.graphIsland = islandIndex;
-                        }
-                    }
-                }
+                outputCells.Add(branch.start);
             }
         }
+
+        return outputCells;
     }
 
 
@@ -154,6 +175,19 @@ public class CellGraph
                 }
             }
         }
+
+        foreach (Cell cell in _availableCells)
+        {
+            cell.graphBranches.Clear();
+
+            for (int i = 0; i < graphBranches.Count; i++)
+            {
+                if (graphBranches[i].start == cell)
+                {
+                    cell.graphBranches.Add(graphBranches[i]);
+                }
+            }
+        }
     }
 
 
@@ -222,7 +256,7 @@ public class CellGraph
                     targetCell.position - cellsInGrid[i].position == downStepThree[k])
 
                 {
-                    possibleDeliveryCells.Add(availableCells[i]);
+                    possibleDeliveryCells.Add(cellsInGrid[i]);
                 }
             }
         }

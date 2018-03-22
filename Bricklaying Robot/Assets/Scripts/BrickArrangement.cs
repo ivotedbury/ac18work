@@ -20,17 +20,22 @@ public class BrickArrangement
     public List<Brick> allBricks = new List<Brick>();
 
     public List<Cell> currentPath = new List<Cell>();
+
+    public List<Cell> possibleNextDropPoints = new List<Cell>();
+
     Cell previousTarget;
     Cell previousPickup;
 
     //Cell[] path;
     bool requestANewPath = false;
 
-    int currentDirection = 0;
-    int placementCounter = 1;
+   public int currentDirection = 0;
+    public int finalCounter = 0; // index of final bricks next to be placed
+   public int stackCounter = 1; // index of stack to be taken next
     public bool graphIsGenerated = false;
 
     public PathFinder pathFinder = new PathFinder();
+ 
 
     public BrickArrangement(int gridX, int gridY, int gridZ)
     {
@@ -49,13 +54,16 @@ public class BrickArrangement
         }
 
         finalBricks = ReorderStack(finalBricks, gateCell);
+
+        
     }
 
     public void DepositBrick()
     {
-        allBricks[allBricks.Count - placementCounter] = finalBricks[placementCounter - 1];
+        allBricks[stackBricks.Count - stackCounter] = finalBricks[finalCounter];
 
-        placementCounter++;
+        stackCounter++;
+        finalCounter++;
     }
 
     public void CreateStack(TextAsset stackDataImport)
@@ -75,66 +83,115 @@ public class BrickArrangement
         {
             allBricks.Add(stackBricks[i]);
         }
-
+                
         GenerateGraph();
     }
 
     public bool CheckPath()
     {
-       bool pathFound = false;
+        bool pathIsPossible = false;
 
-        Cell startCell = stackBricks[stackBricks.Count - placementCounter].originCell;
-        Cell targetCell = finalBricks[placementCounter - 1].originCell;
+        List<Cell> possibleSteppingCells = new List<Cell>();
 
-        // Cell previousTargetCell;
+        possibleSteppingCells = arrangementGraph.GetPossibleDeliveryCells(finalBricks[finalCounter].originCell, workGrid.allCells);
 
-        //if (toDeliver)
-        //{
-        //    Brick brickToPlace = finalBricks[placementCounter - 1];
-        //    Brick brickToPickup = stackBricks[stackBricks.Count - placementCounter];
+        possibleNextDropPoints = possibleSteppingCells; ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        //    startCell = FindBestDropCell(brickToPickup, !toDeliver);
-        //    targetCell = FindBestDropCell(brickToPlace, toDeliver);
-        //    previousTarget = targetCell;
-        //}
+        GenerateGraph();
 
-        //else
-        //{
-        //    startCell = previousTarget;
-        //    targetCell = FindBestDropCell(stackBricks[stackBricks.Count - placementCounter - 1], toDeliver);
-        //    //  previousPickup = targetCell;
-        //}
+        arrangementGraph.DepthFirstSearch(allBricks[allBricks.Count - stackCounter].originCell);
 
-        startCell.isStart = true;
-        targetCell.isEnd = true;
+        for (int i = 0; i < possibleSteppingCells.Count; i++)
+        {
 
-        pathFound = pathFinder.CheckPath(arrangementGraph, startCell, targetCell);
-        return pathFound;
+            if (arrangementGraph.exploredCells.Contains(possibleSteppingCells[i]))
+            {
+                pathIsPossible = true;
+            }
+        }
+
+        return pathIsPossible;
+    }
+
+    public List<Brick> TryAddingBricks()
+    {
+        List<Brick> bricksToAdd = new List<Brick>();
+
+        List<Brick> allBricksRankedByTargetDistance = new List<Brick>();
+        allBricksRankedByTargetDistance = ReorderStack(allBricks, finalBricks[finalCounter].originCell.position);
+        Brick closestBrick = allBricksRankedByTargetDistance[0];
+
+        List<Brick> bricksToTry = new List<Brick>();
+        bricksToTry = GeneratePossibleAdjacentBricks(closestBrick);
+
+        return bricksToTry;
+
+        for (int i = 0; i < bricksToTry.Count; i++)
+        {
+            allBricks.Add(bricksToTry[i]);
+            GenerateGraph();
+            if (CheckPath())
+            {
+                bricksToAdd.Add(bricksToTry[i]);
+                //stackCounter -= 1;
+            }
+            else
+            {
+                allBricks.Remove(bricksToTry[i]);
+               // stackCounter += 1;
+            }
+        }
+
+        
+    }
+
+    public List<Brick> GeneratePossibleAdjacentBricks(Brick inputBrick)
+    {
+        List<Brick> possibleAdjacentBricks = new List<Brick>();
+        Vector3Int inputOrigin = inputBrick.originCell.position;
+
+        if (inputBrick.rotation == Quaternion.Euler(0, 0, 0) || inputBrick.rotation == Quaternion.Euler(0, 180, 0))
+        {
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x + 2, inputOrigin.y, inputOrigin.z], 0));
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x, inputOrigin.y, inputOrigin.z - 4], 0));
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x - 2, inputOrigin.y, inputOrigin.z], 0));
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x, inputOrigin.y, inputOrigin.z + 4], 0));
+        }
+
+        if (inputBrick.rotation == Quaternion.Euler(0, 90, 0) || inputBrick.rotation == Quaternion.Euler(0, 270, 0))
+        {
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x + 4, inputOrigin.y, inputOrigin.z], 90));
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x, inputOrigin.y, inputOrigin.z - 2], 90));
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x - 4, inputOrigin.y, inputOrigin.z], 90));
+            possibleAdjacentBricks.Add(new Brick(workGrid.cells[inputOrigin.x, inputOrigin.y, inputOrigin.z + 2], 90));
+        }
+
+        return possibleAdjacentBricks;
     }
 
     public void FindPath(bool toDeliver)
     {
         ResetPath();
 
-        Cell startCell = FindBestDropCell(stackBricks[stackBricks.Count - 1], toDeliver);
-        Cell targetCell = FindBestDropCell(finalBricks[placementCounter - 1], toDeliver);
+        Cell startCell = arrangementGraph.FindBestNeighbour(stackBricks[stackBricks.Count - stackCounter], toDeliver);
+        Cell targetCell = arrangementGraph.FindBestNeighbour(finalBricks[finalCounter], toDeliver);
 
         // Cell previousTargetCell;
 
         if (toDeliver)
         {
-            Brick brickToPlace = finalBricks[placementCounter - 1];
-            Brick brickToPickup = stackBricks[stackBricks.Count - placementCounter];
+            Brick brickToPlace = finalBricks[finalCounter];
+            Brick brickToPickup = stackBricks[stackBricks.Count - stackCounter];
 
-            startCell = FindBestDropCell(brickToPickup, !toDeliver);
-            targetCell = FindBestDropCell(brickToPlace, toDeliver);
+            startCell = arrangementGraph.FindBestNeighbour(brickToPickup, !toDeliver);
+            targetCell = arrangementGraph.FindBestNeighbour(brickToPlace, toDeliver);
             previousTarget = targetCell;
         }
 
         else
         {
             startCell = previousTarget;
-            targetCell = FindBestDropCell(stackBricks[stackBricks.Count - placementCounter - 1], toDeliver);
+            targetCell = arrangementGraph.FindBestNeighbour(stackBricks[stackBricks.Count - stackCounter - 1], toDeliver);
             //  previousPickup = targetCell;
         }
 
@@ -148,7 +205,10 @@ public class BrickArrangement
         {
             cell.isPath = true;
         }
+        
     }
+
+
 
     public Cell FindBestDropCell(Brick _brickToPlace, bool _onDelivery)
     {
@@ -189,7 +249,7 @@ public class BrickArrangement
     {
         List<Brick> reorderedStack = new List<Brick>();
 
-        int aLargeNumber = 20;
+        int aLargeNumber = 30;
 
         float currentClosestDistance;
         float testDistance;

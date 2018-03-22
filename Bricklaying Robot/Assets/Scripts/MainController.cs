@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainController : MonoBehaviour
 {
@@ -10,31 +11,48 @@ public class MainController : MonoBehaviour
     public GameObject brickCellMesh;
     public GameObject lineRendererObject;
     public GameObject gateCellMarkerMesh;
+    public GameObject robotGameObject;
 
     List<GameObject> bricksInScene = new List<GameObject>();
     List<GameObject> availableCellsInScene = new List<GameObject>();
     List<GameObject> graphBranchesInScene = new List<GameObject>();
     List<GameObject> pathLinesInScene = new List<GameObject>();
+    GameObject robotObject;
 
     List<LineRenderer> graphLines = new List<LineRenderer>();
     List<LineRenderer> pathLines = new List<LineRenderer>();
 
-    public TextAsset brickData;
+    public TextAsset brickData0;
+    public TextAsset brickData1;
+    public TextAsset brickData2;
     public TextAsset brickStackTemplate;
     public Material graphMaterial;
 
+    TextAsset[] assemblyOptionsToImport;
+
     BrickArrangement brickArrangement = new BrickArrangement(20, 20, 41);
     BuildManager buildManager;
+    public Robot robotInScene;
 
 
     public Button showGraphButton;
     public Button hideGraphButton;
     public Button placeNextButton;
-    public Button showPathButton;
+    public Button createStackButton;
+    public Button resetSceneButton;
+    public Button autoBuildButton;
     public Toggle onDeliveryToggle;
     public Text journeyTime;
+    public Text buildTime;
+    public Dropdown assemblyChoice;
+
+    IEnumerator stepThroughPath;
+
+    int chosenAssemblyOption = 0;
 
     bool graphBranchesAreShowing = false;
+    bool robotHasFinishedTrip = false;
+    bool autobuildOn = false;
 
     List<Color> gradientColours = new List<Color>();
 
@@ -48,22 +66,14 @@ public class MainController : MonoBehaviour
 
         GenerateColours(12);
 
-        print(brickArrangement.SetGateCell(new Vector3Int(2, 0, 14)));
+        assemblyOptionsToImport = new TextAsset[] { brickData0, brickData1, brickData2 };
 
-        brickArrangement.CreateBricksInArrangment(brickData);
-        brickArrangement.CreateStack(brickStackTemplate);
+        print(brickArrangement.SetGateCell(new Vector3Int(4, 0, 14))); // set the gate cell
 
-        InstantiateBricks(brickArrangement);
-
-
-        print(brickArrangement.allBricks.Count);
-
-
-        print(brickArrangement.allBricks.Count);
-        print(brickArrangement.allBricks[0].originCell.position);
-
-        print(brickArrangement.finalBricks.Count);
-        print(brickArrangement.finalBricks[0].originCell.position);
+        assemblyChoice.onValueChanged.AddListener(delegate
+        {
+            DropdownValueChanged(assemblyChoice);
+        });
 
         UpdateGateCell(brickArrangement);
 
@@ -76,11 +86,90 @@ public class MainController : MonoBehaviour
         Button placeNextkBut = placeNextButton.GetComponent<Button>();
         placeNextkBut.onClick.AddListener(PlaceNextBrick);
 
-        Button showPathBut = showPathButton.GetComponent<Button>();
-        showPathBut.onClick.AddListener(ShowPath);
+        Button createStackBut = createStackButton.GetComponent<Button>();
+        createStackBut.onClick.AddListener(CreateStack);
+
+        Button resetSceneBut = resetSceneButton.GetComponent<Button>();
+        resetSceneBut.onClick.AddListener(ResetScene);
+
+        Button autoBuildBut = autoBuildButton.GetComponent<Button>();
+        autoBuildBut.onClick.AddListener(AutoBuild);
+
 
 
     }
+
+    void AutoBuild()
+    {
+        autobuildOn = true;
+
+        PlaceNextBrick();
+
+        //if (robotHasFinishedTrip)
+        //{
+        //    AutoBuild();
+        //}
+    }
+
+    void InstantiateRobot()
+    {
+        robotObject = Instantiate(robotGameObject, brickArrangement.GetRealCellPosition(robotInScene.position), robotInScene.rotation);
+    }
+
+    void ResetScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void DropdownValueChanged(Dropdown change)
+    {
+        chosenAssemblyOption = change.value;
+    }
+    void CreateStack()
+    {
+        SetTheAssemblyChoice(chosenAssemblyOption);
+        brickArrangement.CreateStack(brickStackTemplate);
+        InstantiateBricks(brickArrangement);
+
+        robotInScene = new Robot(brickArrangement.allBricks[brickArrangement.allBricks.Count - 1].originCell, brickArrangement);
+        InstantiateRobot();
+    }
+
+    void UpdateRobot()
+    {
+        robotObject.transform.position = brickArrangement.GetRealCellPosition(robotInScene.position) + new Vector3(0, 0.1f, 0);
+        robotObject.transform.rotation = Quaternion.Euler(0, brickArrangement.currentDirection * 90, 0);
+    }
+
+    void SetTheAssemblyChoice(int assemblyOptionSelection)
+    {
+        brickArrangement.CreateBricksInArrangment(assemblyOptionsToImport[assemblyOptionSelection]);
+    }
+
+    void RobotFollowPath(List<Cell> waypointsToFollow)
+    {
+        robotHasFinishedTrip = false;
+        stepThroughPath = robotStepThroughPath(waypointsToFollow);
+        StartCoroutine(stepThroughPath);
+    }
+
+    IEnumerator robotStepThroughPath(List<Cell> robotWaypointsToFollow)
+    {
+        while (robotInScene.position != robotWaypointsToFollow[robotWaypointsToFollow.Count - 1])
+        {
+            for (int i = 0; i < robotWaypointsToFollow.Count; i++)
+            {
+                robotInScene.position = robotWaypointsToFollow[i];
+                yield return new WaitForSeconds(0.05f);
+            }
+        }
+        robotHasFinishedTrip = true;
+        if (autobuildOn)
+        {
+            AutoBuild();
+        }
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -93,12 +182,14 @@ public class MainController : MonoBehaviour
 
         UpdateCellDisplay(brickArrangement);
         UpdateToggle();
-       UpdateJourneyTimeText();
+        UpdateJourneyTimeText();
+        UpdateRobot();
     }
 
     void UpdateJourneyTimeText()
     {
         journeyTime.text = "Journey Time: " + brickArrangement.pathFinder.totalCostofTrip.ToString();
+        buildTime.text = "Build Time: " + brickArrangement.pathFinder.totalCostofBuild.ToString();
     }
 
     void UpdateToggle()
@@ -117,13 +208,8 @@ public class MainController : MonoBehaviour
 
     void ShowPath()
     {
-        //  brickArrangement.FindPath();
-
         DestroyPathLines();
         DrawPathLine(brickArrangement.currentPath);
-
-        print(brickArrangement.arrangementGraph.availableCells.Count);
-        print(brickArrangement.arrangementGraph.GetPathFinderNeighbours(brickArrangement.arrangementGraph.availableCells[1]).Count);
     }
 
     void DrawPathLine(List<Cell> pathCellList)
@@ -150,7 +236,6 @@ public class MainController : MonoBehaviour
             }
 
             pathLines.Add(line);
-
 
             line.SetPosition(0, brickArrangement.GetRealCellPosition(pathCellList[i]) + brickArrangement.displayCellOffset + new Vector3(0, 0.05f, 0));
             line.SetPosition(1, brickArrangement.GetRealCellPosition(pathCellList[i + 1]) + brickArrangement.displayCellOffset + new Vector3(0, 0.05f, 0));
@@ -204,36 +289,56 @@ public class MainController : MonoBehaviour
 
     void PlaceNextBrick()
     {
+        print("cell 0 graphBranches = " + brickArrangement.arrangementGraph.availableCells[0].graphBranches.Count);
         bool pathFound = buildManager.CheckPath();
-        print(pathFound);
+        print("path is possible: " + pathFound);
 
         //if (pathFound)
         //{
-            buildManager.NextBuildStep();
-            //print(brickArrangement.pathFinder.pathIsIncomplete);
+        buildManager.NextBuildStep();
+        //print(brickArrangement.pathFinder.pathIsIncomplete);
 
-            if (graphBranchesAreShowing)
-            {
-                HideGraph();
-                brickArrangement.GenerateGraph();
-                ShowGraph();
-            }
-
+        if (graphBranchesAreShowing)
+        {
+            HideGraph();
             brickArrangement.GenerateGraph();
-            DestroyCellDisplay(brickArrangement);
-            InstantiateCellDisplay(brickArrangement);
-            ShowPath();
+            ShowGraph();
+        }
+
+
+        brickArrangement.GenerateGraph();
+        DestroyCellDisplay(brickArrangement);
+        InstantiateCellDisplay(brickArrangement);
+        ShowPath();
+
+        print(brickArrangement.possibleNextDropPoints.Count);
+
+        RobotFollowPath(brickArrangement.currentPath);
         //}
+
+        //else
+        //{
+        //    List<Brick> bricksToTry = new List<Brick>();
+        //    bricksToTry = brickArrangement.TryAddingBricks();
+        //    print("brickstotry" + bricksToTry.Count);
+        //    for (int i = 0; i < bricksToTry.Count; i++)
+        //    {
+        //        brickArrangement.allBricks.Add(bricksToTry[i]);
+        //        brickArrangement.stackCounter++;
+        //    }
+        //    PlaceNextBrick();
+        //}
+
 
     }
 
     void UpdateBricks(BrickArrangement inputBrickArrangement)
     {
-        for (int i = 0; i < inputBrickArrangement.finalBricks.Count; i++)
-        {
-            bricksInScene[i].transform.position = inputBrickArrangement.GetRealBrickPosition(inputBrickArrangement.finalBricks[i]);
-            bricksInScene[i].transform.rotation = inputBrickArrangement.finalBricks[i].rotation;
-        }
+        //for (int i = 0; i < inputBrickArrangement.allBricks.Count; i++)
+        //{
+        //    bricksInScene[i].transform.position = inputBrickArrangement.GetRealBrickPosition(inputBrickArrangement.allBricks[i]);
+        //    bricksInScene[i].transform.rotation = inputBrickArrangement.allBricks[i].rotation;
+        //}
     }
 
     void InstantiateCellDisplay(BrickArrangement inputBrickArrangement)
@@ -391,8 +496,8 @@ public class MainController : MonoBehaviour
                 graphLines[i].material.color = gradientColours[3];
             }
 
-            graphLines[i].SetPosition(0, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].start) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.5f, 0));
-            graphLines[i].SetPosition(1, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].end) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.5f, 0));
+            graphLines[i].SetPosition(0, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].start) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.6f, 0));
+            graphLines[i].SetPosition(1, inputBrickArrangement.GetRealCellPosition(brickArrangement.arrangementGraph.graphBranches[i].end) + inputBrickArrangement.displayCellOffset + lineDisplaySeparatorFactor + new Vector3(0, 0.6f, 0));
 
         }
     }

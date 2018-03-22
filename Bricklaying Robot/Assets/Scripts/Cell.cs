@@ -15,6 +15,7 @@ public class Cell
     // graph properties
 
     public int graphIsland;
+    public List<GraphBranch> graphBranches = new List<GraphBranch>();
 
     // pathfinding variables
     public int gCost;

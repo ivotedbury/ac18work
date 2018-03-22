@@ -6,6 +6,7 @@ public class PathFinder
 {
     public bool pathIsIncomplete;
     public int totalCostofTrip;
+    public int totalCostofBuild = 0;
     int counterLimit = 100000;
 
     public Cell bestCurrentCell;
@@ -183,6 +184,8 @@ public class PathFinder
         {
             wayPoints = RetracePath(startCell, targetCell);
             totalCostofTrip = wayPoints[wayPoints.Count - 1].gCost;
+            totalCostofBuild = totalCostofBuild + totalCostofTrip;
+
         }
 
         else // if the counter limit has expired - suggesting there is no complete path

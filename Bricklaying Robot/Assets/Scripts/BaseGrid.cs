@@ -8,6 +8,8 @@ public class BaseGrid
     public Cell[,,] cells;
     public Vector3Int gridSize;
 
+    public List<Cell> allCells = new List<Cell>();
+
     public BaseGrid(Vector3Int _gridSize) // creates a base Grid and populates with Cells in the grid coordinate locations
     {
         gridSize = _gridSize;
@@ -20,6 +22,7 @@ public class BaseGrid
                 for (int x = 0; x < gridSize.x; x++)
                 {
                     cells[x, y, z] = new Cell(new Vector3Int(x, y, z)); // creates a cell in each grid coordinate
+                    allCells.Add(cells[x, y, z]);
                 }
             }
         }

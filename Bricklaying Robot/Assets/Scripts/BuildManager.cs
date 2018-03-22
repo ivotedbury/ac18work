@@ -31,18 +31,18 @@ public class BuildManager
 
     public bool CheckPath()
     {
-        bool pathFound = false;
+        bool pathIsPossible = false;
         brickArrangement.GenerateGraph();
-        
-        pathFound = brickArrangement.CheckPath();
 
-        return pathFound;
+        pathIsPossible = brickArrangement.CheckPath();
+
+        return pathIsPossible;
     }
 
-    public void PickUpNextBrick()
-    {
-        
-    }
+    //public void TryAddingBricks()
+    //{
+    //    brickArrangement.GenerateBrickListToTry();
+    //}
 }
 /* 
  if(!pathComplete)
