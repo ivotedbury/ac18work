@@ -53,6 +53,7 @@ public class MainController : MonoBehaviour
     bool graphBranchesAreShowing = false;
     bool robotHasFinishedTrip = false;
     bool autobuildOn = false;
+    bool robotIsCreated = false;
 
     List<Color> gradientColours = new List<Color>();
 
@@ -114,6 +115,7 @@ public class MainController : MonoBehaviour
     void InstantiateRobot()
     {
         robotObject = Instantiate(robotGameObject, brickArrangement.GetRealCellPosition(robotInScene.position), robotInScene.rotation);
+        robotIsCreated = true;
     }
 
     void ResetScene()
@@ -137,8 +139,11 @@ public class MainController : MonoBehaviour
 
     void UpdateRobot()
     {
-        robotObject.transform.position = brickArrangement.GetRealCellPosition(robotInScene.position) + new Vector3(0, 0.1f, 0);
-        robotObject.transform.rotation = Quaternion.Euler(0, brickArrangement.currentDirection * 90, 0);
+        if (robotIsCreated)
+        {
+            robotObject.transform.position = brickArrangement.GetRealCellPosition(robotInScene.position) + new Vector3(0, 0.1f, 0);
+            robotObject.transform.rotation = Quaternion.Euler(0, brickArrangement.currentDirection * 90, 0);
+        }
     }
 
     void SetTheAssemblyChoice(int assemblyOptionSelection)

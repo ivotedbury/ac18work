@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -89,7 +89,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ShowResolutionOverlay: 1
-  m_LightingDataAsset: {fileID: 112000002, guid: f9079e129a7e32e48bb6405b55be6cd7,
+  m_LightingDataAsset: {fileID: 112000002, guid: f50e872f716124346818e7a27e8b1abc,
     type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -274,7 +274,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 15/03/18 Brick Placement with A* Out and Back
+  m_Text: 22/03/18 Brick Placement with A* Out and Back
 --- !u!222 &63879732
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -373,7 +373,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 108081157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d9c4826406765e47ac3a3357947feef, type: 3}
+  m_Script: {fileID: 11500000, guid: a8c35d8370ae3ab4e8a339e12d90301b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   brickMesh: {fileID: 840726099}
@@ -381,12 +381,12 @@ MonoBehaviour:
   lineRendererObject: {fileID: 10335787}
   gateCellMarkerMesh: {fileID: 1727209822056110, guid: 72ff804b7e14c7e46a353bf86da5a8bf,
     type: 2}
-  robotGameObject: {fileID: 1616011811408796, guid: 0e35aff71ac1f404caa5d946837e60d3,
+  robotGameObject: {fileID: 1616011811408796, guid: e536756f93fa52c4faab896db3d0968d,
     type: 2}
-  brickData0: {fileID: 4900000, guid: 3582092dc0086d945a6623996c4c9d0b, type: 3}
-  brickData1: {fileID: 4900000, guid: ceea045c9c9eec9488d50153ef13c853, type: 3}
-  brickData2: {fileID: 4900000, guid: e8db2250c4157de428bef2d9e4d994d2, type: 3}
-  brickStackTemplate: {fileID: 4900000, guid: 2fa8507963ef3674d89b4397f7f04be9, type: 3}
+  brickData0: {fileID: 4900000, guid: 5a3b01aa96ac0f345b2c33fd037d45f2, type: 3}
+  brickData1: {fileID: 4900000, guid: 9c9c578f55ca1a54fb2a6a2c0f83c9a2, type: 3}
+  brickData2: {fileID: 4900000, guid: 3caab8d63a9f0c34da4be80d3b9c8c54, type: 3}
+  brickStackTemplate: {fileID: 4900000, guid: 5aef8e78629fcda4bad83860aa48d831, type: 3}
   graphMaterial: {fileID: 2100000, guid: 09677c8bf0a22cc40b5910e0f46e7445, type: 2}
   showGraphButton: {fileID: 1234850166}
   hideGraphButton: {fileID: 1342878404}
@@ -425,7 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 0}
+  profile: {fileID: 11400000, guid: 6bfbc91cd7e17e44ab70b8bb03617b3d, type: 2}
 --- !u!1 &118616793
 GameObject:
   m_ObjectHideFlags: 0
@@ -929,9 +929,9 @@ RectTransform:
   m_Father: {fileID: 1010125648}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -315.19, y: -71.67}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 96.36, y: 208.1}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &292117842
