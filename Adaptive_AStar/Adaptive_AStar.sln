@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adaptive_AStar", "Adaptive_AStar.csproj", "{4A6098BE-4E5F-8127-9B8A-9255D4252A38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adaptive_AStar.Editor", "Adaptive_AStar.Editor.csproj", "{C678FC3C-CAD3-7C48-8A1A-6D4368CF7685}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A6098BE-4E5F-8127-9B8A-9255D4252A38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A6098BE-4E5F-8127-9B8A-9255D4252A38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A6098BE-4E5F-8127-9B8A-9255D4252A38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A6098BE-4E5F-8127-9B8A-9255D4252A38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C678FC3C-CAD3-7C48-8A1A-6D4368CF7685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C678FC3C-CAD3-7C48-8A1A-6D4368CF7685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C678FC3C-CAD3-7C48-8A1A-6D4368CF7685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C678FC3C-CAD3-7C48-8A1A-6D4368CF7685}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

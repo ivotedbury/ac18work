@@ -638,7 +638,7 @@ PlayerSettings:
   cloudServicesEnabled:
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 3
+  apiCompatibilityLevel: 2
   cloudProjectId: bd7dd286-18d4-4dff-a2c0-249b067ad0af
   projectName: Bricklaying Robot
   organizationId: ivotedbury
