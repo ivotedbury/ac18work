@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainController : MonoBehaviour
 {
 
     // Overall Grid
     Grid grid;
-    int gridSizeX = 100;
-    int gridSizeY = 100;
-    int gridSizeZ = 100;
+    int gridSizeX = 25;
+    int gridSizeY = 25;
+    int gridSizeZ = 25;
     float gridDimension = 0.05625f;
 
     List<Cell> path = new List<Cell>();
@@ -19,13 +20,26 @@ public class MainController : MonoBehaviour
 
     public GameObject brickMesh;
     Cell seed;
+    Cell currentTargetCell;
+
+    public Slider buildProgress;
+
 
     void Start()
     {
-        grid = new Grid(new Vector3Int(gridSizeX, gridSizeY, gridSizeZ));
-        SetSeed(new Vector3Int(5, 0, 5));
+       
 
-        CreateTower(20, 20, 20, new Vector3Int(50, 0, 50));
+        grid = new Grid(new Vector3Int(gridSizeX, gridSizeY, gridSizeZ));
+        SetSeed(new Vector3Int(3, 0, 3));
+
+        CreateTargetTower(10, 10, 10, new Vector3Int(5, 0, 5)); // dimensions x,y,z, origin
+        targetStructure = ReorderTargetStructure(targetStructure, seed);
+        MakeStructureSolid(targetStructure);
+
+        // UI Setup
+        buildProgress.maxValue = targetStructure.Count - 1;
+      buildProgress.wholeNumbers = true;
+        buildProgress.onValueChanged.AddListener(delegate { BuildProgressValueChangeCheck(); });
 
         UpdateCellDisplay();
     }
@@ -34,6 +48,11 @@ public class MainController : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public void BuildProgressValueChangeCheck()
+    {
+        currentTargetCell = targetStructure[(int) buildProgress.value];
     }
 
     void UpdateCellDisplay()
@@ -72,12 +91,20 @@ public class MainController : MonoBehaviour
         }
     }
 
+    void MakeStructureSolid(List<Cell> inputTargetStructure)
+    {
+        foreach(Cell cell in inputTargetStructure)
+        {
+            cell.isSolid = true;
+        }
+    }
+
     List<Cell> ReorderTargetStructure(List<Cell> inputTargetStructure, Cell inputSeed)
     {
         List<Cell> reorderedTargetStructure = new List<Cell>();
 
-        int currentClosestDistance;
-        int testDistance;
+        float currentClosestDistance;
+        float testDistance;
         int listLength = inputTargetStructure.Count;
 
         Cell bestCurrentCell = null;
@@ -94,12 +121,23 @@ public class MainController : MonoBehaviour
                 {
                     if (inputTargetStructure[i].position.y == currentSearchLayer)
                     {
-                        testDistance = ///////////////////////////////////////////////
+                        testDistance = Mathf.Abs(Vector3.Distance(inputTargetStructure[i].position, inputSeed.position));
+
+                        if (testDistance < currentClosestDistance)
+                        {
+                            currentClosestDistance = testDistance;
+                            bestCurrentCell = inputTargetStructure[i];
+                            betterCellFound = true;
+                        }
                     }
+                }
+                if (betterCellFound)
+                {
+                    reorderedTargetStructure.Add(bestCurrentCell);
+                    inputTargetStructure.Remove(bestCurrentCell);
                 }
             }
         }
-
         return reorderedTargetStructure;
     }
 
