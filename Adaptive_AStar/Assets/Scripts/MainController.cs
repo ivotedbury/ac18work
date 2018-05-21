@@ -13,37 +13,49 @@ public class MainController : MonoBehaviour
     int gridSizeZ = 25;
     float gridDimension = 0.05625f;
 
+    PathFinder pathFinder = new PathFinder();
+
     List<Cell> path = new List<Cell>();
     List<GameObject> brickMeshes = new List<GameObject>();
 
     List<Cell> targetStructure = new List<Cell>();
-    List<Cell> solidCells = new List<Cell>();
+    //  List<Cell> solidCells = new List<Cell>();
+    List<Cell> currentPath = new List<Cell>();
 
     public GameObject brickMesh;
     Cell seed;
     Cell currentTargetCell;
 
     public Slider buildProgress;
+    public Button nextBrickButton;
 
 
     void Start()
     {
         grid = new Grid(new Vector3Int(gridSizeX, gridSizeY, gridSizeZ));
-        SetSeed(new Vector3Int(0, 0, 5));
+        SetSeed(new Vector3Int(1, 1, 5));
 
-        CreateTargetTower(10, 10, 10, new Vector3Int(5, 0, 5)); // dimensions x,y,z, origin
+        CreateTargetTower(10, 10, 10, new Vector3Int(5, 1, 5)); // dimensions x,y,z, origin
         targetStructure = ReorderTargetStructure(targetStructure, seed);
         currentTargetCell = targetStructure[0];
-        UpdateCellDisplay();
 
         // UI Setup
+
+
         buildProgress.maxValue = targetStructure.Count - 1;
         buildProgress.wholeNumbers = true;
         buildProgress.onValueChanged.AddListener(delegate { BuildProgressValueChangeCheck(); });
 
+        nextBrickButton.onClick.AddListener(NextBrick);
+
+
+        UpdateCellDisplay();
     }
 
-
+    void NextBrick()
+    {
+        buildProgress.value = buildProgress.value + 1;
+    }
     void Update()
     {
 
@@ -56,15 +68,25 @@ public class MainController : MonoBehaviour
         currentTargetCell = targetStructure[(int)buildProgress.value];
         currentTargetCell.isTarget = true;
 
-        for (int i = 0; i < (int)buildProgress.value + 1; i++)
+        for (int i = 0; i < (int)buildProgress.value; i++)
         {
             targetStructure[i].isSolid = true;
         }
 
+        FindPath();
+
         UpdateCellDisplay();
     }
 
+    void FindPath()
+    {
+        currentPath = pathFinder.FindPath(grid, seed, currentTargetCell);
 
+        foreach (Cell cell in currentPath)
+        {
+            cell.isSolid = true;
+        }
+    }
 
     void UpdateCellDisplay()
     {
@@ -75,30 +97,36 @@ public class MainController : MonoBehaviour
 
         brickMeshes.Clear();
 
-        for (int z = 0; z < gridSizeZ; z++)
+        for (int i = 0; i < grid.allCells.Count; i++)
         {
-            for (int y = 0; y < gridSizeY; y++)
+            if (grid.allCells[i].isSolid)
             {
-                for (int x = 0; x < gridSizeX; x++)
-                {
-                    if (grid.cells[x, y, z].isSolid)
-                    {
-                        brickMeshes.Add(Instantiate(brickMesh, grid.cells[x, y, z].position, Quaternion.identity));
-                    }
+                brickMeshes.Add(Instantiate(brickMesh, grid.allCells[i].position, Quaternion.identity));
 
-                    if (grid.cells[x, y, z].isSeed)
-                    {
-                        brickMeshes[brickMeshes.Count - 1].GetComponent<Renderer>().material.color = Color.green;
-                    }
-                    if (grid.cells[x, y, z].isTarget)
-                    {
-                        brickMeshes[brickMeshes.Count - 1].GetComponent<Renderer>().material.color = Color.red;
-                    }
+                if (grid.allCells[i].isSeed)
+                {
+                    brickMeshes[brickMeshes.Count - 1].GetComponent<Renderer>().material.color = Color.green;
+                }
+                if (grid.allCells[i] == currentTargetCell)
+                {
+                    brickMeshes[brickMeshes.Count - 1].GetComponent<Renderer>().material.color = Color.red;
                 }
             }
+
         }
     }
 
+    void SetGroundCells()
+    {
+        for (int z = 0; z < grid.gridSize.z; z++)
+        {
+            for (int x = 0; x < grid.gridSize.x; x++)
+            {
+                grid.cells[x, 0, z].isGround = true;
+            }
+        }
+    }
+    
     void CreateTargetTower(int dimX, int dimY, int dimZ, Vector3Int targetOrigin)
     {
         for (int z = 0; z < dimZ; z++)
@@ -108,6 +136,17 @@ public class MainController : MonoBehaviour
                 for (int x = 0; x < dimX; x++)
                 {
                     targetStructure.Add(grid.cells[targetOrigin.x + x, targetOrigin.y + y, targetOrigin.z + z]);
+                }
+            }
+        }
+
+        for (int z = 2; z < dimZ - 2; z++)
+        {
+            for (int y = 0; y < dimY; y++)
+            {
+                for (int x = 2; x < dimX - 2; x++)
+                {
+                    targetStructure.Remove(grid.cells[targetOrigin.x + x, targetOrigin.y + y, targetOrigin.z + z]);
                 }
             }
         }

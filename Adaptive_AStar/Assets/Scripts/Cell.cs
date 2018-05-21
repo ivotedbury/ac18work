@@ -7,6 +7,7 @@ public class Cell {
     public Vector3Int position { get; set; }
     public Vector3 worldPosition { get; set; }
 
+    public bool isGround;
    public bool isSolid;
     public bool isSeed;
    public bool isTarget;
@@ -18,12 +19,13 @@ public class Cell {
     bool temporary;
     int normalStartPathEndSupport;
 
-    int bCost; // distance from start
-    int hCost; // distance from target
-    int mCost; // cost to make
+  public int bCost; // distance from start
+   public int hCost; // distance from target
+   public int mCost; // cost to make
     int alreadyUsedInPathCost;
-    int coveredCost;
-    Cell parent;
+  public  int coveredCost;
+
+    public  Cell parent;
 
     public Cell(Vector3Int _position)
     {
@@ -33,15 +35,24 @@ public class Cell {
         isTarget = false;
     }
 
-    int fCost()
+  public int fCost()
     {
         int fCost = bCost + hCost + mCost;
         return fCost;
     }
 
-    int gCost()
+ public int gCost()
     {
         int gCost = bCost + mCost + coveredCost;
         return gCost;
+    }
+
+   public void resetCosts()
+    {
+        bCost = 0;
+        hCost = 0;
+        mCost = 0;
+        alreadyUsedInPathCost = 0;
+        coveredCost = 0;
     }
 }
