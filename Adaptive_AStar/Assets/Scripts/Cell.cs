@@ -9,10 +9,11 @@ public class Cell {
 
    public bool isSolid;
     public bool isSeed;
+   public bool isTarget;
 
     bool ground;
     bool isAlreadyUsedInPath;
-    bool isTarget;
+   
     
     bool temporary;
     int normalStartPathEndSupport;
@@ -29,6 +30,7 @@ public class Cell {
         position = _position;
         isSolid = false;
         isSeed = false;
+        isTarget = false;
     }
 
     int fCost()

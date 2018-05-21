@@ -17,6 +17,7 @@ public class MainController : MonoBehaviour
     List<GameObject> brickMeshes = new List<GameObject>();
 
     List<Cell> targetStructure = new List<Cell>();
+    List<Cell> solidCells = new List<Cell>();
 
     public GameObject brickMesh;
     Cell seed;
@@ -27,21 +28,19 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-       
-
         grid = new Grid(new Vector3Int(gridSizeX, gridSizeY, gridSizeZ));
-        SetSeed(new Vector3Int(3, 0, 3));
+        SetSeed(new Vector3Int(0, 0, 5));
 
         CreateTargetTower(10, 10, 10, new Vector3Int(5, 0, 5)); // dimensions x,y,z, origin
         targetStructure = ReorderTargetStructure(targetStructure, seed);
-        MakeStructureSolid(targetStructure);
+        currentTargetCell = targetStructure[0];
+        UpdateCellDisplay();
 
         // UI Setup
         buildProgress.maxValue = targetStructure.Count - 1;
-      buildProgress.wholeNumbers = true;
+        buildProgress.wholeNumbers = true;
         buildProgress.onValueChanged.AddListener(delegate { BuildProgressValueChangeCheck(); });
 
-        UpdateCellDisplay();
     }
 
 
@@ -52,11 +51,30 @@ public class MainController : MonoBehaviour
 
     public void BuildProgressValueChangeCheck()
     {
-        currentTargetCell = targetStructure[(int) buildProgress.value];
+        currentTargetCell.isTarget = false;
+
+        currentTargetCell = targetStructure[(int)buildProgress.value];
+        currentTargetCell.isTarget = true;
+
+        for (int i = 0; i < (int)buildProgress.value + 1; i++)
+        {
+            targetStructure[i].isSolid = true;
+        }
+
+        UpdateCellDisplay();
     }
+
+
 
     void UpdateCellDisplay()
     {
+        foreach (GameObject brickMesh in brickMeshes)
+        {
+            Destroy(brickMesh);
+        }
+
+        brickMeshes.Clear();
+
         for (int z = 0; z < gridSizeZ; z++)
         {
             for (int y = 0; y < gridSizeY; y++)
@@ -71,6 +89,10 @@ public class MainController : MonoBehaviour
                     if (grid.cells[x, y, z].isSeed)
                     {
                         brickMeshes[brickMeshes.Count - 1].GetComponent<Renderer>().material.color = Color.green;
+                    }
+                    if (grid.cells[x, y, z].isTarget)
+                    {
+                        brickMeshes[brickMeshes.Count - 1].GetComponent<Renderer>().material.color = Color.red;
                     }
                 }
             }
@@ -93,7 +115,7 @@ public class MainController : MonoBehaviour
 
     void MakeStructureSolid(List<Cell> inputTargetStructure)
     {
-        foreach(Cell cell in inputTargetStructure)
+        foreach (Cell cell in inputTargetStructure)
         {
             cell.isSolid = true;
         }

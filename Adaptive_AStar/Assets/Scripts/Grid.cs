@@ -5,7 +5,7 @@ using UnityEngine;
 public class Grid {
 
     public Cell[,,] cells;
-    Vector3Int gridSize;
+    public Vector3Int gridSize;
 
     public List<Cell> allCells = new List<Cell>();
 
