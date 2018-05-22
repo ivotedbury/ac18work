@@ -178,7 +178,7 @@ public class PathFinder
         int startCellCost = 10000000;
         if (testCell.position.y != 0)
         {
-            if (allCells[testCell.position.x, testCell.position.y - 1, testCell.position.z].isSolid != true && allCells[testCell.position.x, testCell.position.y, testCell.position.z].isSolid != true)
+            if (allCells[testCell.position.x, testCell.position.y - 1, testCell.position.z].isSolid != true && allCells[testCell.position.x, testCell.position.y, testCell.position.z].isSolid !s= true)
             {
                 //if (allCells[testCell.position.x, testCell.position.y - 1, testCell.position.z].isGround != true)
                 //{
