@@ -2,30 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cell {
+public class Cell
+{
 
     public Vector3Int position { get; set; }
     public Vector3 worldPosition { get; set; }
 
     public bool isGround;
-   public bool isSolid;
+    public bool isSolid;
     public bool isSeed;
-   public bool isTarget;
+    public bool isTarget;
 
     bool ground;
     bool isAlreadyUsedInPath;
-   
-    
+
+
     bool temporary;
     int normalStartPathEndSupport;
 
-  public int bCost; // distance from start
-   public int hCost; // distance from target
-   public int mCost; // cost to make
+    public int bCost; // distance from start
+    public int hCost; // distance from target
+    public int mCost; // cost to make
     int alreadyUsedInPathCost;
-  public  int coveredCost;
+    public int coveredCost;
 
-    public  Cell parent;
+    public Cell parent;
 
     public Cell(Vector3Int _position)
     {
@@ -35,19 +36,19 @@ public class Cell {
         isTarget = false;
     }
 
-  public int fCost()
+    public int fCost()
     {
         int fCost = bCost + hCost + mCost;
         return fCost;
     }
 
- public int gCost()
+    public int gCost()
     {
         int gCost = bCost + mCost + coveredCost;
         return gCost;
     }
 
-   public void resetCosts()
+    public void resetCosts()
     {
         bCost = 0;
         hCost = 0;
