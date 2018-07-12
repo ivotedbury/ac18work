@@ -9,21 +9,26 @@ public class MainController : MonoBehaviour
     public GameObject robotMeshContainer;
     public GameObject tracker;
 
+    public GameObject fullBrickMesh;
+    public GameObject halfBrickMesh;
+    public GameObject brickContainer;
+
+    public TextAsset brickDataImport;
+
     Material robotMaterialMain;
     Material robotMaterialHighlight;
 
     List<Robot> allRobots = new List<Robot>();
     List<GameObject> allRobotMeshes = new List<GameObject>();
+    List<GameObject> allBrickMeshes = new List<GameObject>();
 
-    bool move = true;
-
-    IEnumerator MakeMove;
-
-   
+    BrickStructure brickStructure;
 
     void Start()
     {
-        Time.timeScale = 10f;
+        Time.timeScale = 1f;
+
+        brickStructure = new BrickStructure(new Vector3Int(50, 50, 50), brickDataImport);
 
         allRobots.Add(new Robot(new Vector3Int(5, 0, 0), 4, 0));
         allRobots.Add(new Robot(new Vector3Int(20, 0, 0), 4, 1));
@@ -34,6 +39,21 @@ public class MainController : MonoBehaviour
             allRobotMeshes[i].transform.SetParent(robotMeshContainer.transform);
         }
 
+        for (int i = 0; i < brickStructure.bricksInStructure.Count; i++)
+        {
+            if (brickStructure.bricksInStructure[i].brickType == 0)
+            {
+                allBrickMeshes.Add(Instantiate(fullBrickMesh, brickStructure.bricksInStructure[i].originCell.actualPosition, brickStructure.bricksInStructure[i].rotation));
+            }
+
+            if (brickStructure.bricksInStructure[i].brickType == 1)
+            {
+                allBrickMeshes.Add(Instantiate(halfBrickMesh, brickStructure.bricksInStructure[i].originCell.actualPosition, brickStructure.bricksInStructure[i].rotation));
+            }
+
+            allBrickMeshes[i].transform.SetParent(brickContainer.transform);
+        }
+
     }
 
     void Update()
@@ -41,14 +61,6 @@ public class MainController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             allRobots[0].TakeStep("Step along 4 lead A");
-        }
-
-        print(allRobots[0].moveCounter);
-
-        for (int i = 0; i < allRobots.Count; i++)
-        {
-            allRobots[i].UpdateRobot();
-            DisplayRobot(allRobots[i], allRobotMeshes[i]);
         }
 
         if (!allRobots[1].stepInProgress)
@@ -61,10 +73,24 @@ public class MainController : MonoBehaviour
             allRobots[0].TakeStep("Step along 4 lead A");
         }
 
+        DisplayAllMeshes();
+
         tracker.transform.position = allRobotMeshes[0].gameObject.transform.GetChild(0).gameObject.transform.position;
+
     }
 
- 
+
+    void DisplayAllMeshes()
+    {
+
+
+        for (int i = 0; i < allRobots.Count; i++)
+        {
+            allRobots[i].UpdateRobot();
+            DisplayRobot(allRobots[i], allRobotMeshes[i]);
+        }
+    }
+
     void DisplayRobot(Robot robotToDisplay, GameObject meshToDisplay)
     {
         GameObject legAFoot = meshToDisplay.gameObject.transform.GetChild(0).gameObject;

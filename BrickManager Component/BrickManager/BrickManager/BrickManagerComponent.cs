@@ -187,7 +187,7 @@ namespace BrickManager
                 brickPosY = (int)Math.Round(_gridPos.Y);
                 brickPosZ = (int)Math.Round(_gridPos.Z);
 
-                rotation = _rotation+12;
+                rotation = _rotation;
 
                 brickType = _type;
             }
@@ -214,7 +214,8 @@ namespace BrickManager
 
             //Vector3d xDirection = new Vector3d(_brickX - _brickOrigins);
             Vector3d yDirection = new Vector3d(_brickY - _brickOrigins);
-            int yLength = (int)Math.Round(yDirection.Length);
+
+            int yLength = (int)Math.Round(yDirection.Length/_gridDimX);
 
             if (yLength == 1)
             {

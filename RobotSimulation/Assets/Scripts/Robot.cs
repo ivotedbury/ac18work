@@ -68,6 +68,8 @@ public class Robot
     public bool stepInProgress = false;
     public int moveCounter = 0;
 
+    int legCRailMoveTypeStore = 0;
+
     public float speedFactor = 10;
 
     List<int[]> jointTargetList = new List<int[]>();
@@ -109,15 +111,15 @@ public class Robot
 
         if (stepDescription == "Step along 4 lead A")
         {
-            int[] jointTargetListValues0 = { 7250, 2150, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
-            int[] jointTargetListValues1 = { 7250, 1425, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
-            int[] jointTargetListValues2 = { 9500, 1425, 0, 5000, 2150, 500, 3000, 0, 1, 1 };
-            int[] jointTargetListValues3 = { 9500, 2150, 0, 5000, 2150, 500, 3000, 0, 1, 1 };
-            int[] jointTargetListValues4 = { 5000, 2150, 0, 500, 2150, 8870, 3000, 0, 1, 1 };
-            int[] jointTargetListValues5 = { 5000, 2150, 0, 500, 1425, 8870, 3000, 0, 1, 0 };
-            int[] jointTargetListValues6 = { 5000, 2150, 0, 2750, 1425, 6935, 3000, 0, 2, 0 };
-            int[] jointTargetListValues7 = { 5000, 2150, 0, 2750, 2150, 6935, 3000, 0, 2, 0 };
-            int[] jointTargetListValues8 = { 6125, 2150, 0, 3875, 2150, 5000, 3000, 0, 1, 0 };
+            int[] jointTargetListValues0 = { 7250, -1, -1, 5000, -1, 2750, -1, -1, 1, 1 };
+            int[] jointTargetListValues1 = { -1, 1425, -1, -1, -1, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues2 = { 9500, -1, -1, -1, -1, 500, -1, -1, -1, -1 };
+            int[] jointTargetListValues3 = { -1, 2150, -1, -1, -1, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues4 = { 5000, -1, -1, 500, -1, 8870, -1, -1, -1, -1 };
+            int[] jointTargetListValues5 = { -1, -1, -1, -1, 1425, -1, -1, -1, -1, 0 };
+            int[] jointTargetListValues6 = { -1, -1, -1, 2750, -1, 6935, -1, -1, 2, -1 };
+            int[] jointTargetListValues7 = { 5000, -1, -1, -1, 2150, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues8 = { 6125, -1, -1, 3875, -1, 5000, -1, -1, 1, -1 };
 
             jointTargetList.Add(jointTargetListValues0);
             jointTargetList.Add(jointTargetListValues1);
@@ -132,15 +134,40 @@ public class Robot
 
         else if (stepDescription == "Step along 4 lead B")
         {
-            int[] jointTargetListValues0 = { 5000, 2150, 0, 2750, 2150, 6935, 3000, 0, 1, 0 };
-            int[] jointTargetListValues1 = { 5000, 2150, 0, 2750, 1425, 6935, 3000, 0, 1, 0 };
-            int[] jointTargetListValues2 = { 5000, 2150, 0, 500, 1425, 8870, 3000, 0, 2, 0 };
-            int[] jointTargetListValues3 = { 5000, 2150, 0, 500, 2150, 8870, 3000, 0, 2, 0 };
-            int[] jointTargetListValues4 = { 9500, 2150, 0, 5000, 2150, 500, 3000, 0, 2, 1 };
-            int[] jointTargetListValues5 = { 9500, 1425, 0, 5000, 2150, 500, 3000, 0, 2, 1 };
-            int[] jointTargetListValues6 = { 7250, 1425, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
-            int[] jointTargetListValues7 = { 7250, 2150, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
-            int[] jointTargetListValues8 = { 6125, 2150, 0, 3876, 2150, 5000, 3000, 0, 1, 1 };
+            int[] jointTargetListValues0 = { 5000, -1, -1, 2750, -1, 6935, -1, -1, 1, 0 };
+            int[] jointTargetListValues1 = { -1, -1, -1, -1, 1425, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues2 = { -1, -1, -1, 500, -1, 8870, -1, -1, 2, -1 };
+            int[] jointTargetListValues3 = { -1, -1, -1, -1, 2150, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues4 = { 9500, -1, -1, 5000, -1, 500, -1, -1, -1, 1 };
+            int[] jointTargetListValues5 = { -1, 1425, -1, -1, -1, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues6 = { 7250, -1, -1, -1, -1, 2750, -1, -1, 1, -1 };
+            int[] jointTargetListValues7 = { -1, 2150, -1, -1, -1, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues8 = { 6125, -1, -1, 3875, -1, 5000, -1, -1, -1, -1 };
+            
+            jointTargetList.Add(jointTargetListValues0);
+            jointTargetList.Add(jointTargetListValues1);
+            jointTargetList.Add(jointTargetListValues2);
+            jointTargetList.Add(jointTargetListValues3);
+            jointTargetList.Add(jointTargetListValues4);
+            jointTargetList.Add(jointTargetListValues5);
+            jointTargetList.Add(jointTargetListValues6);
+            jointTargetList.Add(jointTargetListValues7);
+            jointTargetList.Add(jointTargetListValues8);
+
+        }
+
+        else if (stepDescription == "Test new method")
+        {
+            int[] jointTargetListValues0 = { 5000, -1, -1, 2750, -1, 6935, -1, -1, 1, 0 };
+            int[] jointTargetListValues1 = { -1, -1, -1, -1, 1425, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues2 = { -1, -1, -1, 500, -1, 8870, -1, -1, 2, -1 };
+            int[] jointTargetListValues3 = { -1, -1, -1, -1, 2150, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues4 = { 9500, -1, -1, 5000, -1, 500, -1, -1, -1, 1 };
+            int[] jointTargetListValues5 = { -1, 1425, -1, -1, -1, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues6 = { 7250, -1, -1, -1, -1, 2750, -1, -1, 1, -1 };
+            int[] jointTargetListValues7 = { -1, 2150, -1, -1, -1, -1, -1, -1, -1, -1 };
+            int[] jointTargetListValues8 = { 6125, -1, -1, 3876, -1, 5000, -1, -1, -1, -1 };
+
 
             jointTargetList.Add(jointTargetListValues0);
             jointTargetList.Add(jointTargetListValues1);
@@ -182,20 +209,62 @@ public class Robot
     {
         moveInProgress = true;
 
-        currentlyAttached = _currentlyAttached;
+        if (_currentlyAttached != -1)
+        {
+            currentlyAttached = _currentlyAttached;
+        }
 
-        legARailJoint.targetPos = _legARailTarget;
-        legAVerticalJoint.targetPos = _legAVerticalTarget;
-        legARotationJoint.targetPos = _legARotationTarget;
-        legBRailJoint.targetPos = _legBRailTarget;
-        legBVerticalJoint.targetPos = _legBVerticalTarget;
-        legCRailJoint.targetPos = _legCRailTarget;
-        legCGripJoint.targetPos = _legCGripTarget;
-        legCRotationJoint.targetPos = _legCRotationTarget;
+        if (_legARailTarget != -1)
+        {
+            legARailJoint.targetPos = _legARailTarget;
+        }
+
+        if (_legAVerticalTarget != -1)
+        {
+            legAVerticalJoint.targetPos = _legAVerticalTarget;
+        }
+
+        if (_legARotationTarget != -1)
+        {
+            legARotationJoint.targetPos = _legARotationTarget;
+        }
+
+        if (_legBRailTarget != -1)
+        {
+            legBRailJoint.targetPos = _legBRailTarget;
+        }
+
+        if (_legBVerticalTarget != -1)
+        {
+            legBVerticalJoint.targetPos = _legBVerticalTarget;
+        }
+
+        if (_legCRailTarget != -1)
+        {
+            legCRailJoint.targetPos = _legCRailTarget;
+        }
+
+        if (_legCGripTarget != -1)
+        {
+            legCGripJoint.targetPos = _legCGripTarget;
+        }
+
+        if (_legCRotationTarget != -1)
+        {
+            legCRotationJoint.targetPos = _legCRotationTarget;
+        }
 
         foreach (RobotJoint joint in allJoints)
         {
-            joint.SetLerpValues(_legCRailMoveType);
+            if (_legCRailMoveType == -1)
+            {
+                joint.SetLerpValues(legCRailMoveTypeStore);
+            }
+            else
+            {
+                joint.SetLerpValues(_legCRailMoveType);
+                legCRailMoveTypeStore = _legCRailMoveType;
+            }
         }
 
     }

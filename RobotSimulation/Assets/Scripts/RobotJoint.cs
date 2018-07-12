@@ -176,5 +176,6 @@ public class RobotJoint
         }
 
         currentPos = resetPos;
+        targetPos = currentPos;
     }
 }
