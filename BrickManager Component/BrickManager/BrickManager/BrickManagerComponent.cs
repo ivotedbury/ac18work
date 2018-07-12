@@ -167,25 +167,29 @@ namespace BrickManager
 
         private class Brick
         {
-           // public Vector3d gridPosition;
-           
-           // string brickType;
+            // public Vector3d gridPosition;
 
-           public int brickPosX;
-           public int brickPosY;
-           public int brickPosZ;
+            // string brickType;
+
+            public int brickPosX;
+            public int brickPosY;
+            public int brickPosZ;
 
             public float rotation;
 
-            public Brick(Vector3d _gridPos, float _rotation)
+            public int brickType; //0 = normal, 1 = half
+
+            public Brick(Vector3d _gridPos, float _rotation, int _type)
             {
-             //   gridPosition = _gridPos;
+                //   gridPosition = _gridPos;
 
                 brickPosX = (int)Math.Round(_gridPos.X);
                 brickPosY = (int)Math.Round(_gridPos.Y);
                 brickPosZ = (int)Math.Round(_gridPos.Z);
 
-                rotation = _rotation;
+                rotation = _rotation+12;
+
+                brickType = _type;
             }
         }
 
@@ -196,6 +200,7 @@ namespace BrickManager
             int posZ;
             Vector3d brickPosition;
             float rotationAngle = 0;
+            int thisbrickType;
 
             Plane brickPlane = new Plane(_brickOrigins, _brickX, _brickY);
 
@@ -205,12 +210,22 @@ namespace BrickManager
 
             brickPosition = new Vector3d(posX, posY, posZ);
 
-            rotationAngle = (float) Math.Round(Vector3d.VectorAngle(brickPlane.XAxis, Plane.WorldXY.XAxis) * 180 / Math.PI);
+            rotationAngle = (float)Math.Round(Vector3d.VectorAngle(brickPlane.XAxis, Plane.WorldXY.XAxis) * 180 / Math.PI);
 
             //Vector3d xDirection = new Vector3d(_brickX - _brickOrigins);
             Vector3d yDirection = new Vector3d(_brickY - _brickOrigins);
+            int yLength = (int)Math.Round(yDirection.Length);
 
-            Brick outputBrick = new Brick(brickPosition, rotationAngle);
+            if (yLength == 1)
+            {
+                thisbrickType = 1;
+            }
+            else 
+            {
+                thisbrickType = 0;
+            }
+
+            Brick outputBrick = new Brick(brickPosition, rotationAngle, thisbrickType);
 
 
             return outputBrick;

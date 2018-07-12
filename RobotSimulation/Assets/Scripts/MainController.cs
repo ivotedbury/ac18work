@@ -19,8 +19,12 @@ public class MainController : MonoBehaviour
 
     IEnumerator MakeMove;
 
+   
+
     void Start()
     {
+        Time.timeScale = 10f;
+
         allRobots.Add(new Robot(new Vector3Int(5, 0, 0), 4, 0));
         allRobots.Add(new Robot(new Vector3Int(20, 0, 0), 4, 1));
 

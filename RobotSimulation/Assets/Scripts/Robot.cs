@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Robot
 {
+    //joint names
     const char legARail = 'A';
     const char legAVertical = 'B';
     const char legARotation = 'C';
@@ -13,84 +14,21 @@ public class Robot
     const char legCGrip = 'G';
     const char legCRotation = 'H';
 
-    public int legARailCurrent;
-    public int legAVerticalCurrent;
-    public int legARotationCurrent;
-    public int legBRailCurrent;
-    public int legBVerticalCurrent;
-    public int legCRailCurrent;
-    public int legCGripCurrent;
-    public int legCRotationCurrent;
+    List<RobotJoint> allJoints = new List<RobotJoint>();
 
-    public int legARailTarget;
-    public int legAVerticalTarget;
-    public int legARotationTarget;
-    public int legBRailTarget;
-    public int legBVerticalTarget;
-    public int legCRailTarget;
-    public int legCGripTarget;
-    public int legCRotationTarget;
+    RobotJoint legARailJoint = new RobotJoint(legARail);
+    RobotJoint legAVerticalJoint = new RobotJoint(legAVertical);
+    RobotJoint legARotationJoint = new RobotJoint(legARotation);
+    RobotJoint legBRailJoint = new RobotJoint(legBRail);
+    RobotJoint legBVerticalJoint = new RobotJoint(legBVertical);
+    RobotJoint legCRailJoint = new RobotJoint(legCRail);
+    RobotJoint legCGripJoint = new RobotJoint(legCGrip);
+    RobotJoint legCRotationJoint = new RobotJoint(legCRotation);
 
-    public float legARailStartTime;
-    public float legAVerticalStartTime;
-    public float legARotationStartTime;
-    public float legBRailStartTime;
-    public float legBVerticalStartTime;
-    public float legCRailStartTime;
-    public float legCGripStartTime;
-    public float legCRotationStartTime;
-
-    int legARailStartValue;
-    int legAVerticalStartValue;
-    int legARotationStartValue;
-    int legBRailStartValue;
-    int legBVerticalStartValue;
-    int legCRailStartValue;
-    int legCGripStartValue;
-    int legCRotationStartValue;
-
-    float legARailElapsedTime;
-    float legAVerticalElapsedTime;
-    float legARotationElapsedTime;
-    float legBRailElapsedTime;
-    float legBVerticalElapsedTime;
-    float legCRailElapsedTime;
-    float legCGripElapsedTime;
-    float legCRotationElapsedTime;
-
-    float legARailTimeForMove;
-    float legAVerticalTimeForMove;
-    float legARotationTimeForMove;
-    float legBRailTimeForMove;
-    float legBVerticalTimeForMove;
-    float legCRailTimeForMove;
-    float legCGripTimeForMove;
-    float legCRotationTimeForMove;
-
-    float legARailSpeed = 2800;
-    float legAVerticalSpeed = 500;
-    float legARotationSpeed = 100;
-    float legBRailSpeed = 2800;
-    float legBVerticalSpeed = 500;
-    float legCRailSpeed = 2800;
-    float legCRailSpeedForLegA = 2800;
-    float legCRailSpeedForLegB = 2408;
-    float legCRailSpeedWithBrickForLegA = 2800;/////////////////not set!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    float legCRailSpeedWithBrickForLegB = 2800;/////////////////not set!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    float legCGripSpeed = 2800;
-    float legCRotationSpeed = 100;
-
-    int legARailResetPos = 6125;
-    int legAVerticalResetPos = 2150;
-    int legARotationResetPos = 0;
-    int legBRailResetPos = 3875;
-    int legBVerticalResetPos = 2150;
-    int legCRailResetPos = 5000;
-    int legCGripResetPos = 3000;
-    int legCRotationResetPos = 0;
-
+    //display mesh offset for vertical joints
     float verticalOffset = 0.124246f;
 
+    //positions for display meshes
     public Vector3 legAFootPos;
     public Vector3 legAPos;
     public Vector3 legBFootPos;
@@ -103,6 +41,7 @@ public class Robot
     public Vector3 grip1Pos;
     public Vector3 grip2Pos;
 
+    //rotations for display meshes
     public Quaternion legAFootRot;
     public Quaternion legARot;
     public Quaternion legBFootRot;
@@ -124,44 +63,25 @@ public class Robot
     public Vector3Int currentLegBGrid;
     public Vector3Int currentLegCGrid;
 
-    public int currentlyAttached; // ABC
+    public int currentlyAttached; // legA or legB
     public bool moveInProgress = false;
     public bool stepInProgress = false;
     public int moveCounter = 0;
 
     public float speedFactor = 10;
 
-    List<int> legARailTargetList = new List<int>();
-    List<int> legAVerticalTargetList = new List<int>();
-    List<int> legARotationTargetList = new List<int>();
-    List<int> legBRailTargetList = new List<int>();
-    List<int> legBVerticalTargetList = new List<int>();
-    List<int> legCRailTargetList = new List<int>();
-    List<int> legCGripTargetList = new List<int>();
-    List<int> legCRotationTargetList = new List<int>();
-
-    List<int> legCRailMoveTypeList = new List<int>();
-    List<int> currentlyConnectedList = new List<int>();
+    List<int[]> jointTargetList = new List<int[]>();
 
     public Robot(Vector3Int _startingPos, int _startingStance, int _currentlyAttached)
     {
-        legARailCurrent = legARailResetPos;
-        legAVerticalCurrent = legAVerticalResetPos;
-        legARotationCurrent = legARotationResetPos;
-        legBRailCurrent = legBRailResetPos;
-        legBVerticalCurrent = legBVerticalResetPos;
-        legCRailCurrent = legCRailResetPos;
-        legCGripCurrent = legCGripResetPos;
-        legCRotationCurrent = legCRotationResetPos;
-
-        legARailTarget = legARailResetPos;
-        legAVerticalTarget = legAVerticalResetPos;
-        legARotationTarget = legARotationResetPos;
-        legBRailTarget = legBRailResetPos;
-        legBVerticalTarget = legBVerticalResetPos;
-        legCRailTarget = legCRailResetPos;
-        legCGripTarget = legCGripResetPos;
-        legCRotationTarget = legCRotationResetPos;
+        allJoints.Add(legARailJoint);
+        allJoints.Add(legAVerticalJoint);
+        allJoints.Add(legARotationJoint);
+        allJoints.Add(legBRailJoint);
+        allJoints.Add(legBVerticalJoint);
+        allJoints.Add(legCRailJoint);
+        allJoints.Add(legCGripJoint);
+        allJoints.Add(legCRotationJoint);
 
         currentlyAttached = _currentlyAttached;
 
@@ -185,65 +105,53 @@ public class Robot
 
     public void TakeStep(string stepDescription)
     {
-        legARailTargetList.Clear();
-        legAVerticalTargetList.Clear();
-        legARotationTargetList.Clear();
-        legBRailTargetList.Clear();
-        legBVerticalTargetList.Clear();
-        legCRailTargetList.Clear();
-        legCGripTargetList.Clear();
-        legCRotationTargetList.Clear();
-        legCRailMoveTypeList.Clear();
-        currentlyConnectedList.Clear();
+        jointTargetList.Clear();
 
         if (stepDescription == "Step along 4 lead A")
         {
-            int[] legARailTargetValues = { 7250, 7250, 9500, 9500, 5000, 5000, 5000, 5000, 6125 };
-            int[] legAVerticalTargetValues = { 2150, 1425, 1425, 2150, 2150, 2150, 2150, 2150, 2150 };
-            int[] legARotationTargetValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            int[] legBRailTargetValues = { 5000, 5000, 5000, 5000, 500, 500, 2750, 2750, 3875 };
-            int[] legBVerticalTargetValues = { 2150, 2150, 2150, 2150, 2150, 1425, 1425, 2150, 2150 };
-            int[] legCRailTargetValues = { 2750, 2750, 500, 500, 8870, 8870, 6935, 6935, 5000 };
-            int[] legCGripTargetValues = { 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000 };
-            int[] legCRotationTargetValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            int[] legCRailMoveTypeValues = { 1, 1, 1, 1, 1, 1, 2, 2, 1 };
-            int[] currentlyConnectedValues = { 1, 1, 1, 1, 1, 0, 0, 0, 0 };
+            int[] jointTargetListValues0 = { 7250, 2150, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
+            int[] jointTargetListValues1 = { 7250, 1425, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
+            int[] jointTargetListValues2 = { 9500, 1425, 0, 5000, 2150, 500, 3000, 0, 1, 1 };
+            int[] jointTargetListValues3 = { 9500, 2150, 0, 5000, 2150, 500, 3000, 0, 1, 1 };
+            int[] jointTargetListValues4 = { 5000, 2150, 0, 500, 2150, 8870, 3000, 0, 1, 1 };
+            int[] jointTargetListValues5 = { 5000, 2150, 0, 500, 1425, 8870, 3000, 0, 1, 0 };
+            int[] jointTargetListValues6 = { 5000, 2150, 0, 2750, 1425, 6935, 3000, 0, 2, 0 };
+            int[] jointTargetListValues7 = { 5000, 2150, 0, 2750, 2150, 6935, 3000, 0, 2, 0 };
+            int[] jointTargetListValues8 = { 6125, 2150, 0, 3875, 2150, 5000, 3000, 0, 1, 0 };
 
-            legARailTargetList.AddRange(legARailTargetValues);
-            legAVerticalTargetList.AddRange(legAVerticalTargetValues);
-            legARotationTargetList.AddRange(legARotationTargetValues);
-            legBRailTargetList.AddRange(legBRailTargetValues);
-            legBVerticalTargetList.AddRange(legBVerticalTargetValues);
-            legCRailTargetList.AddRange(legCRailTargetValues);
-            legCGripTargetList.AddRange(legCGripTargetValues);
-            legCRotationTargetList.AddRange(legCRotationTargetValues);
-            legCRailMoveTypeList.AddRange(legCRailMoveTypeValues);
-            currentlyConnectedList.AddRange(currentlyConnectedValues);
+            jointTargetList.Add(jointTargetListValues0);
+            jointTargetList.Add(jointTargetListValues1);
+            jointTargetList.Add(jointTargetListValues2);
+            jointTargetList.Add(jointTargetListValues3);
+            jointTargetList.Add(jointTargetListValues4);
+            jointTargetList.Add(jointTargetListValues5);
+            jointTargetList.Add(jointTargetListValues6);
+            jointTargetList.Add(jointTargetListValues7);
+            jointTargetList.Add(jointTargetListValues8);
         }
 
         else if (stepDescription == "Step along 4 lead B")
         {
-            int[] legARailTargetValues = { 5000, 5000, 5000, 5000, 9500, 9500, 7250, 7250, 6125 };
-            int[] legAVerticalTargetValues = { 2150, 2150, 2150, 2150, 2150, 1425, 1425, 2150, 2150 };
-            int[] legARotationTargetValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            int[] legBRailTargetValues = { 2750, 2750, 500, 500, 5000, 5000, 5000, 5000, 3876 };
-            int[] legBVerticalTargetValues = { 2150, 1425, 1425, 2150, 2150, 2150, 2150, 2150, 2150 };
-            int[] legCRailTargetValues = { 6935, 6935, 8870, 8870, 500, 500, 2750, 2750, 5000 };
-            int[] legCGripTargetValues = { 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000 };
-            int[] legCRotationTargetValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            int[] legCRailMoveTypeValues = { 1, 1, 2, 2, 2, 2, 1, 1, 1 };
-            int[] currentlyConnectedValues = { 0, 0, 0, 0, 1, 1, 1, 1, 1 };
+            int[] jointTargetListValues0 = { 5000, 2150, 0, 2750, 2150, 6935, 3000, 0, 1, 0 };
+            int[] jointTargetListValues1 = { 5000, 2150, 0, 2750, 1425, 6935, 3000, 0, 1, 0 };
+            int[] jointTargetListValues2 = { 5000, 2150, 0, 500, 1425, 8870, 3000, 0, 2, 0 };
+            int[] jointTargetListValues3 = { 5000, 2150, 0, 500, 2150, 8870, 3000, 0, 2, 0 };
+            int[] jointTargetListValues4 = { 9500, 2150, 0, 5000, 2150, 500, 3000, 0, 2, 1 };
+            int[] jointTargetListValues5 = { 9500, 1425, 0, 5000, 2150, 500, 3000, 0, 2, 1 };
+            int[] jointTargetListValues6 = { 7250, 1425, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
+            int[] jointTargetListValues7 = { 7250, 2150, 0, 5000, 2150, 2750, 3000, 0, 1, 1 };
+            int[] jointTargetListValues8 = { 6125, 2150, 0, 3876, 2150, 5000, 3000, 0, 1, 1 };
 
-            legARailTargetList.AddRange(legARailTargetValues);
-            legAVerticalTargetList.AddRange(legAVerticalTargetValues);
-            legARotationTargetList.AddRange(legARotationTargetValues);
-            legBRailTargetList.AddRange(legBRailTargetValues);
-            legBVerticalTargetList.AddRange(legBVerticalTargetValues);
-            legCRailTargetList.AddRange(legCRailTargetValues);
-            legCGripTargetList.AddRange(legCGripTargetValues);
-            legCRotationTargetList.AddRange(legCRotationTargetValues);
-            legCRailMoveTypeList.AddRange(legCRailMoveTypeValues);
-            currentlyConnectedList.AddRange(currentlyConnectedValues);
+            jointTargetList.Add(jointTargetListValues0);
+            jointTargetList.Add(jointTargetListValues1);
+            jointTargetList.Add(jointTargetListValues2);
+            jointTargetList.Add(jointTargetListValues3);
+            jointTargetList.Add(jointTargetListValues4);
+            jointTargetList.Add(jointTargetListValues5);
+            jointTargetList.Add(jointTargetListValues6);
+            jointTargetList.Add(jointTargetListValues7);
+            jointTargetList.Add(jointTargetListValues8);
+
         }
 
         stepInProgress = true;
@@ -252,19 +160,19 @@ public class Robot
 
     public void MakeMove()
     {
-        RobotMove(legARailTargetList[moveCounter],
-            legAVerticalTargetList[moveCounter],
-            legARotationTargetList[moveCounter],
-            legBRailTargetList[moveCounter],
-            legBVerticalTargetList[moveCounter],
-            legCRailTargetList[moveCounter],
-            legCGripTargetList[moveCounter],
-            legCRotationTargetList[moveCounter],
-            legCRailMoveTypeList[moveCounter],
-            currentlyConnectedList[moveCounter]);
+        RobotMove(jointTargetList[moveCounter][0],
+           jointTargetList[moveCounter][1],
+           jointTargetList[moveCounter][2],
+           jointTargetList[moveCounter][3],
+           jointTargetList[moveCounter][4],
+           jointTargetList[moveCounter][5],
+           jointTargetList[moveCounter][6],
+           jointTargetList[moveCounter][7],
+           jointTargetList[moveCounter][8],
+           jointTargetList[moveCounter][9]);
         moveCounter++;
 
-        if (moveCounter == legARailTargetList.Count)
+        if (moveCounter == jointTargetList.Count)
         {
             stepInProgress = false;
         }
@@ -276,110 +184,32 @@ public class Robot
 
         currentlyAttached = _currentlyAttached;
 
-        legARailTarget = _legARailTarget;
-        legAVerticalTarget = _legAVerticalTarget;
-        legARotationTarget = _legARotationTarget;
-        legBRailTarget = _legBRailTarget;
-        legBVerticalTarget = _legBVerticalTarget;
-        legCRailTarget = _legCRailTarget;
-        legCGripTarget = _legCGripTarget;
-        legCRotationTarget = _legCRotationTarget;
+        legARailJoint.targetPos = _legARailTarget;
+        legAVerticalJoint.targetPos = _legAVerticalTarget;
+        legARotationJoint.targetPos = _legARotationTarget;
+        legBRailJoint.targetPos = _legBRailTarget;
+        legBVerticalJoint.targetPos = _legBVerticalTarget;
+        legCRailJoint.targetPos = _legCRailTarget;
+        legCGripJoint.targetPos = _legCGripTarget;
+        legCRotationJoint.targetPos = _legCRotationTarget;
 
-        if (legARailCurrent != legARailTarget)
+        foreach (RobotJoint joint in allJoints)
         {
-            legARailStartValue = legARailCurrent;
-            legARailStartTime = Time.time;
-            legARailElapsedTime = 0;
-            legARailTimeForMove = Mathf.Abs(legARailTarget - legARailStartValue) / (legARailSpeed * speedFactor);
+            joint.SetLerpValues(_legCRailMoveType);
         }
 
-        if (legAVerticalCurrent != legAVerticalTarget)
-        {
-            legAVerticalStartValue = legAVerticalCurrent;
-            legAVerticalStartTime = Time.time;
-            legAVerticalElapsedTime = 0;
-            legAVerticalTimeForMove = Mathf.Abs(legAVerticalTarget - legAVerticalStartValue) / (legAVerticalSpeed * speedFactor);
-        }
-
-        if (legARotationCurrent != legARotationTarget)
-        {
-            legARotationStartValue = legARotationCurrent;
-            legARotationStartTime = Time.time;
-            legARotationElapsedTime = 0;
-            legARotationTimeForMove = Mathf.Abs(legARotationTarget - legARotationStartValue) / (legARotationSpeed * speedFactor);
-        }
-
-        if (legBRailCurrent != legBRailTarget)
-        {
-            legBRailStartValue = legBRailCurrent;
-            legBRailStartTime = Time.time;
-            legBRailElapsedTime = 0;
-            legBRailTimeForMove = Mathf.Abs(legBRailTarget - legBRailStartValue) / (legBRailSpeed * speedFactor);
-        }
-
-        if (legBVerticalCurrent != legBVerticalTarget)
-        {
-            legBVerticalStartValue = legBVerticalCurrent;
-            legBVerticalStartTime = Time.time;
-            legBVerticalElapsedTime = 0;
-            legBVerticalTimeForMove = Mathf.Abs(legBVerticalTarget - legBVerticalStartValue) / (legBVerticalSpeed * speedFactor);
-        }
-
-        if (legCRailCurrent != legCRailTarget)
-        {
-            legCRailStartValue = legCRailCurrent;
-            legCRailStartTime = Time.time;
-            legCRailElapsedTime = 0;
-            if (_legCRailMoveType == 1)
-            {
-                legCRailTimeForMove = Mathf.Abs(legCRailTarget - legCRailStartValue) / (legCRailSpeedForLegA * speedFactor);
-            }
-            if (_legCRailMoveType == 2)
-            {
-                legCRailTimeForMove = Mathf.Abs(legCRailTarget - legCRailStartValue) / (legCRailSpeedForLegB * speedFactor);
-            }
-            if (_legCRailMoveType == 3)
-            {
-                legCRailTimeForMove = Mathf.Abs(legCRailTarget - legCRailStartValue) / (legCRailSpeedWithBrickForLegA * speedFactor);
-            }
-            if (_legCRailMoveType == 4)
-            {
-                legCRailTimeForMove = Mathf.Abs(legCRailTarget - legCRailStartValue) / (legCRailSpeedWithBrickForLegB * speedFactor);
-            }
-            else
-            {
-                legCRailTimeForMove = Mathf.Abs(legCRailTarget - legCRailStartValue) / (legCRailSpeed * speedFactor);
-            }
-
-        }
-
-        if (legCGripCurrent != legCGripTarget)
-        {
-            legCGripStartValue = legAVerticalCurrent;
-            legCGripStartTime = Time.time;
-            legCGripElapsedTime = 0;
-            legCGripTimeForMove = Mathf.Abs(legCGripTarget - legCGripStartValue) / (legCGripSpeed * speedFactor);
-        }
-
-        if (legCRotationCurrent != legCRotationTarget)
-        {
-            legCRotationStartValue = legCRotationCurrent;
-            legCRotationStartTime = Time.time;
-            legCRotationElapsedTime = 0;
-            legCRotationTimeForMove = Mathf.Abs(legCRotationTarget - legCRotationStartValue) / (legCRotationSpeed * speedFactor);
-        }
     }
 
     public void CarryOutMoves()
     {
-        if (legARailCurrent != legARailTarget ||
-    legAVerticalCurrent != legAVerticalTarget ||
-   legARotationCurrent != legARotationTarget ||
-   legBRailCurrent != legBRailTarget ||
-   legBVerticalCurrent != legBVerticalTarget ||
-   legCRailCurrent != legCRailTarget ||
-   legCGripCurrent != legCGripTarget ||
-   legCRotationCurrent != legCRotationTarget)
+        if (legARailJoint.JointNeedsToMove() ||
+            legAVerticalJoint.JointNeedsToMove() ||
+            legARotationJoint.JointNeedsToMove() ||
+            legBRailJoint.JointNeedsToMove() ||
+            legBVerticalJoint.JointNeedsToMove() ||
+            legCRailJoint.JointNeedsToMove() ||
+            legCGripJoint.JointNeedsToMove() ||
+            legCRotationJoint.JointNeedsToMove())
         {
             moveInProgress = true;
         }
@@ -394,62 +224,10 @@ public class Robot
             MakeMove();
         }
 
-        if (legARailCurrent != legARailTarget)
+        foreach (RobotJoint joint in allJoints)
         {
-            float LegARailPercentage = (legARailElapsedTime * 100 / legARailTimeForMove) / 100;
-            legARailCurrent = (int)Mathf.Lerp(legARailStartValue, legARailTarget, LegARailPercentage);
-            legARailElapsedTime += Time.deltaTime;
+            joint.LerpJointPosition();
         }
-
-        if (legAVerticalCurrent != legAVerticalTarget)
-        {
-            float LegAVerticalPercentage = (legAVerticalElapsedTime * 100 / legAVerticalTimeForMove) / 100;
-            legAVerticalCurrent = (int)Mathf.Lerp(legAVerticalStartValue, legAVerticalTarget, LegAVerticalPercentage);
-            legAVerticalElapsedTime += Time.deltaTime;
-        }
-
-        if (legARotationCurrent != legARotationTarget)
-        {
-            float LegARotationPercentage = (legARotationElapsedTime * 100 / legARotationTimeForMove) / 100;
-            legARotationCurrent = (int)Mathf.Lerp(legARotationStartValue, legARotationTarget, LegARotationPercentage);
-            legARotationElapsedTime += Time.deltaTime;
-        }
-
-        if (legBRailCurrent != legBRailTarget)
-        {
-            float LegBRailPercentage = (legBRailElapsedTime * 100 / legBRailTimeForMove) / 100;
-            legBRailCurrent = (int)Mathf.Lerp(legBRailStartValue, legBRailTarget, LegBRailPercentage);
-            legBRailElapsedTime += Time.deltaTime;
-        }
-
-        if (legBVerticalCurrent != legBVerticalTarget)
-        {
-            float LegBVerticalPercentage = (legBVerticalElapsedTime * 100 / legBVerticalTimeForMove) / 100;
-            legBVerticalCurrent = (int)Mathf.Lerp(legBVerticalStartValue, legBVerticalTarget, LegBVerticalPercentage);
-            legBVerticalElapsedTime += Time.deltaTime;
-        }
-
-        if (legCRailCurrent != legCRailTarget)
-        {
-            float LegCRailPercentage = (legCRailElapsedTime * 100 / legCRailTimeForMove) / 100;
-            legCRailCurrent = (int)Mathf.Lerp(legCRailStartValue, legCRailTarget, LegCRailPercentage);
-            legCRailElapsedTime += Time.deltaTime;
-        }
-
-        if (legCGripCurrent != legCGripTarget)
-        {
-            float LegCGripPercentage = (legCGripElapsedTime * 100 / legCGripTimeForMove) / 100;
-            legCGripCurrent = (int)Mathf.Lerp(legCGripStartValue, legCGripTarget, LegCGripPercentage);
-            legCGripElapsedTime += Time.deltaTime;
-        }
-
-        if (legCRotationCurrent != legCRotationTarget)
-        {
-            float LegCRotationPercentage = (legCRotationElapsedTime * 100 / legCRotationTimeForMove) / 100;
-            legCRotationCurrent = (int)Mathf.Lerp(legCRotationStartValue, legCRotationTarget, LegCRotationPercentage);
-            legCRotationElapsedTime += Time.deltaTime;
-        }
-
 
     }
 
@@ -458,33 +236,33 @@ public class Robot
         if (currentlyAttached == 0)
         {
             legAPos = legAFootPos;
-            legARot = Quaternion.Euler(0, legARotationCurrent / 10, 0) * legAFootRot;
+            legARot = Quaternion.Euler(0, legARotationJoint.currentPos / 10, 0) * legAFootRot;
 
-            verticalToHorizontalAPos = legAPos + new Vector3(0, verticalOffset + (legAVerticalCurrent * 0.0001f), 0);
+            verticalToHorizontalAPos = legAPos + new Vector3(0, verticalOffset + (legAVerticalJoint.currentPos * 0.0001f), 0);
             verticalToHorizontalARot = legARot;
 
-            mainBeamPos = verticalToHorizontalAPos + legARot * new Vector3(0, 0.06008f, (legARailCurrent * 0.0001f) - 0.5f);
+            mainBeamPos = verticalToHorizontalAPos + legARot * new Vector3(0, 0.06008f, (legARailJoint.currentPos * 0.0001f) - 0.5f);
             mainBeamRot = legARot;
 
-            verticalToHorizontalBPos = mainBeamPos - legARot * (new Vector3(0, 0.06008f, legBRailCurrent * 0.0001f - 0.5f));
+            verticalToHorizontalBPos = mainBeamPos - legARot * (new Vector3(0, 0.06008f, legBRailJoint.currentPos * 0.0001f - 0.5f));
             verticalToHorizontalBRot = legARot;
 
-            legBPos = verticalToHorizontalBPos - new Vector3(0, verticalOffset + (legBVerticalCurrent * 0.0001f), 0);
+            legBPos = verticalToHorizontalBPos - new Vector3(0, verticalOffset + (legBVerticalJoint.currentPos * 0.0001f), 0);
             legBRot = legARot;
 
             legBFootPos = legBPos;
             legBFootRot = legARot;
 
-            legCPos = mainBeamPos + legARot * (new Vector3(0, -0.192f, -(legCRailCurrent * 0.0001f - 0.5f)));
+            legCPos = mainBeamPos + legARot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
             legCRot = legARot;
 
             legCFootPos = legCPos;
-            legCFootRot = legCRot * Quaternion.Euler(0, legCRotationCurrent / 10, 0);
+            legCFootRot = legCRot * Quaternion.Euler(0, legCRotationJoint.currentPos / 10, 0);
 
-            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(grippedPos - legCGripCurrent) * 0.00001f));
+            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(grippedPos - legCGripJoint.currentPos) * 0.00001f));
             grip1Rot = legCFootRot;
 
-            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (grippedPos - legCGripCurrent) * 0.00001f));
+            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (grippedPos - legCGripJoint.currentPos) * 0.00001f));
             grip2Rot = legCFootRot;
         }
 
@@ -493,31 +271,31 @@ public class Robot
             legBPos = legBFootPos;
             legBRot = legBFootRot;
 
-            verticalToHorizontalBPos = legBPos + new Vector3(0, verticalOffset + (legBVerticalCurrent * 0.0001f), 0);
+            verticalToHorizontalBPos = legBPos + new Vector3(0, verticalOffset + (legBVerticalJoint.currentPos * 0.0001f), 0);
             verticalToHorizontalBRot = legBRot;
 
-            mainBeamPos = verticalToHorizontalBPos + legBRot * new Vector3(0, 0.06008f, (legBRailCurrent * 0.0001f) - 0.5f);
+            mainBeamPos = verticalToHorizontalBPos + legBRot * new Vector3(0, 0.06008f, (legBRailJoint.currentPos * 0.0001f) - 0.5f);
             mainBeamRot = legBRot;
 
-            verticalToHorizontalAPos = mainBeamPos - legBRot * (new Vector3(0, 0.06008f, (legARailCurrent * 0.0001f - 0.5f)));
+            verticalToHorizontalAPos = mainBeamPos - legBRot * (new Vector3(0, 0.06008f, (legARailJoint.currentPos * 0.0001f - 0.5f)));
             verticalToHorizontalARot = legBRot;
 
-            legAPos = verticalToHorizontalAPos - new Vector3(0, verticalOffset + (legAVerticalCurrent * 0.0001f), 0);
+            legAPos = verticalToHorizontalAPos - new Vector3(0, verticalOffset + (legAVerticalJoint.currentPos * 0.0001f), 0);
             legARot = legBRot;
 
             legAFootPos = legAPos;
-            legAFootRot = legARot * Quaternion.Euler(0, legARotationCurrent / 10, 0) * legAFootRot;
+            legAFootRot = legARot * Quaternion.Euler(0, legARotationJoint.currentPos / 10, 0) * legAFootRot;
 
-            legCPos = mainBeamPos + legBRot * (new Vector3(0, -0.192f, -(legCRailCurrent * 0.0001f - 0.5f)));
+            legCPos = mainBeamPos + legBRot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
             legCRot = legBRot;
 
             legCFootPos = legCPos;
-            legCFootRot = legCRot * Quaternion.Euler(0, legCRotationCurrent / 10, 0);
+            legCFootRot = legCRot * Quaternion.Euler(0, legCRotationJoint.currentPos / 10, 0);
 
-            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(grippedPos - legCGripCurrent) * 0.00001f));
+            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(grippedPos - legCGripJoint.currentPos) * 0.00001f));
             grip1Rot = legCFootRot;
 
-            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (grippedPos - legCGripCurrent) * 0.00001f));
+            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (grippedPos - legCGripJoint.currentPos) * 0.00001f));
             grip2Rot = legCFootRot;
         }
     }
