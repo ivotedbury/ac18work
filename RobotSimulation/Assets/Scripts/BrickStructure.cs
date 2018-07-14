@@ -10,11 +10,15 @@ public class BrickStructure
     public List<Brick> bricksInStructure = new List<Brick>();
 
     public Grid grid;
+    public Cell seedCell;
 
-    public BrickStructure(Vector3Int _gridSize, TextAsset _brickDataImport)
+    private int importOffset = 5;
+
+    public BrickStructure(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
         grid = new Grid(_gridSize);
         CreateBricksInArrangment(_brickDataImport);
+        CreateSeed(_seedCell);
     }
 
     void CreateBricksInArrangment(TextAsset _brickDataImport)
@@ -30,11 +34,16 @@ public class BrickStructure
         
     }
 
+    void CreateSeed(Vector3Int _seed)
+    {
+        seedCell = grid.cellsArray[_seed.x, _seed.y, _seed.z];
+    }
+
     Brick ConvertToBrick(BrickImportItem importedBrickItem)
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid.cellsArray[importedBrickItem.brickPosX, importedBrickItem.brickPosZ, importedBrickItem.brickPosY], importedBrickItem.rotation, importedBrickItem.brickType);
+        convertedBrick = new Brick(grid.cellsArray[importedBrickItem.brickPosX + importOffset, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffset], importedBrickItem.rotation, importedBrickItem.brickType);
 
         convertedBrick.childCells = grid.GetChildren(convertedBrick); 
 

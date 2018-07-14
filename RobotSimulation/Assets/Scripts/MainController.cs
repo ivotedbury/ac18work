@@ -13,6 +13,9 @@ public class MainController : MonoBehaviour
     public GameObject halfBrickMesh;
     public GameObject brickContainer;
 
+    public GameObject seedMarker;
+    public GameObject cellMarker;
+
     public TextAsset brickDataImport;
 
     Material robotMaterialMain;
@@ -24,14 +27,18 @@ public class MainController : MonoBehaviour
 
     BrickStructure brickStructure;
 
+    Vector3Int gridSize = new Vector3Int(100, 100, 100);
+    Vector3Int seedPosition = new Vector3Int(5, 0, 5);
+
+
     void Start()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 4f;
 
-        brickStructure = new BrickStructure(new Vector3Int(50, 50, 50), brickDataImport);
+        brickStructure = new BrickStructure(gridSize, seedPosition, brickDataImport);
 
-        allRobots.Add(new Robot(new Vector3Int(5, 0, 0), 4, 0));
-        allRobots.Add(new Robot(new Vector3Int(20, 0, 0), 4, 1));
+        allRobots.Add(new Robot(new Vector3Int(50, 0, 50), 4, 1));
+        allRobots.Add(new Robot(new Vector3Int(20, 0, 20), 4, 0));
 
         for (int i = 0; i < allRobots.Count; i++)
         {
@@ -54,36 +61,72 @@ public class MainController : MonoBehaviour
             allBrickMeshes[i].transform.SetParent(brickContainer.transform);
         }
 
+        seedMarker.transform.position = brickStructure.seedCell.actualPosition;
+
+        for (int z = 0; z < brickStructure.grid.gridSize.z; z++)
+        {
+            for (int x = 0; x < brickStructure.grid.gridSize.x; x++)
+            {
+                Instantiate(cellMarker, brickStructure.grid.cellsArray[x, 0, z].actualPosition + new Vector3(0, 0.001f, 0), Quaternion.identity);
+            }
+        }
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown("h"))
         {
-            allRobots[0].TakeStep("Step along 4 lead A");
+            allRobots[0].TakeStep(1, 8, 0);
         }
 
+        if (Input.GetKeyDown("j"))
+        {
+            allRobots[0].TakeStep(0, 7, 0);
+        }
+        if (Input.GetKeyDown("k"))
+        {
+            allRobots[0].TakeStep(0, 6, 0);
+        }
+        if (Input.GetKeyDown("l"))
+        {
+            allRobots[0].TakeStep(0, 5, 0);
+        }
+
+        if (Input.GetKeyDown("n"))
+        {
+            allRobots[0].TakeStep(0, 8, 1);
+        }
+
+        if (Input.GetKeyDown("m"))
+        {
+            allRobots[0].TakeStep(0, 7, 1);
+        }
+        if (Input.GetKeyDown(","))
+        {
+            allRobots[0].TakeStep(0, 6, 1);
+        }
+        if (Input.GetKeyDown("."))
+        {
+            allRobots[0].TakeStep(0, 5, 1);
+        }
         if (!allRobots[1].stepInProgress)
         {
-            allRobots[1].TakeStep("Step along 4 lead B");
+            //      allRobots[1].TakeStep("Step along 4 lead B");
         }
 
         if (!allRobots[0].stepInProgress)
         {
-            allRobots[0].TakeStep("Step along 4 lead A");
+            //       allRobots[0].TakeStep("Step along 4 lead A");
         }
 
         DisplayAllMeshes();
 
         tracker.transform.position = allRobotMeshes[0].gameObject.transform.GetChild(0).gameObject.transform.position;
-
-    }
+            }
 
 
     void DisplayAllMeshes()
     {
-
-
         for (int i = 0; i < allRobots.Count; i++)
         {
             allRobots[i].UpdateRobot();

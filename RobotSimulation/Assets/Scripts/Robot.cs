@@ -14,6 +14,12 @@ public class Robot
     const char legCGrip = 'G';
     const char legCRotation = 'H';
 
+    const int legA = 0;
+    const int legB = 1;
+    const int legC = 2;
+    const int bothLegs = 3;
+
+
     List<RobotJoint> allJoints = new List<RobotJoint>();
 
     RobotJoint legARailJoint = new RobotJoint(legARail);
@@ -55,7 +61,8 @@ public class Robot
     public Quaternion grip2Rot;
 
     float gridDimXZ = 0.05625f;
-    float gridDimY = 0.0725f;
+    float gridDimY = 0.0625f;
+    float clearanceHeight = 0.02f;
 
     public int grippedPos = 4800;
 
@@ -69,6 +76,8 @@ public class Robot
     public int moveCounter = 0;
 
     int legCRailMoveTypeStore = 0;
+    int currentStance;
+    int brickCurrentlyCarried = 0; // 0 = no brick // 1 = full brick // 2 = half brick
 
     public float speedFactor = 10;
 
@@ -86,6 +95,8 @@ public class Robot
         allJoints.Add(legCRotationJoint);
 
         currentlyAttached = _currentlyAttached;
+
+        currentStance = 4;
 
         if (currentlyAttached == 0)
         {
@@ -105,81 +116,148 @@ public class Robot
         UpdateReferenceTransforms();
     }
 
-    public void TakeStep(string stepDescription)
+    int[] LiftLeg(int _legToLift, int _gridStepsToMove)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_legToLift == legA)
+        {
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) + clearanceHeight) * 10000));
+         //   outputTargetValues[9] = legB;
+        }
+
+        if (_legToLift == legB)
+        {
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) + clearanceHeight) * 10000));
+         //   outputTargetValues[9] = legA;
+        }
+
+        return outputTargetValues;
+    }
+
+    int[] PlaceLeg(int _legToPlace, int _gridStepsToMove)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_legToPlace == legA)
+        {
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) * 10000)));
+          //  outputTargetValues[9] = legA;
+        }
+
+        if (_legToPlace == legB)
+        {
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) * 10000)));
+           // outputTargetValues[9] = legB;
+
+        }
+
+        return outputTargetValues;
+    }
+
+    int[] ReturnToStance(int _currentStance)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        outputTargetValues[0] = (int)(5000 + ((_currentStance * gridDimXZ) * 10000 / 2));
+        outputTargetValues[3] = (int)(5000 - ((_currentStance * gridDimXZ) * 10000 / 2));
+        outputTargetValues[5] = 5000;
+
+        return outputTargetValues;
+    }
+
+    int[] SetForCounterbalance(int _pivotLeg, int _spacing)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_pivotLeg == 0)
+        {
+            outputTargetValues[0] = 5000;
+            outputTargetValues[3] = (int)(5000 - (_spacing * gridDimXZ * 10000));
+
+            if (brickCurrentlyCarried == 0)
+            {
+                outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegBFactor));
+                outputTargetValues[8] = 2;
+            }
+            else if (brickCurrentlyCarried == 1)
+            {
+                outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegBFactor));
+                outputTargetValues[8] = 4;
+            }
+            else if (brickCurrentlyCarried == 2)
+            {
+                outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegBFactor));
+                outputTargetValues[8] = 6;
+            }
+        }
+
+        if (_pivotLeg == 1)
+        {
+            outputTargetValues[3] = 5000;
+            outputTargetValues[0] = (int)(5000 + (_spacing * gridDimXZ * 10000));
+
+            if (brickCurrentlyCarried == 0)
+            {
+                outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegAFactor));
+                outputTargetValues[8] = 1;
+            }
+            else if (brickCurrentlyCarried == 1)
+            {
+                outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegAFactor));
+                outputTargetValues[8] = 3;
+            }
+            else if (brickCurrentlyCarried == 2)
+            {
+                outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegAFactor));
+                outputTargetValues[8] = 5;
+            }
+        }
+
+        outputTargetValues[9] = _pivotLeg;
+
+        return outputTargetValues;
+    }
+
+
+    public void TakeStep(int _stepGradient, int _stepSize, int _leadLeg)
     {
         jointTargetList.Clear();
 
-        if (stepDescription == "Step along 4 lead A")
-        {
-            int[] jointTargetListValues0 = { 7250, -1, -1, 5000, -1, 2750, -1, -1, 1, 1 };
-            int[] jointTargetListValues1 = { -1, 1425, -1, -1, -1, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues2 = { 9500, -1, -1, -1, -1, 500, -1, -1, -1, -1 };
-            int[] jointTargetListValues3 = { -1, 2150, -1, -1, -1, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues4 = { 5000, -1, -1, 500, -1, 8870, -1, -1, -1, -1 };
-            int[] jointTargetListValues5 = { -1, -1, -1, -1, 1425, -1, -1, -1, -1, 0 };
-            int[] jointTargetListValues6 = { -1, -1, -1, 2750, -1, 6935, -1, -1, 2, -1 };
-            int[] jointTargetListValues7 = { 5000, -1, -1, -1, 2150, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues8 = { 6125, -1, -1, 3875, -1, 5000, -1, -1, 1, -1 };
+        int leadingLeg;
+        int trailingLeg;
 
-            jointTargetList.Add(jointTargetListValues0);
-            jointTargetList.Add(jointTargetListValues1);
-            jointTargetList.Add(jointTargetListValues2);
-            jointTargetList.Add(jointTargetListValues3);
-            jointTargetList.Add(jointTargetListValues4);
-            jointTargetList.Add(jointTargetListValues5);
-            jointTargetList.Add(jointTargetListValues6);
-            jointTargetList.Add(jointTargetListValues7);
-            jointTargetList.Add(jointTargetListValues8);
+        if (_leadLeg == legA)
+        {
+            leadingLeg = legA;
+            trailingLeg = legB;
         }
 
-        else if (stepDescription == "Step along 4 lead B")
+        else
         {
-            int[] jointTargetListValues0 = { 5000, -1, -1, 2750, -1, 6935, -1, -1, 1, 0 };
-            int[] jointTargetListValues1 = { -1, -1, -1, -1, 1425, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues2 = { -1, -1, -1, 500, -1, 8870, -1, -1, 2, -1 };
-            int[] jointTargetListValues3 = { -1, -1, -1, -1, 2150, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues4 = { 9500, -1, -1, 5000, -1, 500, -1, -1, -1, 1 };
-            int[] jointTargetListValues5 = { -1, 1425, -1, -1, -1, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues6 = { 7250, -1, -1, -1, -1, 2750, -1, -1, 1, -1 };
-            int[] jointTargetListValues7 = { -1, 2150, -1, -1, -1, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues8 = { 6125, -1, -1, 3875, -1, 5000, -1, -1, -1, -1 };
-            
-            jointTargetList.Add(jointTargetListValues0);
-            jointTargetList.Add(jointTargetListValues1);
-            jointTargetList.Add(jointTargetListValues2);
-            jointTargetList.Add(jointTargetListValues3);
-            jointTargetList.Add(jointTargetListValues4);
-            jointTargetList.Add(jointTargetListValues5);
-            jointTargetList.Add(jointTargetListValues6);
-            jointTargetList.Add(jointTargetListValues7);
-            jointTargetList.Add(jointTargetListValues8);
-
+            leadingLeg = legB;
+            trailingLeg = legA;
         }
 
-        else if (stepDescription == "Test new method")
-        {
-            int[] jointTargetListValues0 = { 5000, -1, -1, 2750, -1, 6935, -1, -1, 1, 0 };
-            int[] jointTargetListValues1 = { -1, -1, -1, -1, 1425, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues2 = { -1, -1, -1, 500, -1, 8870, -1, -1, 2, -1 };
-            int[] jointTargetListValues3 = { -1, -1, -1, -1, 2150, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues4 = { 9500, -1, -1, 5000, -1, 500, -1, -1, -1, 1 };
-            int[] jointTargetListValues5 = { -1, 1425, -1, -1, -1, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues6 = { 7250, -1, -1, -1, -1, 2750, -1, -1, 1, -1 };
-            int[] jointTargetListValues7 = { -1, 2150, -1, -1, -1, -1, -1, -1, -1, -1 };
-            int[] jointTargetListValues8 = { 6125, -1, -1, 3876, -1, 5000, -1, -1, -1, -1 };
+        int[] jointTargetListValues0 = SetForCounterbalance(trailingLeg, currentStance);
+        int[] jointTargetListValues1 = LiftLeg(leadingLeg, _stepGradient+1);
+        int[] jointTargetListValues2 = SetForCounterbalance(trailingLeg,_stepSize);
+        int[] jointTargetListValues3 = PlaceLeg(leadingLeg, _stepGradient);
+        int[] jointTargetListValues4 = SetForCounterbalance(leadingLeg,_stepSize);
+        int[] jointTargetListValues5 = LiftLeg(trailingLeg, _stepGradient+1);
+        int[] jointTargetListValues6 = SetForCounterbalance(leadingLeg, currentStance);
+        int[] jointTargetListValues7 = PlaceLeg(trailingLeg, _stepGradient);
+        int[] jointTargetListValues8 = ReturnToStance(currentStance);
 
-
-            jointTargetList.Add(jointTargetListValues0);
-            jointTargetList.Add(jointTargetListValues1);
-            jointTargetList.Add(jointTargetListValues2);
-            jointTargetList.Add(jointTargetListValues3);
-            jointTargetList.Add(jointTargetListValues4);
-            jointTargetList.Add(jointTargetListValues5);
-            jointTargetList.Add(jointTargetListValues6);
-            jointTargetList.Add(jointTargetListValues7);
-            jointTargetList.Add(jointTargetListValues8);
-
-        }
+        jointTargetList.Add(jointTargetListValues0);
+        jointTargetList.Add(jointTargetListValues1);
+        jointTargetList.Add(jointTargetListValues2);
+        jointTargetList.Add(jointTargetListValues3);
+        jointTargetList.Add(jointTargetListValues4);
+        jointTargetList.Add(jointTargetListValues5);
+        jointTargetList.Add(jointTargetListValues6);
+        jointTargetList.Add(jointTargetListValues7);
+        jointTargetList.Add(jointTargetListValues8);
 
         stepInProgress = true;
         moveCounter = 0;

@@ -9,7 +9,7 @@ public class RobotJoint
 
     //general
     float speed;
-    int resetPos;
+    public int resetPos;
     public int currentPos;
     public int targetPos;
     public int speedMode = 0;
@@ -37,12 +37,12 @@ public class RobotJoint
     float legBRailSpeed = 2800;
     float legBVerticalSpeed = 500;
     float legCRailSpeed = 2800;
-    float legCRailSpeedForLegA = 2800;
-    float legCRailSpeedForLegB = 2408;
-    float legCRailSpeedWithBrickForLegA = 2800;/////////////////not set!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    float legCRailSpeedWithBrickForLegB = 2800;/////////////////not set!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    float legCRailSpeedWithHalfBrickForLegA = 2800;/////////////////not set!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    float legCRailSpeedWithHalfBrickForLegB = 2800;/////////////////not set!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    float legCRailSpeedForLegA;
+    float legCRailSpeedForLegB;
+    float legCRailSpeedWithBrickForLegA;
+    float legCRailSpeedWithBrickForLegB;
+    float legCRailSpeedWithHalfBrickForLegA;
+    float legCRailSpeedWithHalfBrickForLegB;
     float legCGripSpeed = 2800;
     float legCRotationSpeed = 100;
 
@@ -56,11 +56,47 @@ public class RobotJoint
     int legCGripResetPos = 3000;
     int legCRotationResetPos = 0;
 
+    //relative weights
+    float legAWeight = 3700;
+    float legBWeight = 3050;
+    float legCWeight = 3750;
+    float legCWithFullBrickWeight = 5750;
+    float legCWithHalfBrickWeight = 4650;
+
+    //relative speed and distance factors
+    public float normalLegCFactor;
+    public float normalLegAFactor;
+    public float normalLegBFactor;
+    public float fullBrickLegAFactor;
+    public float fullBrickLegBFactor;
+    public float halfBrickLegAFactor;
+    public float halfBrickLegBFactor;
+
+
     public RobotJoint(char _thisJoint)
     {
         thisJoint = _thisJoint;
 
+        SetRelativeFactorsAndSpeeds();
         SetupJoint();
+    }
+
+    void SetRelativeFactorsAndSpeeds()
+    {
+        normalLegCFactor = 1;
+        normalLegAFactor = legAWeight / legCWeight;
+        normalLegBFactor = legBWeight / legCWeight;
+        fullBrickLegAFactor = legAWeight / legCWithFullBrickWeight;
+        fullBrickLegBFactor = legBWeight / legCWithFullBrickWeight;
+        halfBrickLegAFactor = legAWeight / legCWithHalfBrickWeight;
+        halfBrickLegBFactor = legBWeight / legCWithHalfBrickWeight;
+
+        legCRailSpeedForLegA = legCRailSpeed * normalLegAFactor;
+        legCRailSpeedForLegB = legCRailSpeed * normalLegBFactor;
+        legCRailSpeedWithBrickForLegA = legCRailSpeed * fullBrickLegAFactor;
+        legCRailSpeedWithBrickForLegB = legCRailSpeed * fullBrickLegBFactor;
+        legCRailSpeedWithHalfBrickForLegA = legCRailSpeed * halfBrickLegAFactor;
+        legCRailSpeedWithHalfBrickForLegB = legCRailSpeed * halfBrickLegBFactor;
     }
 
     public bool JointNeedsToMove()
