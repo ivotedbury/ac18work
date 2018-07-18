@@ -33,18 +33,18 @@ public class RobotJoint
     //speeds
     float legARailSpeed = 2800;
     float legAVerticalSpeed = 500;
-    float legARotationSpeed = 100;
+    float legARotationSpeed = 500;
     float legBRailSpeed = 2800;
     float legBVerticalSpeed = 500;
     float legCRailSpeed = 2800;
-    float legCRailSpeedForLegA;
-    float legCRailSpeedForLegB;
-    float legCRailSpeedWithBrickForLegA;
-    float legCRailSpeedWithBrickForLegB;
-    float legCRailSpeedWithHalfBrickForLegA;
-    float legCRailSpeedWithHalfBrickForLegB;
+    float legCRailSpeedForLegA; //1
+    float legCRailSpeedForLegB; //2
+    float legCRailSpeedWithBrickForLegA; //3
+    float legCRailSpeedWithBrickForLegB; //4
+    float legCRailSpeedWithHalfBrickForLegA; //5
+    float legCRailSpeedWithHalfBrickForLegB; //6
     float legCGripSpeed = 2800;
-    float legCRotationSpeed = 100;
+    float legCRotationSpeed = 500;
 
     //reset positions
     int legARailResetPos = 6125;

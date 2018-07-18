@@ -219,11 +219,11 @@ namespace BrickManager
 
             if (yLength == 1)
             {
-                thisbrickType = 1;
+                thisbrickType = 2;
             }
             else 
             {
-                thisbrickType = 0;
+                thisbrickType = 1;
             }
 
             Brick outputBrick = new Brick(brickPosition, rotationAngle, thisbrickType);

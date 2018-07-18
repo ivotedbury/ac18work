@@ -32,7 +32,7 @@ public class Robot
     RobotJoint legCRotationJoint = new RobotJoint(legCRotation);
 
     //display mesh offset for vertical joints
-    float verticalOffset = 0.124246f;
+    float verticalOffset = 0.114246f;
 
     //positions for display meshes
     public Vector3 legAFootPos;
@@ -60,11 +60,13 @@ public class Robot
     public Quaternion grip1Rot;
     public Quaternion grip2Rot;
 
-    float gridDimXZ = 0.05625f;
-    float gridDimY = 0.0625f;
-    float clearanceHeight = 0.02f;
+    public float gridDimXZ = 0.05625f; //brick grid dimensions
+    public float gridDimY = 0.0625f;
 
-    public int grippedPos = 4800;
+    float clearanceHeight = 0.00f; //extra height to clear the brick when lifting a leg
+
+    int gripClosedPos = 4800;
+    int gripOpenPos = 3000;
 
     public Vector3Int currentLegAGrid;
     public Vector3Int currentLegBGrid;
@@ -72,18 +74,25 @@ public class Robot
 
     public int currentlyAttached; // legA or legB
     public bool moveInProgress = false;
-    public bool stepInProgress = false;
+
+    public bool stepInProgress = false;   //type of Move
+    public bool pickupInProgress = false;
+    public bool placementInProgress = false;
     public int moveCounter = 0;
+
+    public bool brickIsAttached = false; //for external coordination with the brick
+    public Brick brickBeingCarried;
+    public int brickTypeCurrentlyCarried = 0; // 0 = no brick // 1 = full brick // 2 = half brick
+
 
     int legCRailMoveTypeStore = 0;
     int currentStance;
-    int brickCurrentlyCarried = 0; // 0 = no brick // 1 = full brick // 2 = half brick
-
-    public float speedFactor = 10;
+    bool footAHeelIn;
 
     List<int[]> jointTargetList = new List<int[]>();
+    int[] defaultTargetValues = new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-    public Robot(Vector3Int _startingPos, int _startingStance, int _currentlyAttached)
+    public Robot(Vector3Int _startingPos, int _startingStance, int _currentlyAttached, bool _footAHeelIn)
     {
         allJoints.Add(legARailJoint);
         allJoints.Add(legAVerticalJoint);
@@ -96,7 +105,13 @@ public class Robot
 
         currentlyAttached = _currentlyAttached;
 
-        currentStance = 4;
+        currentStance = _startingStance;
+        footAHeelIn = _footAHeelIn;
+
+        if (!footAHeelIn) // if heel is supposed to be out, set the current position to 1800
+        {
+            allJoints[2].targetPos = 1800;
+        }
 
         if (currentlyAttached == 0)
         {
@@ -122,14 +137,33 @@ public class Robot
 
         if (_legToLift == legA)
         {
-            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) + clearanceHeight) * 10000));
-         //   outputTargetValues[9] = legB;
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - ((gridDimY + clearanceHeight) * 10000));
+            outputTargetValues[9] = legB;
         }
 
         if (_legToLift == legB)
         {
-            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) + clearanceHeight) * 10000));
-         //   outputTargetValues[9] = legA;
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - ((gridDimY + clearanceHeight) * 10000));
+            outputTargetValues[9] = legA;
+        }
+
+        return outputTargetValues;
+    }
+
+    int[] LiftBothLegs(int _gridStepsToMove)
+    {
+
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_gridStepsToMove > 0)
+        {
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos + (gridDimY * 10000));
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos + (gridDimY * 10000));
+        }
+        else if (_gridStepsToMove < 0)
+        {
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos);
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos);
         }
 
         return outputTargetValues;
@@ -141,15 +175,26 @@ public class Robot
 
         if (_legToPlace == legA)
         {
-            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) * 10000)));
-          //  outputTargetValues[9] = legA;
+            if (_gridStepsToMove < 0)
+            {
+                outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (_gridStepsToMove * gridDimY * 10000));
+            }
+            else
+            {
+                outputTargetValues[1] = (int)(legAVerticalJoint.resetPos);
+            }
         }
 
         if (_legToPlace == legB)
         {
-            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (((_gridStepsToMove * gridDimY) * 10000)));
-           // outputTargetValues[9] = legB;
-
+            if (_gridStepsToMove < 0)
+            {
+                outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (_gridStepsToMove * gridDimY * 10000));
+            }
+            else
+            {
+                outputTargetValues[4] = (int)(legBVerticalJoint.resetPos);
+            }
         }
 
         return outputTargetValues;
@@ -166,7 +211,7 @@ public class Robot
         return outputTargetValues;
     }
 
-    int[] SetForCounterbalance(int _pivotLeg, int _spacing)
+    int[] SetForCounterbalance(int _pivotLeg, float _spacing, int _brickTypeCurrentlyBeingCarried)
     {
         int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
@@ -175,17 +220,17 @@ public class Robot
             outputTargetValues[0] = 5000;
             outputTargetValues[3] = (int)(5000 - (_spacing * gridDimXZ * 10000));
 
-            if (brickCurrentlyCarried == 0)
+            if (_brickTypeCurrentlyBeingCarried == 0)
             {
                 outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegBFactor));
                 outputTargetValues[8] = 2;
             }
-            else if (brickCurrentlyCarried == 1)
+            else if (_brickTypeCurrentlyBeingCarried == 1)
             {
                 outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegBFactor));
                 outputTargetValues[8] = 4;
             }
-            else if (brickCurrentlyCarried == 2)
+            else if (_brickTypeCurrentlyBeingCarried == 2)
             {
                 outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegBFactor));
                 outputTargetValues[8] = 6;
@@ -197,17 +242,17 @@ public class Robot
             outputTargetValues[3] = 5000;
             outputTargetValues[0] = (int)(5000 + (_spacing * gridDimXZ * 10000));
 
-            if (brickCurrentlyCarried == 0)
+            if (_brickTypeCurrentlyBeingCarried == 0)
             {
                 outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegAFactor));
                 outputTargetValues[8] = 1;
             }
-            else if (brickCurrentlyCarried == 1)
+            else if (_brickTypeCurrentlyBeingCarried == 1)
             {
                 outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegAFactor));
                 outputTargetValues[8] = 3;
             }
-            else if (brickCurrentlyCarried == 2)
+            else if (_brickTypeCurrentlyBeingCarried == 2)
             {
                 outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegAFactor));
                 outputTargetValues[8] = 5;
@@ -219,35 +264,276 @@ public class Robot
         return outputTargetValues;
     }
 
-
-    public void TakeStep(int _stepGradient, int _stepSize, int _leadLeg)
+    int[] RotateLegA(float _turnAngle)
     {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        outputTargetValues[2] = (int)(_turnAngle);
+
+        return outputTargetValues;
+    }
+
+    int[] PrepareLegsForGrip(int _baseLeg, float _distanceInFront, int _brickTypeCurrentlyBeingCarried)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_baseLeg == 0)
+        {
+            outputTargetValues[0] = 5000;
+            outputTargetValues[5] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000));
+
+            if (_brickTypeCurrentlyBeingCarried == 0)
+            {
+                outputTargetValues[3] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.normalLegBFactor));
+                outputTargetValues[8] = 2;
+            }
+            else if (_brickTypeCurrentlyBeingCarried == 1)
+            {
+                outputTargetValues[3] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.fullBrickLegBFactor));
+                outputTargetValues[8] = 4;
+            }
+            else if (_brickTypeCurrentlyBeingCarried == 2)
+            {
+                outputTargetValues[3] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.halfBrickLegBFactor));
+                outputTargetValues[8] = 6;
+            }
+        }
+
+        if (_baseLeg == 1)
+        {
+            outputTargetValues[3] = 5000;
+            outputTargetValues[0] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000));
+
+            if (_brickTypeCurrentlyBeingCarried == 0)
+            {
+                outputTargetValues[5] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.normalLegAFactor));
+                outputTargetValues[8] = 1;
+            }
+            else if (_brickTypeCurrentlyBeingCarried == 1)
+            {
+                outputTargetValues[5] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.fullBrickLegAFactor));
+                outputTargetValues[8] = 3;
+            }
+            else if (_brickTypeCurrentlyBeingCarried == 2)
+            {
+                outputTargetValues[5] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.halfBrickLegAFactor));
+                outputTargetValues[8] = 5;
+            }
+        }
+
+        outputTargetValues[9] = _baseLeg;
+
+        return outputTargetValues;
+    }
+
+    int[] OpenGrip()
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        outputTargetValues[6] = gripOpenPos;
+
+        return outputTargetValues;
+    }
+
+    int[] RotateGrip(float _turnAngle)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        outputTargetValues[7] = (int)_turnAngle;
+
+        return outputTargetValues;
+    }
+
+    int[] CloseGrip()
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        outputTargetValues[6] = gripClosedPos;
+
+        return outputTargetValues;
+    }
+
+    int[] LiftBothLegsForBrick(int _baseLeg, int _relativeBrickHeight)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_baseLeg == legA)
+        {
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos);
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (gridDimY * 10000));
+        }
+        else if (_baseLeg == legB)
+        {
+            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (gridDimY * 10000));
+            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos);
+        }
+
+        return outputTargetValues;
+    }
+
+    int[] LowerBothLegsForBrick(int _baseLeg, int _relativeBrickHeight)
+    {
+        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        float pickupOffsetFromResetPos = 0.135321f;
+
+        if (_baseLeg == legA)
+        {
+            outputTargetValues[1] = (int)((legAVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+            outputTargetValues[4] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight - 1) * gridDimY + pickupOffsetFromResetPos) * 10000));
+        }
+        else if (_baseLeg == legB)
+        {
+            outputTargetValues[1] = (int)((legAVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight - 1) * gridDimY + pickupOffsetFromResetPos) * 10000));
+            outputTargetValues[4] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+        }
+
+        return outputTargetValues;
+    }
+
+    public void ChangeFootAHeelPosition(int _newPosition)
+    {
+        bool changeIsNeeded = false;
+
+        if (_newPosition == 0 && footAHeelIn == false)
+        {
+            footAHeelIn = true;
+            changeIsNeeded = true;
+        }
+        else if (_newPosition == 180 && footAHeelIn == true)
+        {
+            footAHeelIn = false;
+            changeIsNeeded = true;
+        }
+
         jointTargetList.Clear();
 
+        int[] jointTargetListValues0 = SetForCounterbalance(legB, currentStance, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues1 = LiftLeg(legA, 1);
+        int[] jointTargetListValues2 = RotateLegA(_newPosition * 10);
+        int[] jointTargetListValues3 = PlaceLeg(legA, 1);
+        int[] jointTargetListValues4 = ReturnToStance(currentStance);
+
+        jointTargetList.Add(jointTargetListValues0);
+        jointTargetList.Add(jointTargetListValues1);
+        jointTargetList.Add(jointTargetListValues2);
+        jointTargetList.Add(jointTargetListValues3);
+        jointTargetList.Add(jointTargetListValues4);
+
+        if (changeIsNeeded)
+        {
+            stepInProgress = true;
+            placementInProgress = true;
+            moveCounter = 0;
+        }
+
+    }
+
+    public void PlaceBrick(int _relativeBrickHeight, int _distanceInFront, int _distanceToSide, int _leadLeg, int _gripRotation, Brick _brickToPlace)
+    {
+        jointTargetList.Clear();
+        int brickTypeToBeCarriedAfterPlacement = 0;
+
+        bool preTurnIsNeeded = false;
+        int preTurnAngle = 0;
+        bool postTurnIsNeeded = false;
+        int postTurnAngle = 0;
+
+        float currentLegABase;
+
+        if (_distanceToSide < 0 && !footAHeelIn)
+        {
+            currentLegABase = 180;
+        }
+
+        else if (_distanceToSide > 0 && !footAHeelIn)
+        {
+            preTurnIsNeeded = true;
+            preTurnAngle = 0;
+            postTurnIsNeeded = true;
+            postTurnAngle = 1800;
+            currentLegABase = 0;
+        }
+
+        else if (_distanceToSide < 0 && footAHeelIn)
+        {
+            preTurnIsNeeded = true;
+            preTurnAngle = 1800;
+            postTurnIsNeeded = true;
+            postTurnAngle = 0;
+            currentLegABase = 180;
+        }
+        else
+        {
+            currentLegABase = 0;
+        }
+
+        float legARotation = RadianToDegree(Mathf.Atan((float)_distanceToSide / _distanceInFront));
+        float gripRotation = _gripRotation - legARotation;
+        float legCPlacementDistance = Mathf.Sqrt(Mathf.Pow(_distanceInFront, 2) + Mathf.Pow(_distanceToSide, 2));
+
+        // account for foot A heel in or out
+
+        //set leg types
         int leadingLeg;
         int trailingLeg;
-
         if (_leadLeg == legA)
         {
             leadingLeg = legA;
             trailingLeg = legB;
         }
-
         else
         {
             leadingLeg = legB;
             trailingLeg = legA;
+            legARotation = 0;
         }
 
-        int[] jointTargetListValues0 = SetForCounterbalance(trailingLeg, currentStance);
-        int[] jointTargetListValues1 = LiftLeg(leadingLeg, _stepGradient+1);
-        int[] jointTargetListValues2 = SetForCounterbalance(trailingLeg,_stepSize);
-        int[] jointTargetListValues3 = PlaceLeg(leadingLeg, _stepGradient);
-        int[] jointTargetListValues4 = SetForCounterbalance(leadingLeg,_stepSize);
-        int[] jointTargetListValues5 = LiftLeg(trailingLeg, _stepGradient+1);
-        int[] jointTargetListValues6 = SetForCounterbalance(leadingLeg, currentStance);
-        int[] jointTargetListValues7 = PlaceLeg(trailingLeg, _stepGradient);
-        int[] jointTargetListValues8 = ReturnToStance(currentStance);
+        int[] jointTargetListValues0 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues1 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues2 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues3 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues4 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (preTurnIsNeeded)
+        {
+            jointTargetListValues0 = SetForCounterbalance(legB, currentStance, brickTypeCurrentlyCarried);
+            jointTargetListValues1 = LiftLeg(legA, 1);
+            jointTargetListValues2 = RotateLegA(preTurnAngle);
+            jointTargetListValues3 = PlaceLeg(legA, 1);
+            jointTargetListValues4 = ReturnToStance(currentStance);
+        }
+
+        int[] jointTargetListValues5 = SetForCounterbalance(leadingLeg, currentStance, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues6 = LiftLeg(trailingLeg, 1);
+        int[] jointTargetListValues7 = SetForCounterbalance(leadingLeg, 2, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues8 = RotateLegA((currentLegABase + legARotation) * 10);
+        int[] jointTargetListValues9 = PrepareLegsForGrip(leadingLeg, legCPlacementDistance, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues10 = RotateGrip((gripRotation * 10));
+        int[] jointTargetListValues11 = LowerBothLegsForBrick(leadingLeg, _relativeBrickHeight);
+        int[] jointTargetListValues12 = OpenGrip();
+        int[] jointTargetListValues13 = PrepareLegsForGrip(leadingLeg, legCPlacementDistance, brickTypeToBeCarriedAfterPlacement);
+        int[] jointTargetListValues14 = LiftBothLegsForBrick(leadingLeg, _relativeBrickHeight);
+        int[] jointTargetListValues15 = RotateGrip(0);
+        int[] jointTargetListValues16 = SetForCounterbalance(leadingLeg, currentStance, brickTypeToBeCarriedAfterPlacement);
+        int[] jointTargetListValues17 = RotateLegA(currentLegABase * 10);
+        int[] jointTargetListValues18 = PlaceLeg(trailingLeg, 1);
+        int[] jointTargetListValues19 = ReturnToStance(currentStance);
+
+        int[] jointTargetListValues20 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues21 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues22 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues23 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues24 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (postTurnIsNeeded)
+        {
+            jointTargetListValues20 = SetForCounterbalance(legB, currentStance, brickTypeCurrentlyCarried);
+            jointTargetListValues21 = LiftLeg(legA, 1);
+            jointTargetListValues22 = RotateLegA(postTurnAngle);
+            jointTargetListValues23 = PlaceLeg(legA, 1);
+            jointTargetListValues24 = ReturnToStance(currentStance);
+        }
 
         jointTargetList.Add(jointTargetListValues0);
         jointTargetList.Add(jointTargetListValues1);
@@ -258,7 +544,305 @@ public class Robot
         jointTargetList.Add(jointTargetListValues6);
         jointTargetList.Add(jointTargetListValues7);
         jointTargetList.Add(jointTargetListValues8);
+        jointTargetList.Add(jointTargetListValues9);
+        jointTargetList.Add(jointTargetListValues10);
+        jointTargetList.Add(jointTargetListValues11);
+        jointTargetList.Add(jointTargetListValues12);
+        jointTargetList.Add(jointTargetListValues13);
+        jointTargetList.Add(jointTargetListValues14);
+        jointTargetList.Add(jointTargetListValues15);
+        jointTargetList.Add(jointTargetListValues16);
+        jointTargetList.Add(jointTargetListValues17);
+        jointTargetList.Add(jointTargetListValues18);
+        jointTargetList.Add(jointTargetListValues19);
+        jointTargetList.Add(jointTargetListValues20);
+        jointTargetList.Add(jointTargetListValues21);
+        jointTargetList.Add(jointTargetListValues22);
+        jointTargetList.Add(jointTargetListValues23);
+        jointTargetList.Add(jointTargetListValues24);
 
+        stepInProgress = true;
+        placementInProgress = true;
+        moveCounter = 0;
+    }
+
+    public void PickUpBrick(int _relativeBrickHeight, int _distanceInFront, int _leadLeg, Brick _brickToCarry)
+    {
+        jointTargetList.Clear();
+
+        int leadingLeg;
+        int trailingLeg;
+
+        brickBeingCarried = _brickToCarry;
+
+        int brickTypeToBeCarriedAfterPickup = _brickToCarry.brickType;
+
+        if (_leadLeg == legA)
+        {
+            leadingLeg = legA;
+            trailingLeg = legB;
+        }
+        else
+        {
+            leadingLeg = legB;
+            trailingLeg = legA;
+        }
+
+        int[] jointTargetListValues0 = SetForCounterbalance(leadingLeg, currentStance, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues1 = LiftLeg(trailingLeg, 1);
+        int[] jointTargetListValues2 = SetForCounterbalance(leadingLeg, 2 * _distanceInFront, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues3 = PlaceLeg(trailingLeg, 1);
+        int[] jointTargetListValues4 = PrepareLegsForGrip(leadingLeg, _distanceInFront, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues5 = OpenGrip(); // no brick being carried
+        int[] jointTargetListValues6 = LowerBothLegsForBrick(leadingLeg, _relativeBrickHeight);
+        int[] jointTargetListValues7 = CloseGrip();
+        int[] jointTargetListValues8 = LiftBothLegsForBrick(leadingLeg, _relativeBrickHeight);
+        int[] jointTargetListValues9 = SetForCounterbalance(leadingLeg, 2 * _distanceInFront, brickTypeToBeCarriedAfterPickup);
+        int[] jointTargetListValues10 = LiftLeg(trailingLeg, 1);
+        int[] jointTargetListValues11 = SetForCounterbalance(leadingLeg, currentStance, brickTypeToBeCarriedAfterPickup);
+        int[] jointTargetListValues12 = PlaceLeg(trailingLeg, 1);
+        int[] jointTargetListValues13 = ReturnToStance(currentStance);
+
+        jointTargetList.Add(jointTargetListValues0);
+        jointTargetList.Add(jointTargetListValues1);
+        jointTargetList.Add(jointTargetListValues2);
+        jointTargetList.Add(jointTargetListValues3);
+        jointTargetList.Add(jointTargetListValues4);
+        jointTargetList.Add(jointTargetListValues5);
+        jointTargetList.Add(jointTargetListValues6);
+        jointTargetList.Add(jointTargetListValues7);
+        jointTargetList.Add(jointTargetListValues8);
+        jointTargetList.Add(jointTargetListValues9);
+        jointTargetList.Add(jointTargetListValues10);
+        jointTargetList.Add(jointTargetListValues11);
+        jointTargetList.Add(jointTargetListValues12);
+        jointTargetList.Add(jointTargetListValues13);
+
+        stepInProgress = true;
+        pickupInProgress = true;
+        moveCounter = 0;
+    }
+
+    public void TakeStep(int _stepGradient, int _stepSize, int _leadLeg, int _endStance, int _turnAngle)
+    {
+        jointTargetList.Clear();
+
+        int leadingLeg;
+        int trailingLeg;
+
+        int preTurnAngle = 0;
+        int initialTurnAngle = 0;
+        int finalTurnAngle = 0;
+        int postTurnAngle = 0;
+
+        bool preTurnIsNeeded = false;
+        bool postTurnIsNeeded = false;
+
+        if (footAHeelIn == true) // heel in - 0 is the resting position
+        {
+
+            if (_leadLeg == legA)
+            {
+                leadingLeg = legA;
+                trailingLeg = legB;
+
+                if (_turnAngle == 90) // turn right
+                {
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 0;
+                }
+                else if (_turnAngle == -90) // turn left
+                {
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 1800;
+                    postTurnAngle = 0;
+                    postTurnIsNeeded = true;
+                }
+                else if (_turnAngle == 180) // turn 180
+                {
+                    initialTurnAngle = 1800;
+                    finalTurnAngle = 0;
+                }
+            }
+
+            else
+            {
+                leadingLeg = legB;
+                trailingLeg = legA;
+
+                if (_turnAngle == -90) // turn right
+                {
+                    preTurnAngle = 1800;
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 0;
+                    preTurnIsNeeded = true;
+                }
+                else if (_turnAngle == 90) // turn left
+                {
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 0;
+                }
+                else if (_turnAngle == 180) // turn 180
+                {
+                    initialTurnAngle = 1800;
+                    finalTurnAngle = 0;
+                }
+            }
+
+        }
+
+        else // heel out - 180 is the resting position
+        {
+            if (_leadLeg == legA)
+            {
+                leadingLeg = legA;
+                trailingLeg = legB;
+
+                if (_turnAngle == 90) // turn right
+                {
+
+                    initialTurnAngle = 1800;
+                    finalTurnAngle = 900;
+                    postTurnAngle = 1800;
+                    postTurnIsNeeded = true;
+                }
+                else if (_turnAngle == -90) // turn left
+                {
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 1800;
+                }
+                else if (_turnAngle == 180) // turn 180
+                {
+                    initialTurnAngle = 0;
+                    finalTurnAngle = 1800;
+                }
+            }
+
+            else
+            {
+                leadingLeg = legB;
+                trailingLeg = legA;
+
+                if (_turnAngle == -90) // turn right
+                {
+                    //preTurnAngle = 0;
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 1800;
+                    //preTurnIsNeeded = true;
+                }
+                else if (_turnAngle == 90) // turn left
+                {
+                    preTurnAngle = 0;
+                    initialTurnAngle = 900;
+                    finalTurnAngle = 1800;
+                    preTurnIsNeeded = true;
+                }
+                else if (_turnAngle == 180) // turn 180
+                {
+                    initialTurnAngle = 0;
+                    finalTurnAngle = 1800;
+                }
+            }
+        }
+
+        //PRE TURN
+        int[] jointTargetListValues0 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues1 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues2 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues3 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (preTurnIsNeeded)
+        {
+            jointTargetListValues0 = SetForCounterbalance(leadingLeg, currentStance, brickTypeCurrentlyCarried);
+            jointTargetListValues1 = LiftLeg(trailingLeg, 1);
+            jointTargetListValues2 = RotateLegA(preTurnAngle);
+            jointTargetListValues3 = PlaceLeg(trailingLeg, 1);
+        }
+
+        //SHIFT HEIGHT IF GOING UP
+        int[] jointTargetListValues4 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_stepGradient > 0)
+        {
+            jointTargetListValues4 = LiftBothLegs(_stepGradient);
+        }
+
+        //MAIN STEP
+        int[] jointTargetListValues5 = SetForCounterbalance(trailingLeg, currentStance, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues6 = LiftLeg(leadingLeg, _stepGradient);
+        int[] jointTargetListValues7 = RotateLegA(initialTurnAngle);
+        int[] jointTargetListValues8 = SetForCounterbalance(trailingLeg, _stepSize, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues9 = PlaceLeg(leadingLeg, _stepGradient);
+        int[] jointTargetListValues10 = SetForCounterbalance(leadingLeg, _stepSize, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues11 = LiftLeg(trailingLeg, _stepGradient + 1);
+        int[] jointTargetListValues12 = SetForCounterbalance(leadingLeg, _endStance, brickTypeCurrentlyCarried);
+        int[] jointTargetListValues13 = RotateLegA(finalTurnAngle);
+        int[] jointTargetListValues14 = PlaceLeg(trailingLeg, _stepGradient);
+
+        int[] jointTargetListValues15 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (!postTurnIsNeeded)
+        {
+            jointTargetListValues15 = ReturnToStance(_endStance);
+        }
+
+        //SHIFT HEIGHT IF GOING DOWN
+        int[] jointTargetListValues16 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_stepGradient < 0)
+        {
+            jointTargetListValues16 = LiftBothLegs(_stepGradient);
+        }
+
+        // POST TURN
+        int[] jointTargetListValues17 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues18 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues19 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues20 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        int[] jointTargetListValues21 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (postTurnIsNeeded)
+        {
+            jointTargetListValues17 = SetForCounterbalance(trailingLeg, currentStance, brickTypeCurrentlyCarried);
+            jointTargetListValues18 = LiftLeg(leadingLeg, 1);
+            jointTargetListValues19 = RotateLegA(postTurnAngle);
+            jointTargetListValues20 = PlaceLeg(leadingLeg, 1);
+            jointTargetListValues21 = ReturnToStance(_endStance);
+
+        }
+
+        if (preTurnIsNeeded)
+        {
+            jointTargetList.Add(jointTargetListValues0);
+            jointTargetList.Add(jointTargetListValues1);
+            jointTargetList.Add(jointTargetListValues2);
+            jointTargetList.Add(jointTargetListValues3);
+        }
+
+        jointTargetList.Add(jointTargetListValues4);
+        jointTargetList.Add(jointTargetListValues5);
+        jointTargetList.Add(jointTargetListValues6);
+        jointTargetList.Add(jointTargetListValues7);
+        jointTargetList.Add(jointTargetListValues8);
+        jointTargetList.Add(jointTargetListValues9);
+        jointTargetList.Add(jointTargetListValues10);
+        jointTargetList.Add(jointTargetListValues11);
+        jointTargetList.Add(jointTargetListValues12);
+        jointTargetList.Add(jointTargetListValues13);
+        jointTargetList.Add(jointTargetListValues14);
+        jointTargetList.Add(jointTargetListValues15);
+        jointTargetList.Add(jointTargetListValues16);
+
+        if (postTurnIsNeeded)
+        {
+            jointTargetList.Add(jointTargetListValues17);
+            jointTargetList.Add(jointTargetListValues18);
+            jointTargetList.Add(jointTargetListValues19);
+            jointTargetList.Add(jointTargetListValues20);
+            jointTargetList.Add(jointTargetListValues21);
+        }
+
+        currentStance = _endStance;
         stepInProgress = true;
         moveCounter = 0;
     }
@@ -277,9 +861,23 @@ public class Robot
            jointTargetList[moveCounter][9]);
         moveCounter++;
 
+        if (pickupInProgress && moveCounter == 9)
+        {
+            brickIsAttached = true;
+            brickTypeCurrentlyCarried = brickBeingCarried.brickType;
+        }
+
+        if (placementInProgress && moveCounter == 14)
+        {
+            brickIsAttached = false;
+            brickTypeCurrentlyCarried = 0;
+        }
+
         if (moveCounter == jointTargetList.Count)
         {
             stepInProgress = false;
+            pickupInProgress = false;
+            placementInProgress = false;
         }
     }
 
@@ -383,7 +981,7 @@ public class Robot
         if (currentlyAttached == 0)
         {
             legAPos = legAFootPos;
-            legARot = Quaternion.Euler(0, legARotationJoint.currentPos / 10, 0) * legAFootRot;
+            legARot = Quaternion.Euler(0, (legARotationJoint.currentPos / 10), 0) * legAFootRot;
 
             verticalToHorizontalAPos = legAPos + new Vector3(0, verticalOffset + (legAVerticalJoint.currentPos * 0.0001f), 0);
             verticalToHorizontalARot = legARot;
@@ -406,10 +1004,10 @@ public class Robot
             legCFootPos = legCPos;
             legCFootRot = legCRot * Quaternion.Euler(0, legCRotationJoint.currentPos / 10, 0);
 
-            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(grippedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
             grip1Rot = legCFootRot;
 
-            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (grippedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
             grip2Rot = legCFootRot;
         }
 
@@ -431,7 +1029,7 @@ public class Robot
             legARot = legBRot;
 
             legAFootPos = legAPos;
-            legAFootRot = legARot * Quaternion.Euler(0, legARotationJoint.currentPos / 10, 0) * legAFootRot;
+            legAFootRot = legARot * Quaternion.Euler(0, -legARotationJoint.currentPos / 10, 0);
 
             legCPos = mainBeamPos + legBRot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
             legCRot = legBRot;
@@ -439,11 +1037,21 @@ public class Robot
             legCFootPos = legCPos;
             legCFootRot = legCRot * Quaternion.Euler(0, legCRotationJoint.currentPos / 10, 0);
 
-            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(grippedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
             grip1Rot = legCFootRot;
 
-            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (grippedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
             grip2Rot = legCFootRot;
         }
+    }
+
+    private float RadianToDegree(float angle)
+    {
+        return (angle * (180 / Mathf.PI));
+    }
+
+    private float DegreeToRadian(float angle)
+    {
+        return (Mathf.PI * angle / 180);
     }
 }
