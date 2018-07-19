@@ -20,7 +20,12 @@ public class MainController : MonoBehaviour
     public GameObject cellMarkerContainer;
     public GameObject cellMarker;
 
+    public GameObject lineRendererObject;
+    public GameObject lineRendererContainer;
+
     public TextAsset brickDataImport;
+
+    public Material gridLineMaterial;
 
     Material robotMaterialMain;
     Material robotMaterialHighlight;
@@ -30,21 +35,25 @@ public class MainController : MonoBehaviour
     List<GameObject> allBrickMeshes = new List<GameObject>();
     List<GameObject> allCellMarkers = new List<GameObject>();
     List<GameObject> allLegMarkers = new List<GameObject>();
+    List<GameObject> allLineRendererObjects = new List<GameObject>();
+    List<LineRenderer> allLineRenderers = new List<LineRenderer>();
 
     BrickStructure brickStructure;
 
     Vector3Int gridSize = new Vector3Int(50, 20, 50);
     Vector3Int seedPosition = new Vector3Int(5, 0, 5);
 
+    Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
+    int startingBricks = 3;
 
     void Start()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 2f;
 
         brickStructure = new BrickStructure(gridSize, seedPosition, brickDataImport);
 
-        allRobots.Add(new Robot(new Vector3Int(25, 0, 25), 4, 1, false));
-        allRobots.Add(new Robot(new Vector3Int(1000, 0, 1000), 4, 0, false));
+        allRobots.Add(new Robot(brickStructure.bricksInTargetStructure[0], 4, 1, true));
+        //allRobots.Add(new Robot(new Brick(brickStructure.grid.cellsArray[25,0,25],0,1), 4, 0, false));
 
         allRobots[0].brickTypeCurrentlyCarried = 0;
 
@@ -56,16 +65,33 @@ public class MainController : MonoBehaviour
             allLegMarkers[i].transform.SetParent(legMarkerContainer.transform);
         }
 
-        for (int i = 0; i < brickStructure.bricksInStructure.Count; i++)
+        for (int i = 0; i < brickStructure.bricksInTargetStructure.Count; i++)
         {
-            if (brickStructure.bricksInStructure[i].brickType == 1)
+            if (i < startingBricks)
             {
-                allBrickMeshes.Add(Instantiate(fullBrickMesh, brickStructure.bricksInStructure[i].originCell.actualPosition, brickStructure.bricksInStructure[i].rotation));
+                if (brickStructure.bricksInTargetStructure[i].brickType == 1)
+                {
+                    allBrickMeshes.Add(Instantiate(fullBrickMesh, brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, brickStructure.bricksInTargetStructure[i].rotation));
+                }
+
+                else if (brickStructure.bricksInTargetStructure[i].brickType == 2)
+                {
+                    allBrickMeshes.Add(Instantiate(halfBrickMesh, brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, brickStructure.bricksInTargetStructure[i].rotation));
+                }
+                brickStructure.bricksInPlace.Add(brickStructure.bricksInTargetStructure[i]);
             }
 
-            if (brickStructure.bricksInStructure[i].brickType == 2)
+            else
             {
-                allBrickMeshes.Add(Instantiate(halfBrickMesh, brickStructure.bricksInStructure[i].originCell.actualPosition, brickStructure.bricksInStructure[i].rotation));
+                if (brickStructure.bricksInTargetStructure[i].brickType == 1)
+                {
+                    allBrickMeshes.Add(Instantiate(fullBrickMesh, brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.identity));
+                }
+
+                else if (brickStructure.bricksInTargetStructure[i].brickType == 2)
+                {
+                    allBrickMeshes.Add(Instantiate(fullBrickMesh, brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.identity));
+                }
             }
 
             allBrickMeshes[i].transform.SetParent(brickContainer.transform);
@@ -73,76 +99,149 @@ public class MainController : MonoBehaviour
 
         seedMarker.transform.position = brickStructure.seedCell.actualPosition;
 
+        UpdateAvailableCells();
+        CreateGridLines();
+
+       // print(brickStructure.FindDropOffCell(brickStructure.bricksInTargetStructure[startingBricks + 1], brickStructure.availableCells).actualPosition);
+    }
+
+    void CreateGridLines()
+    {
+        for (int x = 0; x < brickStructure.grid.gridSize.x; x++)
+        {
+            allLineRendererObjects.Add(Instantiate(lineRendererObject, lineRendererObject.transform.position, lineRendererObject.transform.rotation));
+            allLineRendererObjects[allLineRendererObjects.Count - 1].transform.SetParent(lineRendererContainer.transform);
+
+            allLineRenderers.Add(allLineRendererObjects[allLineRendererObjects.Count - 1].AddComponent<LineRenderer>());
+            allLineRenderers[allLineRenderers.Count - 1].material = gridLineMaterial;
+            allLineRenderers[allLineRenderers.Count - 1].widthMultiplier = 0.005f;
+            allLineRenderers[allLineRenderers.Count - 1].positionCount = 2;
+            allLineRenderers[allLineRenderers.Count - 1].SetPosition(0, brickStructure.grid.cellsArray[x, 0, 0].actualPosition + brickDisplayOffset);
+            allLineRenderers[allLineRenderers.Count - 1].SetPosition(1, brickStructure.grid.cellsArray[x, 0, brickStructure.grid.gridSize.z - 1].actualPosition + brickDisplayOffset);
+
+        }
+
         for (int z = 0; z < brickStructure.grid.gridSize.z; z++)
         {
-            for (int x = 0; x < brickStructure.grid.gridSize.x; x++)
-            {
-                allCellMarkers.Add(Instantiate(cellMarker, brickStructure.grid.cellsArray[x, 0, z].actualPosition + new Vector3(0, 0.001f, 0), Quaternion.identity));
-                allCellMarkers[allCellMarkers.Count - 1].transform.parent = cellMarkerContainer.transform;
-            }
+            allLineRendererObjects.Add(Instantiate(lineRendererObject, lineRendererObject.transform.position, lineRendererObject.transform.rotation));
+            allLineRendererObjects[allLineRendererObjects.Count - 1].transform.SetParent(lineRendererContainer.transform);
+
+            allLineRenderers.Add(allLineRendererObjects[allLineRendererObjects.Count - 1].AddComponent<LineRenderer>());
+            allLineRenderers[allLineRenderers.Count - 1].material = gridLineMaterial;
+            allLineRenderers[allLineRenderers.Count - 1].widthMultiplier = 0.005f;
+            allLineRenderers[allLineRenderers.Count - 1].positionCount = 2;
+            allLineRenderers[allLineRenderers.Count - 1].SetPosition(0, brickStructure.grid.cellsArray[0, 0, z].actualPosition + brickDisplayOffset);
+            allLineRenderers[allLineRenderers.Count - 1].SetPosition(1, brickStructure.grid.cellsArray[brickStructure.grid.gridSize.x - 1, 0, z].actualPosition + brickDisplayOffset);
+        }
+    }
+
+    void UpdateAvailableCells()
+    {
+        brickStructure.UpdateAvailableCells();
+
+        foreach (GameObject cellMarker in allCellMarkers)
+        {
+            Destroy(cellMarker);
+        }
+
+        allCellMarkers.Clear();
+
+        foreach (Cell cell in brickStructure.availableCells)
+        {
+            allCellMarkers.Add(Instantiate(cellMarker, cell.actualPosition + new Vector3(0, 0.001f, 0), Quaternion.identity));
+            allCellMarkers[allCellMarkers.Count - 1].transform.parent = cellMarkerContainer.transform;
         }
     }
 
     void Update()
     {
-        if (Input.GetKeyDown("h"))
+        //if (Input.GetKeyDown("h"))
+        //{
+        //    allRobots[0].TakeStep(0, 8, 0, 4, -90);
+        //}
+
+        //if (Input.GetKeyDown("j"))
+        //{
+        //    allRobots[0].TakeStep(0, 8, 0, 4, 90);
+        //}
+        //if (Input.GetKeyDown("k"))
+        //{
+        //    allRobots[0].TakeStep(0, 8, 0, 4, 180);
+        //}
+        //if (Input.GetKeyDown("n"))
+        //{
+        //    allRobots[0].TakeStep(0, 8, 1, 4, -90);
+        //}
+
+        //if (Input.GetKeyDown("m"))
+        //{
+        //    allRobots[0].TakeStep(0, 8, 1, 4, 90);
+        //}
+        //if (Input.GetKeyDown(","))
+        //{
+        //    allRobots[0].TakeStep(0, 8, 1, 4, 180);
+        //}
+
+        if (Input.GetKeyDown("r"))
         {
-            allRobots[0].TakeStep(0, 8, 0, 4, -90);
+            allRobots[0].HandleBrick(0, 4, -2, 0, 90, brickStructure.bricksInTargetStructure[5], true);
         }
 
-        if (Input.GetKeyDown("j"))
+        if (Input.GetKeyDown("t"))
         {
-            allRobots[0].TakeStep(0, 8, 0, 4, 90);
-        }
-        if (Input.GetKeyDown("k"))
-        {
-            allRobots[0].TakeStep(0, 8, 0, 4, 180);
-        }
-        if (Input.GetKeyDown("n"))
-        {
-            allRobots[0].TakeStep(0, 8, 1, 4, -90);
-        }
-
-        if (Input.GetKeyDown("m"))
-        {
-            allRobots[0].TakeStep(0, 8, 1, 4, 90);
-        }
-        if (Input.GetKeyDown(","))
-        {
-            allRobots[0].TakeStep(0, 8, 1, 4, 180);
+            allRobots[0].HandleBrick(0, 4, 1, 0, 90, brickStructure.bricksInTargetStructure[5], true);
         }
 
         if (Input.GetKeyDown("y"))
         {
-            allRobots[0].PickUpBrick(0, 4, 0, brickStructure.bricksInStructure[1]);
+            allRobots[0].HandleBrick(0, 4, 0, 0, 0, brickStructure.bricksInTargetStructure[5], true);
         }
 
         if (Input.GetKeyDown("u"))
         {
-            allRobots[0].PlaceBrick(0, 4, 2, 0, 90, brickStructure.bricksInStructure[1]);
+            allRobots[0].HandleBrick(-1, 4, 0, 0, 0, brickStructure.bricksInTargetStructure[5], false);
         }
         if (Input.GetKeyDown("i"))
         {
-            allRobots[0].PickUpBrick(-1, 4, 0, brickStructure.bricksInStructure[0]);
+            allRobots[0].HandleBrick(0, 4, 0, 0, 0, brickStructure.bricksInTargetStructure[5], false);
         }
         if (Input.GetKeyDown("o"))
         {
-            allRobots[0].PlaceBrick(0, 4, -2, 0, 90, brickStructure.bricksInStructure[0]);
-        }
-        if (Input.GetKeyDown("9"))
-        {
-            allRobots[0].ChangeFootAHeelPosition(0);
+            allRobots[0].HandleBrick(-1, 4, 0, 1, 0, brickStructure.bricksInTargetStructure[5], false);
         }
 
-        if (!allRobots[1].stepInProgress)
+        if (Input.GetKeyDown("p"))
         {
-            //      allRobots[1].TakeStep("Step along 4 lead B");
+            allRobots[0].HandleBrick(0, 4, 0, 1, 0, brickStructure.bricksInTargetStructure[5], false);
         }
 
-        if (!allRobots[0].stepInProgress)
+        if (Input.GetKeyDown("j"))
         {
-            //    allRobots[0].TakeStep(0, 8, 1, 4, 90); 
+            allRobots[0].HandleBrick(-1, 4, -2, 0, 0, brickStructure.bricksInTargetStructure[5], false);
         }
+        if (Input.GetKeyDown("k"))
+        {
+            allRobots[0].HandleBrick(0, 4, 2, 0, 0, brickStructure.bricksInTargetStructure[5], false);
+        }
+        if (Input.GetKeyDown("l"))
+        {
+            allRobots[0].HandleBrick(-1, 4, -2, 0, 90, brickStructure.bricksInTargetStructure[5], false);
+        }
+
+        if (Input.GetKeyDown(";"))
+        {
+            allRobots[0].HandleBrick(0, 4, 2, 0, 90, brickStructure.bricksInTargetStructure[5], false);
+        }
+
+        //if (!allRobots[1].stepInProgress)
+        //{
+        //      allRobots[1].TakeStep("Step along 4 lead B");
+        //}
+
+        //if (!allRobots[0].stepInProgress)
+        //{
+        //    allRobots[0].TakeStep(0, 8, 1, 4, 90); 
+        //}
 
         DisplayAllMeshes();
 
@@ -213,9 +312,9 @@ public class MainController : MonoBehaviour
         _legMarkerMesh.transform.rotation = mainBeam.transform.rotation;
 
         //brick being carried
-        for (int i = 0; i < brickStructure.bricksInStructure.Count; i++)
+        for (int i = 0; i < brickStructure.bricksInTargetStructure.Count; i++)
         {
-            if (brickStructure.bricksInStructure[i] == robotToDisplay.brickBeingCarried && robotToDisplay.brickIsAttached)
+            if (brickStructure.bricksInTargetStructure[i] == robotToDisplay.brickBeingCarried && robotToDisplay.brickIsAttached)
             {
                 allBrickMeshes[i].transform.position = legCFoot.transform.position + new Vector3(0, -robotToDisplay.gridDimY, 0);
                 allBrickMeshes[i].transform.rotation = legCFoot.transform.rotation;

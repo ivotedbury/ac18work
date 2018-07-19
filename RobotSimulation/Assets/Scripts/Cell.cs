@@ -14,6 +14,6 @@ public class Cell
     public Cell(Vector3Int _position)
     {
         position = _position;
-        actualPosition = new Vector3(position.x * gridDimX, position.y * gridDimY, position.z * gridDimZ);
+        actualPosition = new Vector3(position.x * gridDimX, (position.y+1) * gridDimY, position.z * gridDimZ);
     }
 }

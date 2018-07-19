@@ -27,6 +27,15 @@ public class Grid
         }
     }
 
+    public Cell GetANeighbour(Cell _inputCell, Vector3Int _relation)
+    {
+        Cell neighbour;
+
+        neighbour = cellsArray[_inputCell.position.x + _relation.x, _inputCell.position.y + _relation.y, _inputCell.position.z + _relation.z];
+
+        return neighbour;
+    }
+
     public List<Cell> GetChildren(Brick brick)
     {
         List<Cell> childCells = new List<Cell>();
