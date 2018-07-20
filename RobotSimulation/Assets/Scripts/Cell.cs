@@ -11,9 +11,29 @@ public class Cell
     float gridDimY = 0.0625f; // 0.0725 with mortar space
     float gridDimZ = 0.05625f;
 
+    public int currentStatus = 0; // normal / start / path / end
+
+    public int gCost;
+    public int hCost;
+
+    public Cell parent;
+
     public Cell(Vector3Int _position)
     {
         position = _position;
-        actualPosition = new Vector3(position.x * gridDimX, (position.y+1) * gridDimY, position.z * gridDimZ);
+        actualPosition = new Vector3(position.x * gridDimX, (position.y + 1) * gridDimY, position.z * gridDimZ);
+    }
+
+    public void ResetCosts()
+    {
+        gCost = 0;
+        hCost = 0;
+    }
+    public int fCost
+    {
+        get
+        {
+            return gCost + hCost;
+        }
     }
 }

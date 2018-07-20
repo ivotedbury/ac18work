@@ -10,7 +10,10 @@ public class BrickStructure
     public List<Cell> availableCells = new List<Cell>();
 
     public Grid grid;
+    PathFinder pathFinder = new PathFinder();
     public Cell seedCell;
+
+    public Cell legAPickupPoint;
 
     private int importOffset = 5;
 
@@ -19,6 +22,7 @@ public class BrickStructure
         grid = new Grid(_gridSize);
         CreateSeed(_seedCell);
         CreateBricksInArrangment(_brickDataImport);
+        legAPickupPoint = grid.cellsArray[_seedCell.x + 8, _seedCell.y, _seedCell.z];
     }
 
     void CreateBricksInArrangment(TextAsset _brickDataImport)
@@ -34,6 +38,15 @@ public class BrickStructure
         }
 
         bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell);
+    }
+
+    public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell)
+    {
+        List<Cell> path = new List<Cell>();
+
+        path = pathFinder.FindPath(grid, availableCells, _startCell, _endCell);
+
+        return path;
     }
 
     public void UpdateAvailableCells()
@@ -63,7 +76,25 @@ public class BrickStructure
                     grid.GetANeighbour(allChildCells[j], new Vector3Int(0, 1, -1)) == allChildCells[i] ||
                     grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, -1)) == allChildCells[i] ||
                     grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, 0)) == allChildCells[i] ||
-                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, 1)) == allChildCells[i])
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, 1)) == allChildCells[i] ||
+
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(0, 2, 1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(1, 2, 1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(1, 2, 0)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(1, 2, -1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(0, 2, -1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 2, -1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 2, 0)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 2, 1)) == allChildCells[i] ||
+
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(0, 3, 1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(1, 3, 1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(1, 3, 0)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(1, 3, -1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(0, 3, -1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 3, -1)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 3, 0)) == allChildCells[i] ||
+                    grid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 3, 1)) == allChildCells[i])
                 {
                     availableCells.Remove(allChildCells[j]);
                 }
@@ -91,13 +122,26 @@ public class BrickStructure
         }
 
 
-
         for (int i = 0; i < potentialDropOffCells.Count; i++)
         {
-            if (_availableCells.Contains(potentialDropOffCells[i]))
+            for (int j = 0; j < _availableCells.Count; j++)
             {
-                possibleDropOffCells.Add(potentialDropOffCells[i]);
+                if (_availableCells[j] == potentialDropOffCells[i])
+                {
+                    possibleDropOffCells.Add(potentialDropOffCells[i]);
+                }
             }
+        }
+
+        Debug.Log(possibleDropOffCells.Count);
+
+        if (possibleDropOffCells.Count >= 2)
+        {
+            dropOffCell = possibleDropOffCells[1];
+        }
+        else
+        {
+            dropOffCell = possibleDropOffCells[0];
         }
 
         return dropOffCell;

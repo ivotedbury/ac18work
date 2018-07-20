@@ -19,13 +19,16 @@ public class Brick
 
     public void AssignChildCells(Grid _inputGrid)
     {
-        childCells.Add(originCell);
+        //   childCells.Add(originCell);
+
+        childCells.Clear();
 
         if (brickType == 1)
         {
             if (rotation == Quaternion.Euler(0, 0, 0) || rotation == Quaternion.Euler(0, 180, 0))
             {
                 childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(0, 0, 1)));
+                childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(0, 0, 0)));
                 childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(0, 0, -1)));
 
             }
@@ -33,6 +36,7 @@ public class Brick
             if (rotation == Quaternion.Euler(0, 90, 0) || rotation == Quaternion.Euler(0, 270, 0))
             {
                 childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(1, 0, 0)));
+                childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(0, 0, 0)));
                 childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(-1, 0, 0)));
             }
         }

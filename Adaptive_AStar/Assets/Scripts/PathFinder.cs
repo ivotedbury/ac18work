@@ -15,7 +15,7 @@ public class PathFinder
     //    _grid = grid;
     //}
 
-     public List<Cell> FindPath(Grid inputGrid, Cell _startCell, Cell _targetCell)
+    public List<Cell> FindPath(Grid inputGrid, Cell _startCell, Cell _targetCell)
     {
         List<Cell> waypoints = new List<Cell>();
 
@@ -189,7 +189,7 @@ public class PathFinder
             {
                 //if (allCells[testCell.position.x, testCell.position.y - 1, testCell.position.z].isGround != true)
                 //{
-                    testCell.mCost = testCell.position.y * mCost;
+                testCell.mCost = testCell.position.y * mCost;
                 //}
             }
             for (int i = 0; i < testCell.position.y; i++)
