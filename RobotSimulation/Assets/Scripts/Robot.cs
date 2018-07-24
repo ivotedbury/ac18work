@@ -92,6 +92,8 @@ public class Robot
     List<int[]> jointTargetList = new List<int[]>();
     int[] defaultTargetValues = new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
+    List<RobotAction> actionList = new List<RobotAction>();
+
     public Robot(Brick _startingBrick, int _startingStance, int _currentlyAttached, bool _footAHeelIn)
     {
         allJoints.Add(legARailJoint);
@@ -700,63 +702,6 @@ public class Robot
         stepInProgress = true;
         moveCounter = 0;
     }
-
-    //public void PickUpBrick(int _relativeBrickHeight, int _distanceInFront, int _leadLeg, Brick _brickToCarry)
-    //{
-    //    jointTargetList.Clear();
-
-    //    int leadingLeg;
-    //    int trailingLeg;
-
-    //    brickBeingCarried = _brickToCarry;
-
-    //    int brickTypeToBeCarriedAfterPickup = _brickToCarry.brickType;
-
-    //    if (_leadLeg == legA)
-    //    {
-    //        leadingLeg = legA;
-    //        trailingLeg = legB;
-    //    }
-    //    else
-    //    {
-    //        leadingLeg = legB;
-    //        trailingLeg = legA;
-    //    }
-
-    //    int[] jointTargetListValues0 = SetForCounterbalance(leadingLeg, currentStance, brickTypeCurrentlyCarried);
-    //    int[] jointTargetListValues1 = LiftLeg(trailingLeg, 1);
-    //    int[] jointTargetListValues2 = SetForCounterbalance(leadingLeg, 2 * _distanceInFront, brickTypeCurrentlyCarried);
-    //    int[] jointTargetListValues3 = PlaceLeg(trailingLeg, 1);
-    //    int[] jointTargetListValues4 = PrepareLegsForGrip(leadingLeg, _distanceInFront, false, brickTypeCurrentlyCarried);
-    //    int[] jointTargetListValues5 = OpenGrip(); // no brick being carried
-    //    int[] jointTargetListValues6 = LowerBothLegsForBrick(leadingLeg, _relativeBrickHeight, false);
-    //    int[] jointTargetListValues7 = CloseGrip();
-    //    int[] jointTargetListValues8 = LiftBothLegsForBrick(leadingLeg, _relativeBrickHeight, false);
-    //    int[] jointTargetListValues9 = SetForCounterbalance(leadingLeg, 2 * _distanceInFront, brickTypeToBeCarriedAfterPickup);
-    //    int[] jointTargetListValues10 = LiftLeg(trailingLeg, 1);
-    //    int[] jointTargetListValues11 = SetForCounterbalance(leadingLeg, currentStance, brickTypeToBeCarriedAfterPickup);
-    //    int[] jointTargetListValues12 = PlaceLeg(trailingLeg, 1);
-    //    int[] jointTargetListValues13 = ReturnToStance(currentStance);
-
-    //    jointTargetList.Add(jointTargetListValues0);
-    //    jointTargetList.Add(jointTargetListValues1);
-    //    jointTargetList.Add(jointTargetListValues2);
-    //    jointTargetList.Add(jointTargetListValues3);
-    //    jointTargetList.Add(jointTargetListValues4);
-    //    jointTargetList.Add(jointTargetListValues5);
-    //    jointTargetList.Add(jointTargetListValues6);
-    //    jointTargetList.Add(jointTargetListValues7);
-    //    jointTargetList.Add(jointTargetListValues8);
-    //    jointTargetList.Add(jointTargetListValues9);
-    //    jointTargetList.Add(jointTargetListValues10);
-    //    jointTargetList.Add(jointTargetListValues11);
-    //    jointTargetList.Add(jointTargetListValues12);
-    //    jointTargetList.Add(jointTargetListValues13);
-
-    //    stepInProgress = true;
-    //    pickupInProgress = true;
-    //    moveCounter = 0;
-    //}
 
     public void TakeStep(int _stepGradient, int _stepSize, int _leadLeg, int _endStance, int _turnAngle)
     {

@@ -40,11 +40,11 @@ public class BrickStructure
         bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell);
     }
 
-    public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell)
+    public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)
     {
         List<Cell> path = new List<Cell>();
 
-        path = pathFinder.FindPath(grid, availableCells, _startCell, _endCell);
+        path = pathFinder.FindPath(grid, availableCells, _startCell, _endCell, _startDiection);
 
         return path;
     }
@@ -52,6 +52,8 @@ public class BrickStructure
     public void UpdateAvailableCells()
     {
         availableCells.Clear();
+
+        Debug.Log(bricksInPlace.Count);
 
         List<Cell> allChildCells = new List<Cell>();
 
@@ -102,25 +104,125 @@ public class BrickStructure
         }
     }
 
+    public Cell FindCompanionCell(Cell _cell, int _leadLeg, int _robotOrientation, List<Cell> _availableCells)
+    {
+        List<Cell> potentialListOfCompanions = new List<Cell>();
+
+        if (_robotOrientation == 0 && _leadLeg == 0)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 4]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 3]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 2]);
+        }
+        if (_robotOrientation == 1 && _leadLeg == 0)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 4, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 3, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 2, _cell.position.y, _cell.position.z]);
+        }
+        if (_robotOrientation == 2 && _leadLeg == 0)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 4]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 3]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 2]);
+        }
+        if (_robotOrientation == 3 && _leadLeg == 0)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 4, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 3, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 2, _cell.position.y, _cell.position.z]);
+        }
+        //////////////////////////////////////////////////////////////////////////////
+        if (_robotOrientation == 0 && _leadLeg == 1)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 4]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 3]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 2]);
+        }
+        if (_robotOrientation == 1 && _leadLeg == 1)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 4, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 3, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 2, _cell.position.y, _cell.position.z]);
+        }
+        if (_robotOrientation == 2 && _leadLeg == 1)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 4]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 3]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 2]);
+        }
+        if (_robotOrientation == 3 && _leadLeg == 1)
+        {
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 4, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 3, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 2, _cell.position.y, _cell.position.z]);
+        }
+
+        List<Cell> availableListofCompanions = new List<Cell>();
+
+        for (int i = 0; i < potentialListOfCompanions.Count; i++)
+        {
+            if (availableCells.Contains(potentialListOfCompanions[i]))
+            {
+                availableListofCompanions.Add(potentialListOfCompanions[i]);
+            }
+        }
+
+        Debug.Log("A " + _cell.position + "B " + availableListofCompanions.Count);
+
+        Cell companionCell = availableListofCompanions[0];
+
+        return companionCell;
+
+    }
+
+    public int GetCurrentDirection(Cell _start, Cell _end)
+    {
+        int direction = 0;
+
+        Vector3Int directionVector = _end.position - _start.position;
+
+        if (directionVector.z > 0)
+        {
+            direction = 0;
+        }
+        else if (directionVector.x > 0)
+        {
+            direction = 1;
+        }
+        else if (directionVector.z < 0)
+        {
+            direction = 2;
+        }
+        else if (directionVector.x < 0)
+        {
+            direction = 3;
+        }
+
+        return direction;
+    }
+
     public Cell FindDropOffCell(Brick _targetBrick, List<Cell> _availableCells)
     {
         Cell dropOffCell = null;
 
         List<Cell> potentialDropOffCells = new List<Cell>();
         List<Cell> possibleDropOffCells = new List<Cell>();
+        List<Cell> shortlistDropOffCells = new List<Cell>();
 
+
+        Cell targetCell = _targetBrick.originCell;
 
         for (int relativeHeight = -1; relativeHeight < 1; relativeHeight++) // should be -1
         {
             for (int relativeDistance = 2; relativeDistance < 5; relativeDistance++)
             {
-                potentialDropOffCells.Add(grid.GetANeighbour(_targetBrick.originCell, new Vector3Int(0, relativeHeight, relativeDistance)));
-                potentialDropOffCells.Add(grid.GetANeighbour(_targetBrick.originCell, new Vector3Int(relativeDistance, relativeHeight, 0)));
-                potentialDropOffCells.Add(grid.GetANeighbour(_targetBrick.originCell, new Vector3Int(-relativeDistance, relativeHeight, 0)));
-                potentialDropOffCells.Add(grid.GetANeighbour(_targetBrick.originCell, new Vector3Int(0, relativeHeight, -relativeDistance)));
+                potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(0, relativeHeight, relativeDistance)));
+                potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(relativeDistance, relativeHeight, 0)));
+                potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-relativeDistance, relativeHeight, 0)));
+                potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(0, relativeHeight, -relativeDistance)));
             }
         }
-
 
         for (int i = 0; i < potentialDropOffCells.Count; i++)
         {
@@ -133,18 +235,98 @@ public class BrickStructure
             }
         }
 
-        Debug.Log(possibleDropOffCells.Count);
+        for (int i = 0; i < possibleDropOffCells.Count; i++)
+        {
+            Vector3Int dropOffToTarget = possibleDropOffCells[i].position - targetCell.position;
 
-        if (possibleDropOffCells.Count >= 2)
-        {
-            dropOffCell = possibleDropOffCells[1];
+            if (_targetBrick.brickType == 1)
+            {
+                if ((_targetBrick.rotation == Quaternion.Euler(0, 90, 0) || _targetBrick.rotation == Quaternion.Euler(0, 270, 0)))
+                {
+                    if (Mathf.Abs(dropOffToTarget.x) > 2)
+                    {
+                        shortlistDropOffCells.Add(possibleDropOffCells[i]);
+                    }
+                }
+
+            }
+            else
+            {
+                shortlistDropOffCells = possibleDropOffCells;
+            }
         }
-        else
+
+        float bestCurrentDistance = 10000000;
+
+        for (int i = 0; i < shortlistDropOffCells.Count; i++)
         {
-            dropOffCell = possibleDropOffCells[0];
+            float distanceFromSeed = (shortlistDropOffCells[i].position - seedCell.position).magnitude;
+            if (distanceFromSeed < bestCurrentDistance)
+            {
+                dropOffCell = shortlistDropOffCells[i];
+                bestCurrentDistance = distanceFromSeed;
+            }
         }
 
         return dropOffCell;
+    }
+
+    //Cell FindCompanionCell(Cell _cell, int _stepOrientation)
+    //{
+    //    List<Cell> potentialListOfCompanions = new List<Cell>();
+
+    //    if (_stepOrientation == 0)
+    //    {
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 4]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 3]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 2]);
+    //    }
+    //    if (_stepOrientation == 1)
+    //    {
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 4, _cell.position.y, _cell.position.z]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 3, _cell.position.y, _cell.position.z]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x - 2, _cell.position.y, _cell.position.z]);
+    //    }
+    //    if (_stepOrientation == 2)
+    //    {
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 4]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 3]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 2]);
+    //    }
+    //    if (_stepOrientation == 3)
+    //    {
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 4, _cell.position.y, _cell.position.z]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 3, _cell.position.y, _cell.position.z]);
+    //        potentialListOfCompanions.Add(grid.cellsArray[_cell.position.x + 2, _cell.position.y, _cell.position.z]);
+    //    }
+
+    //    return potentialListOfCompanions;
+    //}
+
+    int GetDirection(Cell _start, Cell _end)
+    {
+        int direction = 0;
+
+        Vector3Int directionVector = _end.position - _start.position;
+
+        if (directionVector.z > 0)
+        {
+            direction = 0;
+        }
+        else if (directionVector.x > 0)
+        {
+            direction = 1;
+        }
+        else if (directionVector.z < 0)
+        {
+            direction = 2;
+        }
+        else if (directionVector.x < 0)
+        {
+            direction = 3;
+        }
+
+        return direction;
     }
 
     void CreateSeed(Vector3Int _seed)
@@ -168,34 +350,60 @@ public class BrickStructure
         List<Brick> reorderedTargetStructure = new List<Brick>();
 
         float currentClosestDistance;
+        float currentFurthestDistance;
+
         float testDistance;
         int listLength = _inputTargetStructure.Count;
 
         Brick bestCurrentBrick = null;
-        bool betterCellFound = false;
+        bool betterBrickFound = false;
 
-        for (int currentSearchLayer = 0; currentSearchLayer < grid.gridSize.y; currentSearchLayer++)
+        for (int currentSearchLayer = 1; currentSearchLayer < grid.gridSize.y; currentSearchLayer++)
         {
             for (int listCounter = 0; listCounter < listLength; listCounter++)
             {
                 currentClosestDistance = 1000000;
-                betterCellFound = false;
+                currentFurthestDistance = 0;
+                betterBrickFound = false;
 
-                for (int i = 0; i < _inputTargetStructure.Count; i++)
+                if (currentSearchLayer == 1)
                 {
-                    if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
-                    {
-                        testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
 
-                        if (testDistance < currentClosestDistance)
+                    for (int i = 0; i < _inputTargetStructure.Count; i++)
+                    {
+                        if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
                         {
-                            currentClosestDistance = testDistance;
-                            bestCurrentBrick = _inputTargetStructure[i];
-                            betterCellFound = true;
+                            testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+
+                            if (testDistance < currentClosestDistance)
+                            {
+                                currentClosestDistance = testDistance;
+                                bestCurrentBrick = _inputTargetStructure[i];
+                                betterBrickFound = true;
+                            }
                         }
                     }
                 }
-                if (betterCellFound)
+
+                else
+                {
+                    for (int i = 0; i < _inputTargetStructure.Count; i++)
+                    {
+                        if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
+                        {
+                            testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+
+                            if (testDistance > currentFurthestDistance)
+                            {
+                                currentFurthestDistance = testDistance;
+                                bestCurrentBrick = _inputTargetStructure[i];
+                                betterBrickFound = true;
+                            }
+                        }
+                    }
+                }
+
+                if (betterBrickFound)
                 {
                     reorderedTargetStructure.Add(bestCurrentBrick);
                     _inputTargetStructure.Remove(bestCurrentBrick);

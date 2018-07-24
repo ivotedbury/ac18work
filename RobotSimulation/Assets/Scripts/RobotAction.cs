@@ -7,7 +7,7 @@ public class RobotAction
 
 
     Robot robot;
-    int action;
+    int action; 
     //step
     int stepGradient;
     int stepSize;
@@ -26,9 +26,9 @@ public class RobotAction
     int heelPosition;
 
 
-    int changeFootAHeelPosition = 0;
-    int handleBrick = 1;
-    int takeStep = 2;
+    const int changeFootAHeelPosition = 0;
+    const int handleBrick = 1;
+    const int takeStep = 2;
 
     public RobotAction(
         Robot _robot,

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainController : MonoBehaviour
 {
@@ -39,19 +40,25 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(50, 20, 50);
+    Vector3Int gridSize = new Vector3Int(60, 20, 60);
     Vector3Int seedPosition = new Vector3Int(5, 1, 5);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0625f;
 
-    int startingBricks = 6;
+    float timeScaleFactor = 10f;
+    public Slider timeScaleSlider;
+    public Text timeScaleFactorLabel;
+    public Text totalBuildTimeLabel;
+    public Text tripTimeLabel;
+
+    int startingBricks = 3;
     int numberOfRobots = 1;
 
     void Start()
     {
-        Time.timeScale = 8f;
+        SetupUI();
 
         buildManager = new BuildManager(gridSize, seedPosition, brickImportData, startingBricks, numberOfRobots);
 
@@ -76,7 +83,6 @@ public class MainController : MonoBehaviour
                 {
                     allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, buildManager.brickStructure.bricksInTargetStructure[i].rotation));
                 }
-                buildManager.brickStructure.bricksInPlace.Add(buildManager.brickStructure.bricksInTargetStructure[i]);
             }
 
             else
@@ -100,8 +106,48 @@ public class MainController : MonoBehaviour
         UpdateAvailableCells();
         CreateGridLines();
 
-        buildManager.GeneratePath();
+        buildManager.PlaceNextBrick();
         UpdateAvailableCells();
+    }
+
+    private void OnGUI()
+    {
+        string timescaleFactorForLabel;
+
+        if (timeScaleFactor >= 10)
+        {
+            timescaleFactorForLabel = Mathf.Round(timeScaleFactor).ToString();
+        }
+        else if (timeScaleFactor >= 1 && timeScaleFactor < 10)
+        {
+            timescaleFactorForLabel = (Mathf.Round(timeScaleFactor * 10) / 10).ToString();
+        }
+        else
+        {
+            timescaleFactorForLabel = (Mathf.Round(timeScaleFactor * 100) / 100).ToString();
+        }
+        timeScaleFactorLabel.text = "Timescale Factor: " + timescaleFactorForLabel.ToString();
+
+        tripTimeLabel.text = "Trip Time: ";
+
+        int timeHours = (int) (Time.time) / 3600;
+        int timeMinutes = ((int)(Time.time) - (timeHours * 3600)) / 60;
+        int timeSeconds = (((int)Time.time - (timeHours * 3600)) - (timeMinutes*60));
+
+        totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
+    }
+
+    void SetupUI()
+    {
+        Time.timeScale = timeScaleFactor;
+        timeScaleSlider.value = timeScaleFactor;
+        timeScaleSlider.onValueChanged.AddListener(delegate { TimeScaleSliderChange(); });
+    }
+
+    void TimeScaleSliderChange()
+    {
+        timeScaleFactor = timeScaleSlider.value;
+        Time.timeScale = timeScaleFactor;
     }
 
     void CreateGridLines()
@@ -214,7 +260,7 @@ public class MainController : MonoBehaviour
 
     void UpdateAvailableCells()
     {
-        buildManager.brickStructure.UpdateAvailableCells();
+      //  buildManager.brickStructure.UpdateAvailableCells();
 
         foreach (GameObject cellMarker in allCellMarkers)
         {
@@ -237,6 +283,11 @@ public class MainController : MonoBehaviour
     void Update()
     {
         buildManager.Update();
+
+        if (!buildManager.readyForNextBrick)
+        {
+            UpdateAvailableCells();
+        }
 
         if (Input.GetKeyDown("r"))
         {

@@ -8,7 +8,7 @@ public class PathFinder
     int totalCostOfTrip;
     int totalCostOfBuild = 0;
 
-    public List<Cell> FindPath(Grid _inputGrid, List<Cell> _availableCells, Cell _startCell, Cell _targetCell)
+    public List<Cell> FindPath(Grid _inputGrid, List<Cell> _availableCells, Cell _startCell, Cell _targetCell, int _startingDirection)
     {
         List<Cell> waypoints = new List<Cell>();
 
@@ -18,6 +18,8 @@ public class PathFinder
 
         List<Cell> openSet = new List<Cell>();
         List<Cell> closedSet = new List<Cell>();
+
+        int currentDirection = _startingDirection;
 
         for (int z = 0; z < _inputGrid.gridSize.z; z++)
         {
@@ -55,7 +57,7 @@ public class PathFinder
                 break;
             }
 
-            foreach (Cell neighbour in GetCellNeighbours(_inputGrid,cell))
+            foreach (Cell neighbour in GetCellNeighbours(_inputGrid, cell))
             {
                 if (!_availableCells.Contains(neighbour) || closedSet.Contains(neighbour))
                 {
@@ -63,17 +65,26 @@ public class PathFinder
                 }
 
                 int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour);
+
                 if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
                 {
                     neighbour.gCost = newCostToNeighbour;
                     neighbour.hCost = GetDistance(neighbour, targetCell);
                     neighbour.parent = cell;
+                    currentDirection = GetDirection(cell, neighbour);
 
-                    if (!openSet.Contains(neighbour))
+                    List<Cell> potentialCompanionCells = FindListOfPotentialCompanionCells(_inputGrid, neighbour, currentDirection, _availableCells);
+
+                    if (potentialCompanionCells.Count > 0)
                     {
-                        openSet.Add(neighbour);
+                        if (!openSet.Contains(neighbour))
+                        {
+                            openSet.Add(neighbour);
+                        }
                     }
                 }
+
+
             }
         }
 
@@ -88,6 +99,74 @@ public class PathFinder
         return waypoints;
     }
 
+    int GetDirection(Cell _start, Cell _end)
+    {
+        int direction = 0;
+
+        Vector3Int directionVector = _end.position - _start.position;
+
+        if (directionVector.z > 0)
+        {
+            direction = 0;
+        }
+        else if (directionVector.x > 0)
+        {
+            direction = 1;
+        }
+        else if (directionVector.z < 0)
+        {
+            direction = 2;
+        }
+        else if (directionVector.x < 0)
+        {
+            direction = 3;
+        }
+
+        return direction;
+    }
+
+    public List<Cell> FindListOfPotentialCompanionCells(Grid _inputGrid, Cell _cell, int _stepOrientation, List<Cell> _availableCells)
+    {
+        List<Cell> potentialListOfCompanions = new List<Cell>();
+
+        if (_stepOrientation == 0)
+        {
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 4]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 3]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z - 2]);
+        }
+        if (_stepOrientation == 1)
+        {
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x - 4, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x - 3, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x - 2, _cell.position.y, _cell.position.z]);
+        }
+        if (_stepOrientation == 2)
+        {
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 4]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 3]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x, _cell.position.y, _cell.position.z + 2]);
+        }
+        if (_stepOrientation == 3)
+        {
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x + 4, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x + 3, _cell.position.y, _cell.position.z]);
+            potentialListOfCompanions.Add(_inputGrid.cellsArray[_cell.position.x + 2, _cell.position.y, _cell.position.z]);
+        }
+
+        List<Cell> finalListOfCompanions = new List<Cell>();
+
+        for (int i = 0; i < potentialListOfCompanions.Count; i++)
+        {
+            if (_availableCells.Contains(potentialListOfCompanions[i]))
+            {
+                finalListOfCompanions.Add(potentialListOfCompanions[i]);
+            }
+        }
+
+        return finalListOfCompanions;
+    }
+
     List<Cell> RetracePath(Cell _startCell, Cell _endCell)
     {
         List<Cell> path = new List<Cell>();
@@ -99,6 +178,8 @@ public class PathFinder
             path.Add(currentCell);
             currentCell = currentCell.parent;
         }
+
+        path.Add(_startCell);
 
         path.Reverse(); // reverse the path to the correct order
         return path;
