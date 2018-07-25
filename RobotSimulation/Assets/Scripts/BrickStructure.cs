@@ -15,7 +15,7 @@ public class BrickStructure
 
     public Cell legAPickupPoint;
 
-    private int importOffset = 5;
+    private int importOffset = 8;
 
     public BrickStructure(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
@@ -52,8 +52,6 @@ public class BrickStructure
     public void UpdateAvailableCells()
     {
         availableCells.Clear();
-
-        Debug.Log(bricksInPlace.Count);
 
         List<Cell> allChildCells = new List<Cell>();
 
@@ -170,13 +168,18 @@ public class BrickStructure
 
         Debug.Log("A " + _cell.position + "B " + availableListofCompanions.Count);
 
-        Cell companionCell = availableListofCompanions[0];
+        Cell companionCell = null;
+
+        if (availableListofCompanions.Count > 0)
+        {
+            companionCell = availableListofCompanions[0];
+        }
 
         return companionCell;
 
     }
 
-    public int GetCurrentDirection(Cell _start, Cell _end)
+    public int GetCurrentDirectionOfTravel(Cell _start, Cell _end)
     {
         int direction = 0;
 
@@ -222,6 +225,19 @@ public class BrickStructure
                 potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-relativeDistance, relativeHeight, 0)));
                 potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(0, relativeHeight, -relativeDistance)));
             }
+
+            int value1 = 1;
+            int value2 = 2;
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, value2)));
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, value1)));
+
         }
 
         for (int i = 0; i < potentialDropOffCells.Count; i++)
@@ -241,14 +257,20 @@ public class BrickStructure
 
             if (_targetBrick.brickType == 1)
             {
-                if ((_targetBrick.rotation == Quaternion.Euler(0, 90, 0) || _targetBrick.rotation == Quaternion.Euler(0, 270, 0)))
+                if (_targetBrick.rotation == Quaternion.Euler(0, 90, 0) || _targetBrick.rotation == Quaternion.Euler(0, 270, 0))
                 {
                     if (Mathf.Abs(dropOffToTarget.x) > 2)
                     {
                         shortlistDropOffCells.Add(possibleDropOffCells[i]);
                     }
                 }
-
+                else if (_targetBrick.rotation == Quaternion.Euler(0, 0, 0) || _targetBrick.rotation == Quaternion.Euler(0, 180, 0))
+                {
+                    if (Mathf.Abs(dropOffToTarget.z) > 2)
+                    {
+                        shortlistDropOffCells.Add(possibleDropOffCells[i]);
+                    }
+                }
             }
             else
             {
@@ -256,14 +278,27 @@ public class BrickStructure
             }
         }
 
-        float bestCurrentDistance = 10000000;
+        List<Cell> finalListDropOffCells = new List<Cell>();
 
         for (int i = 0; i < shortlistDropOffCells.Count; i++)
         {
-            float distanceFromSeed = (shortlistDropOffCells[i].position - seedCell.position).magnitude;
+            for (int _robotOrientation = 0; _robotOrientation < 4; _robotOrientation++)
+            {
+                if (FindCompanionCell(shortlistDropOffCells[i], 0, _robotOrientation, availableCells) != null)
+                {
+                    finalListDropOffCells.Add(shortlistDropOffCells[i]);
+                }
+            }
+        }
+
+        float bestCurrentDistance = 10000000;
+
+        for (int i = 0; i < finalListDropOffCells.Count; i++)
+        {
+            float distanceFromSeed = (finalListDropOffCells[i].position - seedCell.position).magnitude;
             if (distanceFromSeed < bestCurrentDistance)
             {
-                dropOffCell = shortlistDropOffCells[i];
+                dropOffCell = finalListDropOffCells[i];
                 bestCurrentDistance = distanceFromSeed;
             }
         }

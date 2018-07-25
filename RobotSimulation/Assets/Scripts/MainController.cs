@@ -40,20 +40,22 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(60, 20, 60);
-    Vector3Int seedPosition = new Vector3Int(5, 1, 5);
+    Vector3Int gridSize = new Vector3Int(75, 20, 75);
+    Vector3Int seedPosition = new Vector3Int(8, 1, 8);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0625f;
 
     float timeScaleFactor = 10f;
+    float overallTime = 0;
+
     public Slider timeScaleSlider;
     public Text timeScaleFactorLabel;
     public Text totalBuildTimeLabel;
     public Text tripTimeLabel;
 
-    int startingBricks = 3;
+    int startingBricks = 22;
     int numberOfRobots = 1;
 
     void Start()
@@ -130,12 +132,20 @@ public class MainController : MonoBehaviour
 
         tripTimeLabel.text = "Trip Time: ";
 
-        int timeHours = (int) (Time.time) / 3600;
-        int timeMinutes = ((int)(Time.time) - (timeHours * 3600)) / 60;
-        int timeSeconds = (((int)Time.time - (timeHours * 3600)) - (timeMinutes*60));
+        int timeHours = (int) (overallTime) / 3600;
+        int timeMinutes = ((int)(overallTime) - (timeHours * 3600)) / 60;
+        int timeSeconds = (((int)overallTime - (timeHours * 3600)) - (timeMinutes*60));
 
         totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
     }
+
+    //overallTime += Time.deltaTime;
+
+    //    int timeHours = (int)(overallTime) / 3600;
+    //int timeMinutes = ((int)(overallTime) - (timeHours * 3600)) / 60;
+    //int timeSeconds = (((int)overallTime - (timeHours * 3600)) - (timeMinutes * 60));
+
+    //totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
 
     void SetupUI()
     {
@@ -282,6 +292,8 @@ public class MainController : MonoBehaviour
 
     void Update()
     {
+        overallTime += Time.deltaTime;
+
         buildManager.Update();
 
         if (!buildManager.readyForNextBrick)

@@ -85,7 +85,7 @@ public class RobotAction
 
         if (action == takeStep)
         {
-            robot.TakeStep(stepGradient, stepSize, leadLegForStep, endStance, turnAngle);
+            robot.TakeStep(stepGradient, stepSize, leadLegForStep, endStance, turnAngle, heelPosition);
         }
 
     }

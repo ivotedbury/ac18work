@@ -66,24 +66,26 @@ public class PathFinder
 
                 int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour);
 
-                if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+                currentDirection = GetDirection(cell, neighbour);
+                List<Cell> potentialCompanionCells = FindListOfPotentialCompanionCells(_inputGrid, neighbour, currentDirection, _availableCells);
+
+                if (potentialCompanionCells.Count > 0)
                 {
-                    neighbour.gCost = newCostToNeighbour;
-                    neighbour.hCost = GetDistance(neighbour, targetCell);
-                    neighbour.parent = cell;
-                    currentDirection = GetDirection(cell, neighbour);
-
-                    List<Cell> potentialCompanionCells = FindListOfPotentialCompanionCells(_inputGrid, neighbour, currentDirection, _availableCells);
-
-                    if (potentialCompanionCells.Count > 0)
+                    if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
                     {
+                        neighbour.gCost = newCostToNeighbour;
+                        neighbour.hCost = GetDistance(neighbour, targetCell);
+                        neighbour.parent = cell;
+
+
+
                         if (!openSet.Contains(neighbour))
                         {
                             openSet.Add(neighbour);
                         }
+
                     }
                 }
-
 
             }
         }

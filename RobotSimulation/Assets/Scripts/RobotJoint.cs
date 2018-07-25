@@ -9,10 +9,9 @@ public class RobotJoint
 
     //general
     float speed;
-    public int resetPos;
-    public int currentPos;
-    public int targetPos;
-    public int speedMode = 0;
+    public float resetPos;
+    public float currentPos;
+    public float targetPos;
 
     //for lerp
     float startPos;
@@ -72,6 +71,8 @@ public class RobotJoint
     public float halfBrickLegAFactor;
     public float halfBrickLegBFactor;
 
+    float speedFactor = 2f;
+    float overallTime = 0;
 
     public RobotJoint(char _thisJoint)
     {
@@ -101,6 +102,8 @@ public class RobotJoint
 
     public bool JointNeedsToMove()
     {
+        overallTime += Time.deltaTime;
+
         bool jointNeedsToMove;
 
         if (targetPos != currentPos)
@@ -120,7 +123,7 @@ public class RobotJoint
         if (currentPos != targetPos)
         {
             float progress = elapsedTime / timeForMove;
-            currentPos = (int)Mathf.Lerp(startPos, targetPos, progress);
+            currentPos = Mathf.Lerp(startPos, targetPos, progress);
             elapsedTime += Time.deltaTime;
         }
     }
@@ -162,9 +165,9 @@ public class RobotJoint
         if (targetPos != currentPos)
         {
             startPos = currentPos;
-            startTime = Time.time;
+            startTime = overallTime;//Time.time
             elapsedTime = 0;
-            timeForMove = Mathf.Abs(targetPos - startPos) / speed;
+            timeForMove = Mathf.Abs(targetPos - startPos) / (speed * speedFactor);
         }
     }
 

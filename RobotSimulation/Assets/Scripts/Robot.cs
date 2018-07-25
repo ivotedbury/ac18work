@@ -65,8 +65,8 @@ public class Robot
 
     float clearanceHeight = 0.00f; //extra height to clear the brick when lifting a leg
 
-    int gripClosedPos = 4800;
-    int gripOpenPos = 3000;
+    float gripClosedPos = 4800;
+    float gripOpenPos = 3000;
 
     public Vector3Int currentLegAGrid;
     public Vector3Int currentLegBGrid;
@@ -89,8 +89,7 @@ public class Robot
     int currentStance;
     bool footAHeelIn;
 
-    List<int[]> jointTargetList = new List<int[]>();
-    int[] defaultTargetValues = new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    List<float[]> jointTargetList = new List<float[]>();
 
     List<RobotAction> actionList = new List<RobotAction>();
 
@@ -120,13 +119,13 @@ public class Robot
 
         if (currentlyAttached == 0)
         {
-            legAFootPos = new Vector3(startingPos.x * gridDimXZ, (startingPos.y+1) * gridDimY, startingPos.z * gridDimXZ);
+            legAFootPos = new Vector3(startingPos.x * gridDimXZ, (startingPos.y + 1) * gridDimY, startingPos.z * gridDimXZ);
             legAFootRot = startingRot;
         }
         if (currentlyAttached == 1)
         {
-            legBFootPos = new Vector3(startingPos.x * gridDimXZ, (startingPos.y + 1 ) * gridDimY, startingPos.z * gridDimXZ);
-            legBFootRot = startingRot * Quaternion.Euler(0,180,0);
+            legBFootPos = new Vector3(startingPos.x * gridDimXZ, (startingPos.y + 1) * gridDimY, startingPos.z * gridDimXZ);
+            legBFootRot = startingRot * Quaternion.Euler(0, 180, 0);
         }
     }
 
@@ -136,57 +135,57 @@ public class Robot
         UpdateReferenceTransforms();
     }
 
-    int[] LiftLeg(int _legToLift, int _gridStepsToMove)
+    float[] LiftLeg(int _legToLift, int _gridStepsToMove)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_legToLift == legA)
         {
-            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - ((gridDimY + clearanceHeight) * 10000));
+            outputTargetValues[1] = (legAVerticalJoint.resetPos - ((gridDimY + clearanceHeight) * 10000));
             outputTargetValues[9] = legB;
         }
 
         if (_legToLift == legB)
         {
-            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - ((gridDimY + clearanceHeight) * 10000));
+            outputTargetValues[4] = (legBVerticalJoint.resetPos - ((gridDimY + clearanceHeight) * 10000));
             outputTargetValues[9] = legA;
         }
 
         return outputTargetValues;
     }
 
-    int[] LiftBothLegs(int _gridStepsToMove)
+    float[] LiftBothLegs(int _gridStepsToMove)
     {
 
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_gridStepsToMove > 0)
         {
-            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos + (gridDimY * 10000));
-            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos + (gridDimY * 10000));
+            outputTargetValues[1] = (legAVerticalJoint.resetPos + (gridDimY * 10000));
+            outputTargetValues[4] = (legBVerticalJoint.resetPos + (gridDimY * 10000));
         }
         else if (_gridStepsToMove < 0)
         {
-            outputTargetValues[1] = (int)(legAVerticalJoint.resetPos);
-            outputTargetValues[4] = (int)(legBVerticalJoint.resetPos);
+            outputTargetValues[1] = (legAVerticalJoint.resetPos);
+            outputTargetValues[4] = (legBVerticalJoint.resetPos);
         }
 
         return outputTargetValues;
     }
 
-    int[] PlaceLeg(int _legToPlace, int _gridStepsToMove)
+    float[] PlaceLeg(int _legToPlace, int _gridStepsToMove)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_legToPlace == legA)
         {
             if (_gridStepsToMove < 0)
             {
-                outputTargetValues[1] = (int)(legAVerticalJoint.resetPos - (_gridStepsToMove * gridDimY * 10000));
+                outputTargetValues[1] = legAVerticalJoint.resetPos - (_gridStepsToMove * gridDimY * 10000);
             }
             else
             {
-                outputTargetValues[1] = (int)(legAVerticalJoint.resetPos);
+                outputTargetValues[1] = legAVerticalJoint.resetPos;
             }
         }
 
@@ -194,50 +193,50 @@ public class Robot
         {
             if (_gridStepsToMove < 0)
             {
-                outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (_gridStepsToMove * gridDimY * 10000));
+                outputTargetValues[4] = legBVerticalJoint.resetPos - (_gridStepsToMove * gridDimY * 10000);
             }
             else
             {
-                outputTargetValues[4] = (int)(legBVerticalJoint.resetPos);
+                outputTargetValues[4] = legBVerticalJoint.resetPos;
             }
         }
 
         return outputTargetValues;
     }
 
-    int[] ReturnToStance(int _currentStance)
+    float[] ReturnToStance(int _currentStance)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-        outputTargetValues[0] = (int)(5000 + ((_currentStance * gridDimXZ) * 10000 / 2));
-        outputTargetValues[3] = (int)(5000 - ((_currentStance * gridDimXZ) * 10000 / 2));
+        outputTargetValues[0] = 5000 + ((_currentStance * gridDimXZ) * 10000 / 2);
+        outputTargetValues[3] = 5000 - ((_currentStance * gridDimXZ) * 10000 / 2);
         outputTargetValues[5] = 5000;
 
         return outputTargetValues;
     }
 
-    int[] SetForCounterbalance(int _pivotLeg, float _spacing, int _brickTypeCurrentlyBeingCarried)
+    float[] SetForCounterbalance(int _pivotLeg, float _spacing, int _brickTypeCurrentlyBeingCarried)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_pivotLeg == 0)
         {
             outputTargetValues[0] = 5000;
-            outputTargetValues[3] = (int)(5000 - (_spacing * gridDimXZ * 10000));
+            outputTargetValues[3] = 5000 - (_spacing * gridDimXZ * 10000);
 
             if (_brickTypeCurrentlyBeingCarried == 0)
             {
-                outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegBFactor));
+                outputTargetValues[5] = 5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegBFactor);
                 outputTargetValues[8] = 2;
             }
             else if (_brickTypeCurrentlyBeingCarried == 1)
             {
-                outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegBFactor));
+                outputTargetValues[5] = 5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegBFactor);
                 outputTargetValues[8] = 4;
             }
             else if (_brickTypeCurrentlyBeingCarried == 2)
             {
-                outputTargetValues[5] = (int)(5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegBFactor));
+                outputTargetValues[5] = 5000 + (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegBFactor);
                 outputTargetValues[8] = 6;
             }
         }
@@ -245,21 +244,21 @@ public class Robot
         if (_pivotLeg == 1)
         {
             outputTargetValues[3] = 5000;
-            outputTargetValues[0] = (int)(5000 + (_spacing * gridDimXZ * 10000));
+            outputTargetValues[0] = 5000 + (_spacing * gridDimXZ * 10000);
 
             if (_brickTypeCurrentlyBeingCarried == 0)
             {
-                outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegAFactor));
+                outputTargetValues[5] = 5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.normalLegAFactor);
                 outputTargetValues[8] = 1;
             }
             else if (_brickTypeCurrentlyBeingCarried == 1)
             {
-                outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegAFactor));
+                outputTargetValues[5] = 5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.fullBrickLegAFactor);
                 outputTargetValues[8] = 3;
             }
             else if (_brickTypeCurrentlyBeingCarried == 2)
             {
-                outputTargetValues[5] = (int)(5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegAFactor));
+                outputTargetValues[5] = 5000 - (_spacing * gridDimXZ * 10000 * legCRailJoint.halfBrickLegAFactor);
                 outputTargetValues[8] = 5;
             }
         }
@@ -269,38 +268,38 @@ public class Robot
         return outputTargetValues;
     }
 
-    int[] RotateLegA(float _turnAngle)
+    float[] RotateLegA(float _turnAngle)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-        outputTargetValues[2] = (int)(_turnAngle);
+        outputTargetValues[2] = _turnAngle;
 
         return outputTargetValues;
     }
 
-    int[] PrepareLegsForGrip(int _baseLeg, float _distanceInFront, bool _straightSequence, int _brickTypeCurrentlyBeingCarried)
+    float[] PrepareLegsForGrip(int _baseLeg, float _distanceInFront, bool _straightSequence, int _brickTypeCurrentlyBeingCarried)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_baseLeg == 0)
         {
             outputTargetValues[0] = 5000;
-            outputTargetValues[5] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000));
+            outputTargetValues[5] = 5000 + (_distanceInFront * gridDimXZ * 10000);
 
             if (_brickTypeCurrentlyBeingCarried == 0 && !_straightSequence)
             {
 
-                outputTargetValues[3] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.normalLegBFactor));
+                outputTargetValues[3] = 5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.normalLegBFactor);
                 outputTargetValues[8] = 2;
             }
             else if (_brickTypeCurrentlyBeingCarried == 1 && !_straightSequence)
             {
-                outputTargetValues[3] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.fullBrickLegBFactor));
+                outputTargetValues[3] = 5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.fullBrickLegBFactor);
                 outputTargetValues[8] = 4;
             }
             else if (_brickTypeCurrentlyBeingCarried == 2 && !_straightSequence)
             {
-                outputTargetValues[3] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.halfBrickLegBFactor));
+                outputTargetValues[3] = 5000 - (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.halfBrickLegBFactor);
                 outputTargetValues[8] = 6;
             }
         }
@@ -308,21 +307,21 @@ public class Robot
         if (_baseLeg == 1)
         {
             outputTargetValues[3] = 5000;
-            outputTargetValues[5] = (int)(5000 - (_distanceInFront * gridDimXZ * 10000));
+            outputTargetValues[5] = 5000 - (_distanceInFront * gridDimXZ * 10000);
 
             if (_brickTypeCurrentlyBeingCarried == 0 && !_straightSequence)
             {
-                outputTargetValues[0] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.normalLegAFactor));
+                outputTargetValues[0] = 5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.normalLegAFactor);
                 outputTargetValues[8] = 1;
             }
             else if (_brickTypeCurrentlyBeingCarried == 1 && !_straightSequence)
             {
-                outputTargetValues[0] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.fullBrickLegAFactor));
+                outputTargetValues[0] = 5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.fullBrickLegAFactor);
                 outputTargetValues[8] = 3;
             }
             else if (_brickTypeCurrentlyBeingCarried == 2 && !_straightSequence)
             {
-                outputTargetValues[0] = (int)(5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.halfBrickLegAFactor));
+                outputTargetValues[0] = 5000 + (_distanceInFront * gridDimXZ * 10000 / legCRailJoint.halfBrickLegAFactor);
                 outputTargetValues[8] = 5;
             }
         }
@@ -332,112 +331,112 @@ public class Robot
         return outputTargetValues;
     }
 
-    int[] OpenGrip()
+    float[] OpenGrip()
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         outputTargetValues[6] = gripOpenPos;
 
         return outputTargetValues;
     }
 
-    int[] RotateGrip(float _turnAngle)
+    float[] RotateGrip(float _turnAngle)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-        outputTargetValues[7] = (int)_turnAngle;
+        outputTargetValues[7] = _turnAngle;
 
         return outputTargetValues;
     }
 
-    int[] CloseGrip()
+    float[] CloseGrip()
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         outputTargetValues[6] = gripClosedPos;
 
         return outputTargetValues;
     }
 
-    int[] LiftBothLegsForBrick(int _baseLeg, int _relativeBrickHeight, bool _straightSequence)
+    float[] LiftBothLegsForBrick(int _baseLeg, int _relativeBrickHeight, bool _straightSequence)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_baseLeg == legA)
         {
-            outputTargetValues[1] = (int)legAVerticalJoint.resetPos;
+            outputTargetValues[1] = legAVerticalJoint.resetPos;
 
             if (_straightSequence)
             {
-                outputTargetValues[4] = (int)legBVerticalJoint.resetPos;
+                outputTargetValues[4] = legBVerticalJoint.resetPos;
             }
             else
             {
-                outputTargetValues[4] = (int)(legBVerticalJoint.resetPos - (gridDimY * 10000));
+                outputTargetValues[4] = (legBVerticalJoint.resetPos - (gridDimY * 10000));
             }
         }
         else if (_baseLeg == legB)
         {
-            outputTargetValues[4] = (int)legBVerticalJoint.resetPos;
+            outputTargetValues[4] = legBVerticalJoint.resetPos;
 
             if (_straightSequence)
             {
-                outputTargetValues[1] = (int)legBVerticalJoint.resetPos;
+                outputTargetValues[1] = legBVerticalJoint.resetPos;
             }
             else
             {
-                outputTargetValues[1] = (int)(legBVerticalJoint.resetPos - (gridDimY * 10000));
+                outputTargetValues[1] = (legBVerticalJoint.resetPos - (gridDimY * 10000));
             }
         }
 
         return outputTargetValues;
     }
 
-    int[] LowerBothLegsForBrick(int _baseLeg, int _relativeBrickHeight, bool _straightSequence)
+    float[] LowerBothLegsForBrick(int _baseLeg, int _relativeBrickHeight, bool _straightSequence)
     {
-        int[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] outputTargetValues = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         float pickupOffsetFromResetPos = 0.135321f;
 
         if (_baseLeg == legA)
         {
-            outputTargetValues[1] = (int)((legAVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+            outputTargetValues[1] = (legAVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000);
 
             if (_relativeBrickHeight < 0)
             {
-                outputTargetValues[4] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+                outputTargetValues[4] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000);
             }
 
             else
             {
                 if (_straightSequence)
                 {
-                    outputTargetValues[4] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+                    outputTargetValues[4] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000);
                 }
                 else
                 {
-                    outputTargetValues[4] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight - 1) * gridDimY + pickupOffsetFromResetPos) * 10000));
+                    outputTargetValues[4] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight - 1) * gridDimY + pickupOffsetFromResetPos) * 10000);
                 }
             }
         }
         else if (_baseLeg == legB)
         {
-            outputTargetValues[4] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+            outputTargetValues[4] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000);
 
             if (_relativeBrickHeight < 0)
             {
-                outputTargetValues[1] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+                outputTargetValues[1] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000);
             }
 
             else
             {
                 if (_straightSequence)
                 {
-                    outputTargetValues[1] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000));
+                    outputTargetValues[1] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight) * gridDimY + pickupOffsetFromResetPos) * 10000);
                 }
                 else
                 {
-                    outputTargetValues[1] = (int)((legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight - 1) * gridDimY + pickupOffsetFromResetPos) * 10000));
+                    outputTargetValues[1] = (legBVerticalJoint.resetPos - (Mathf.Abs(_relativeBrickHeight - 1) * gridDimY + pickupOffsetFromResetPos) * 10000);
                 }
             }
         }
@@ -462,11 +461,11 @@ public class Robot
 
         jointTargetList.Clear();
 
-        int[] jointTargetListValues0 = SetForCounterbalance(legB, currentStance, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues1 = LiftLeg(legA, 1);
-        int[] jointTargetListValues2 = RotateLegA(_newPosition * 10);
-        int[] jointTargetListValues3 = PlaceLeg(legA, 1);
-        int[] jointTargetListValues4 = ReturnToStance(currentStance);
+        float[] jointTargetListValues0 = SetForCounterbalance(legB, currentStance, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues1 = LiftLeg(legA, 1);
+        float[] jointTargetListValues2 = RotateLegA(_newPosition * 10);
+        float[] jointTargetListValues3 = PlaceLeg(legA, 1);
+        float[] jointTargetListValues4 = ReturnToStance(currentStance);
 
         jointTargetList.Add(jointTargetListValues0);
         jointTargetList.Add(jointTargetListValues1);
@@ -502,9 +501,9 @@ public class Robot
             straightSequence = true;
         }
         bool preTurnIsNeeded = false;
-        int preTurnAngle = 0;
+        float preTurnAngle = 0;
         bool postTurnIsNeeded = false;
-        int postTurnAngle = 0;
+        float postTurnAngle = 0;
 
         // account for foot A heel in or out
         float currentLegABase = 0;
@@ -568,11 +567,11 @@ public class Robot
             legARotation = 0;
         }
 
-        int[] jointTargetListValues0 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues1 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues2 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues3 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues4 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues0 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues1 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues2 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues3 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues4 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (preTurnIsNeeded)
         {
@@ -583,10 +582,10 @@ public class Robot
             jointTargetListValues4 = ReturnToStance(currentStance);
         }
 
-        int[] jointTargetListValues5 = SetForCounterbalance(leadingLeg, currentStance, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues6 = LiftLeg(trailingLeg, 1);
+        float[] jointTargetListValues5 = SetForCounterbalance(leadingLeg, currentStance, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues6 = LiftLeg(trailingLeg, 1);
 
-        int[] jointTargetListValues7 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues7 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (straightSequence)
         {
@@ -597,20 +596,20 @@ public class Robot
             jointTargetListValues7 = SetForCounterbalance(leadingLeg, 4, brickTypeCurrentlyCarried);
         }
 
-        int[] jointTargetListValues8 = RotateLegA((currentLegABase + legARotation) * 10); // non straight only
+        float[] jointTargetListValues8 = RotateLegA((currentLegABase + legARotation) * 10); // non straight only
 
-        int[] jointTargetListValues9 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues9 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (straightSequence)
         {
             jointTargetListValues9 = PlaceLeg(trailingLeg, 1);
         }
 
-        int[] jointTargetListValues10 = PrepareLegsForGrip(leadingLeg, legCPlacementDistance, straightSequence, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues11 = RotateGrip((gripRotation * 10));
-        int[] jointTargetListValues12 = LowerBothLegsForBrick(leadingLeg, _relativeBrickHeight, straightSequence);
+        float[] jointTargetListValues10 = PrepareLegsForGrip(leadingLeg, legCPlacementDistance, straightSequence, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues11 = RotateGrip((gripRotation * 10));
+        float[] jointTargetListValues12 = LowerBothLegsForBrick(leadingLeg, _relativeBrickHeight, straightSequence);
 
-        int[] jointTargetListValues13 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues13 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_pickupMode)
         {
@@ -621,17 +620,17 @@ public class Robot
             jointTargetListValues13 = OpenGrip();
         }
 
-        int[] jointTargetListValues14 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues14 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (!straightSequence)
         {
             jointTargetListValues14 = PrepareLegsForGrip(leadingLeg, legCPlacementDistance, straightSequence, brickTypeToBeCarriedAfterHandle);
         }
 
-        int[] jointTargetListValues15 = LiftBothLegsForBrick(leadingLeg, _relativeBrickHeight, straightSequence);
-        int[] jointTargetListValues16 = RotateGrip(0);
-        int[] jointTargetListValues17 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues18 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues15 = LiftBothLegsForBrick(leadingLeg, _relativeBrickHeight, straightSequence);
+        float[] jointTargetListValues16 = RotateGrip(0);
+        float[] jointTargetListValues17 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues18 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (straightSequence)
         {
@@ -640,16 +639,16 @@ public class Robot
         }
 
 
-        int[] jointTargetListValues19 = SetForCounterbalance(leadingLeg, currentStance, brickTypeToBeCarriedAfterHandle);
-        int[] jointTargetListValues20 = RotateLegA(currentLegABase * 10);
-        int[] jointTargetListValues21 = PlaceLeg(trailingLeg, 1);
-        int[] jointTargetListValues22 = ReturnToStance(currentStance);
+        float[] jointTargetListValues19 = SetForCounterbalance(leadingLeg, currentStance, brickTypeToBeCarriedAfterHandle);
+        float[] jointTargetListValues20 = RotateLegA(currentLegABase * 10);
+        float[] jointTargetListValues21 = PlaceLeg(trailingLeg, 1);
+        float[] jointTargetListValues22 = ReturnToStance(currentStance);
 
-        int[] jointTargetListValues23 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues24 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues25 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues26 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues27 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues23 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues24 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues25 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues26 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues27 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (postTurnIsNeeded)
         {
@@ -703,17 +702,17 @@ public class Robot
         moveCounter = 0;
     }
 
-    public void TakeStep(int _stepGradient, int _stepSize, int _leadLeg, int _endStance, int _turnAngle)
+    public void TakeStep(int _stepGradient, int _stepSize, int _leadLeg, int _endStance, int _turnAngle, int _footAHeel)
     {
         jointTargetList.Clear();
 
         int leadingLeg;
         int trailingLeg;
 
-        int preTurnAngle = 0;
-        int initialTurnAngle = 0;
-        int finalTurnAngle = 0;
-        int postTurnAngle = 0;
+        float preTurnAngle = 0;
+        float initialTurnAngle = 0;
+        float finalTurnAngle = 0;
+        float postTurnAngle = 0;
 
         bool preTurnIsNeeded = false;
         bool postTurnIsNeeded = false;
@@ -743,6 +742,13 @@ public class Robot
                     initialTurnAngle = 1800;
                     finalTurnAngle = 0;
                 }
+
+                if (_footAHeel == 180 && _turnAngle == 0)
+                {
+                    initialTurnAngle = 1800;
+                    finalTurnAngle = 1800;
+                    footAHeelIn = false;
+                }
             }
 
             else
@@ -766,6 +772,12 @@ public class Robot
                 {
                     initialTurnAngle = 1800;
                     finalTurnAngle = 0;
+                }
+
+                if (_footAHeel == 180 && _turnAngle == 0)
+                {
+                    finalTurnAngle = 1800;
+                    footAHeelIn = false;
                 }
             }
 
@@ -796,6 +808,13 @@ public class Robot
                     initialTurnAngle = 0;
                     finalTurnAngle = 1800;
                 }
+
+                if (_footAHeel == 0 && _turnAngle == 0)
+                {
+                    initialTurnAngle = 0;
+                    finalTurnAngle = 0;
+                    footAHeelIn = true;
+                }
             }
 
             else
@@ -822,14 +841,20 @@ public class Robot
                     initialTurnAngle = 0;
                     finalTurnAngle = 1800;
                 }
+
+                if (_footAHeel == 180 && _turnAngle == 0)
+                {
+                    finalTurnAngle = 0;
+                    footAHeelIn = true;
+                }
             }
         }
 
         //PRE TURN
-        int[] jointTargetListValues0 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues1 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues2 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues3 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues0 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues1 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues2 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues3 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (preTurnIsNeeded)
         {
@@ -840,7 +865,7 @@ public class Robot
         }
 
         //SHIFT HEIGHT IF GOING UP
-        int[] jointTargetListValues4 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues4 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_stepGradient > 0)
         {
@@ -848,18 +873,18 @@ public class Robot
         }
 
         //MAIN STEP
-        int[] jointTargetListValues5 = SetForCounterbalance(trailingLeg, currentStance, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues6 = LiftLeg(leadingLeg, _stepGradient);
-        int[] jointTargetListValues7 = RotateLegA(initialTurnAngle);
-        int[] jointTargetListValues8 = SetForCounterbalance(trailingLeg, _stepSize, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues9 = PlaceLeg(leadingLeg, _stepGradient);
-        int[] jointTargetListValues10 = SetForCounterbalance(leadingLeg, _stepSize, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues11 = LiftLeg(trailingLeg, _stepGradient + 1);
-        int[] jointTargetListValues12 = SetForCounterbalance(leadingLeg, _endStance, brickTypeCurrentlyCarried);
-        int[] jointTargetListValues13 = RotateLegA(finalTurnAngle);
-        int[] jointTargetListValues14 = PlaceLeg(trailingLeg, _stepGradient);
+        float[] jointTargetListValues5 = SetForCounterbalance(trailingLeg, currentStance, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues6 = LiftLeg(leadingLeg, _stepGradient);
+        float[] jointTargetListValues7 = SetForCounterbalance(trailingLeg, _stepSize, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues8 = RotateLegA(initialTurnAngle);
+        float[] jointTargetListValues9 = PlaceLeg(leadingLeg, _stepGradient);
+        float[] jointTargetListValues10 = SetForCounterbalance(leadingLeg, _stepSize, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues11 = LiftLeg(trailingLeg, _stepGradient + 1);
+        float[] jointTargetListValues12 = SetForCounterbalance(leadingLeg, _endStance, brickTypeCurrentlyCarried);
+        float[] jointTargetListValues13 = RotateLegA(finalTurnAngle);
+        float[] jointTargetListValues14 = PlaceLeg(trailingLeg, _stepGradient);
 
-        int[] jointTargetListValues15 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues15 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (!postTurnIsNeeded)
         {
@@ -867,7 +892,7 @@ public class Robot
         }
 
         //SHIFT HEIGHT IF GOING DOWN
-        int[] jointTargetListValues16 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues16 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (_stepGradient < 0)
         {
@@ -875,11 +900,11 @@ public class Robot
         }
 
         // POST TURN
-        int[] jointTargetListValues17 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues18 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues19 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues20 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-        int[] jointTargetListValues21 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues17 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues18 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues19 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues20 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] jointTargetListValues21 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         if (postTurnIsNeeded)
         {
@@ -961,13 +986,13 @@ public class Robot
         }
     }
 
-    public void RobotMove(int _legARailTarget, int _legAVerticalTarget, int _legARotationTarget, int _legBRailTarget, int _legBVerticalTarget, int _legCRailTarget, int _legCGripTarget, int _legCRotationTarget, int _legCRailMoveType, int _currentlyAttached)
+    public void RobotMove(float _legARailTarget, float _legAVerticalTarget, float _legARotationTarget, float _legBRailTarget, float _legBVerticalTarget, float _legCRailTarget, float _legCGripTarget, float _legCRotationTarget, float _legCRailMoveType, float _currentlyAttached)
     {
         moveInProgress = true;
 
         if (_currentlyAttached != -1)
         {
-            currentlyAttached = _currentlyAttached;
+            currentlyAttached = (int)_currentlyAttached;
         }
 
         if (_legARailTarget != -1)
@@ -1018,8 +1043,8 @@ public class Robot
             }
             else
             {
-                joint.SetLerpValues(_legCRailMoveType);
-                legCRailMoveTypeStore = _legCRailMoveType;
+                joint.SetLerpValues((int)_legCRailMoveType);
+                legCRailMoveTypeStore = (int)_legCRailMoveType;
             }
         }
 
