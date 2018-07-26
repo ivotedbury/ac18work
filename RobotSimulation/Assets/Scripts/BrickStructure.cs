@@ -166,7 +166,7 @@ public class BrickStructure
             }
         }
 
-        Debug.Log("A " + _cell.position + "B " + availableListofCompanions.Count);
+       // Debug.Log("A " + _cell.position + "B " + availableListofCompanions.Count);
 
         Cell companionCell = null;
 
@@ -238,7 +238,48 @@ public class BrickStructure
             potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, -value1)));
             potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, value1)));
 
+            value1 = 1;
+            value2 = 3;
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, value2)));
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, value1)));
+
+            value1 = 2;
+            value2 = 2;
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, value2)));
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, value1)));
+
+            value1 = 2;
+            value2 = 3;
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, -value2)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value1, relativeHeight, value2)));
+
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, -value1)));
+            potentialDropOffCells.Add(grid.GetANeighbour(targetCell, new Vector3Int(-value2, relativeHeight, value1)));
+
         }
+
+        Debug.Log(potentialDropOffCells.Count);
 
         for (int i = 0; i < potentialDropOffCells.Count; i++)
         {
@@ -250,6 +291,7 @@ public class BrickStructure
                 }
             }
         }
+        Debug.Log(possibleDropOffCells.Count);
 
         for (int i = 0; i < possibleDropOffCells.Count; i++)
         {
@@ -257,19 +299,25 @@ public class BrickStructure
 
             if (_targetBrick.brickType == 1)
             {
-                if (_targetBrick.rotation == Quaternion.Euler(0, 90, 0) || _targetBrick.rotation == Quaternion.Euler(0, 270, 0))
+                if ((_targetBrick.rotation == Quaternion.Euler(0, 90, 0) || _targetBrick.rotation == Quaternion.Euler(0, 270, 0)) && Mathf.Abs(dropOffToTarget.z) == 0)
                 {
+
                     if (Mathf.Abs(dropOffToTarget.x) > 2)
                     {
                         shortlistDropOffCells.Add(possibleDropOffCells[i]);
                     }
                 }
-                else if (_targetBrick.rotation == Quaternion.Euler(0, 0, 0) || _targetBrick.rotation == Quaternion.Euler(0, 180, 0))
+                else if ((_targetBrick.rotation == Quaternion.Euler(0, 0, 0) || _targetBrick.rotation == Quaternion.Euler(0, 180, 0)) && Mathf.Abs(dropOffToTarget.x) == 0)
                 {
-                    if (Mathf.Abs(dropOffToTarget.z) > 2)
+                    if (Mathf.Abs(dropOffToTarget.z) > 2 && Mathf.Abs(dropOffToTarget.x) == 0)
                     {
                         shortlistDropOffCells.Add(possibleDropOffCells[i]);
                     }
+                }
+
+                else
+                {
+                    shortlistDropOffCells.Add(possibleDropOffCells[i]);
                 }
             }
             else
@@ -277,6 +325,9 @@ public class BrickStructure
                 shortlistDropOffCells = possibleDropOffCells;
             }
         }
+
+        Debug.Log(shortlistDropOffCells.Count);
+
 
         List<Cell> finalListDropOffCells = new List<Cell>();
 
@@ -291,17 +342,45 @@ public class BrickStructure
             }
         }
 
-        float bestCurrentDistance = 10000000;
+        int bestTripCost = 100000000;
 
         for (int i = 0; i < finalListDropOffCells.Count; i++)
         {
-            float distanceFromSeed = (finalListDropOffCells[i].position - seedCell.position).magnitude;
-            if (distanceFromSeed < bestCurrentDistance)
+            List<Cell> potentialPath = new List<Cell>();
+            potentialPath = pathFinder.FindPath(grid, availableCells, bricksInTargetStructure[0].originCell, finalListDropOffCells[i], 1);
+            int testTripCost = bestTripCost;
+            if (potentialPath.Count > 0)
             {
-                dropOffCell = finalListDropOffCells[i];
-                bestCurrentDistance = distanceFromSeed;
+                testTripCost = pathFinder.totalCostOfTrip;
             }
+            Debug.Log("potentialPath length: " + potentialPath.Count);
+            Debug.Log("finalListDropOffCells position: " + i + "-" + finalListDropOffCells[i].position);
+            Debug.Log("testTripCost " + i + "-" + testTripCost);
+
+            if (testTripCost < bestTripCost)
+            {
+                bestTripCost = testTripCost;
+                dropOffCell = finalListDropOffCells[i];
+            }
+            Debug.Log(dropOffCell.position);
+
         }
+
+
+
+        //    float bestCurrentDistance = 10000000;
+
+        //for (int i = 0; i < finalListDropOffCells.Count; i++)
+        //{
+        //    float distanceFromSeed = (finalListDropOffCells[i].position - seedCell.position).magnitude;
+        //    if (distanceFromSeed < bestCurrentDistance)
+        //    {
+        //        dropOffCell = finalListDropOffCells[i];
+        //        bestCurrentDistance = distanceFromSeed;
+        //    }
+        //}
+
+        Debug.Log("dropOffCell Position: "+ dropOffCell.position);
 
         return dropOffCell;
     }

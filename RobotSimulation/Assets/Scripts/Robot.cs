@@ -482,7 +482,7 @@ public class Robot
 
     }
 
-    public void HandleBrick(int _relativeBrickHeight, int _distanceInFront, int _distanceToSide, int _leadLeg, int _gripRotation, Brick _brickToMove, bool _pickupMode)
+    public void HandleBrick(int _relativeBrickHeight, int _distanceInFront, int _distanceToSide, int _leadLeg, int _gripRotation, Brick _brickToMove, bool _pickupMode, bool _backWeight)
     {
         jointTargetList.Clear();
         int brickTypeToBeCarriedAfterHandle = 0;
@@ -496,7 +496,7 @@ public class Robot
 
         bool straightSequence = false;
 
-        if (_distanceToSide == 0)
+        if (_distanceToSide == 0 && _backWeight)
         {
             straightSequence = true;
         }
@@ -739,8 +739,14 @@ public class Robot
                 }
                 else if (_turnAngle == 180) // turn 180
                 {
-                    initialTurnAngle = 1800;
-                    finalTurnAngle = 0;
+                    //initialTurnAngle = 1800;
+                    //finalTurnAngle = 0;
+
+                    initialTurnAngle = 0;
+                    finalTurnAngle = 1800;
+
+                    postTurnAngle = 0;
+                    postTurnIsNeeded = true;
                 }
 
                 if (_footAHeel == 180 && _turnAngle == 0)

@@ -40,6 +40,10 @@ public class Brick
                 childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(-1, 0, 0)));
             }
         }
+        else if (brickType == 2)
+        {
+            childCells.Add(_inputGrid.GetANeighbour(originCell, new Vector3Int(0, 0, 0)));
+        }
     }
 
 }

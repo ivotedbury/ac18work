@@ -86,26 +86,28 @@ public class BuildManager
         Vector3Int placementDirections;
         Cell nextCompanionCell;
         int leadLeg;
-        bool legAHeelIn;
         int heelPosition;
+        bool backWeight = true;
         int currentDirectionOfTravel;
         int previousDirectionOfTravel = 0;
         int robotOrientation = 0;
         int previousRobotOrientation;
         int turnAngle = 0;
-        bool afterTurn = false;
+        bool immediateTurnRequired = false;
+        bool afterImmediateTurn = false;
+        int lateTurnAngle = 0;
 
         // PICKUP
         leadLeg = 0;
         heelPosition = 0;
-        actionsForPath.Add(new RobotAction(allRobots[0], handleBrick, 0, 0, 0, 0, 0, -1, 4, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], true, 0));
-
+        actionsForPath.Add(new RobotAction(allRobots[0], handleBrick, 0, 0, 0, 0, 0, -1, 4, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], true, backWeight, 0));
+        backWeight = false;
         Debug.Log("pickup");
 
         // TURN AROUND
 
-        actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, 8, 1, 4, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, 0));
-        actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, 4, 1, 4, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, 0));
+        actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, 8, 1, 4, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, 0));
+        actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, 4, 1, 4, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, 0));
         Debug.Log("turnaround");
 
         //OUTWARD PATH
@@ -150,17 +152,29 @@ public class BuildManager
 
             if (turnAngle != 0)////////////////////////////////////////////////////////////
             {
-                leadLeg = 1;
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
-                turnAngle = 0;
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirections.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
-                leadLeg = 0;
+                if (i == _outwardPath.Count - 2)
+                {
+                    leadLeg = 1;
+                    lateTurnAngle = turnAngle;
+                    actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                    turnAngle = 0;
+                    immediateTurnRequired = true;
+                }
+
+                else
+                {
+                    leadLeg = 1;
+                    actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                    turnAngle = 0;
+                    actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                    actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirections.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                    leadLeg = 0;
+                }
             }
 
             else
             {
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
             }
 
             previousDirectionOfTravel = currentDirectionOfTravel;
@@ -174,6 +188,11 @@ public class BuildManager
         int placementDistanceInFront = 0;
         int placementDistanceToSide = 0;
         int placementAngle = 0;
+
+        if (BackWeightPossible(_outwardPath[_outwardPath.Count - 1], robotOrientation))
+        {
+            backWeight = true;
+        }
 
         if (robotOrientation == 0)
         {
@@ -210,9 +229,10 @@ public class BuildManager
             placementAngle = (int)brickStructure.bricksInTargetStructure[nextBrickToPlace].rotation.eulerAngles.y - 90;
         }
 
-        actionsForPath.Add(new RobotAction(allRobots[0], handleBrick, 0, 0, 0, 0, 0, placementRelativeBrickHeight - 1, placementDistanceInFront, placementDistanceToSide, leadLeg, placementAngle, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, 0));
+        actionsForPath.Add(new RobotAction(allRobots[0], handleBrick, 0, 0, 0, 0, 0, placementRelativeBrickHeight - 1, placementDistanceInFront, placementDistanceToSide, leadLeg, placementAngle, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, 0));
         Debug.Log("placement");
 
+        backWeight = false;
 
         //RETURN PATH
         leadLeg = 1;
@@ -226,10 +246,23 @@ public class BuildManager
             }
             else
             {
+
                 currentDirectionOfTravel = brickStructure.GetCurrentDirectionOfTravel(_returnPath[i], _returnPath[i + 1]);
+
+                if (afterImmediateTurn)
+                {
+                    previousDirectionOfTravel = currentDirectionOfTravel;
+                }
+
                 Debug.Log("currentDirectionBack " + currentDirectionOfTravel);
 
                 leadLeg = 0;
+            }
+
+            if (afterImmediateTurn)
+            {
+                afterImmediateTurn = false;
+                continue;
             }
 
             if (currentDirectionOfTravel != previousDirectionOfTravel)
@@ -269,26 +302,36 @@ public class BuildManager
                 heelPosition = 0;
             }
 
+            if (immediateTurnRequired)
+            {
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude, 1, (int)nextStep.magnitude, -lateTurnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                immediateTurnRequired = false;
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirectionsPrevious.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                afterImmediateTurn = true;
+                leadLeg = 0;
+                continue;
+            }
+
             if (i == 0)
             {
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirections.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
-                // leadLeg = 0;
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
             }
 
             else if (turnAngle != 0)////////////////////////////////////////////////////////////
             {
                 leadLeg = 1;
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, turnAngle, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
                 turnAngle = 0;
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirections.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, 0, (int)nextStepCompanionDirections.magnitude, leadLeg, (int)nextStepCompanionDirections.magnitude, 180, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
                 leadLeg = 0;
             }
 
             else
             {
-                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)Mathf.Abs(nextStepCompanionDirections.magnitude), 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, heelPosition));
+                actionsForPath.Add(new RobotAction(allRobots[0], takeStep, nextStep.y, (int)nextStep.magnitude + (int)nextStepCompanionDirectionsPrevious.magnitude, leadLeg, (int)Mathf.Abs(nextStepCompanionDirections.magnitude), 0, 0, 0, 0, 0, 0, brickStructure.bricksInTargetStructure[nextBrickToPlace], false, backWeight, heelPosition));
             }
 
             previousDirectionOfTravel = currentDirectionOfTravel;
@@ -299,6 +342,37 @@ public class BuildManager
 
 
         return actionsForPath;
+    }
+
+    private bool BackWeightPossible(Cell _leadFootCell, int _robotOrientation)
+    {
+        bool backWeightIsPossible = false;
+
+        Cell candidateCell = null;
+
+        if (_robotOrientation == 0)
+        {
+            candidateCell = brickStructure.grid.GetANeighbour(_leadFootCell, new Vector3Int(0, 0, -8));
+        }
+        else if (_robotOrientation == 1)
+        {
+            candidateCell = brickStructure.grid.GetANeighbour(_leadFootCell, new Vector3Int(-8, 0, 0));
+        }
+        else if (_robotOrientation == 2)
+        {
+            candidateCell = brickStructure.grid.GetANeighbour(_leadFootCell, new Vector3Int(8, 0, 0));
+        }
+        else if (_robotOrientation == 3)
+        {
+            candidateCell = brickStructure.grid.GetANeighbour(_leadFootCell, new Vector3Int(0, 0, 8));
+        }
+
+        if (brickStructure.availableCells.Contains(candidateCell))
+        {
+            backWeightIsPossible = true;
+        }
+
+        return backWeightIsPossible;
     }
 
     private int InvertDirectionOfTravel(int _inputDirection)

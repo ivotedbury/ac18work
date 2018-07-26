@@ -5,11 +5,12 @@ using UnityEngine;
 public class PathFinder
 {
 
-    int totalCostOfTrip;
+  public  int totalCostOfTrip;
     int totalCostOfBuild = 0;
 
     public List<Cell> FindPath(Grid _inputGrid, List<Cell> _availableCells, Cell _startCell, Cell _targetCell, int _startingDirection)
     {
+        totalCostOfTrip = 0;
         List<Cell> waypoints = new List<Cell>();
 
         Cell startCell = _startCell;
@@ -20,6 +21,7 @@ public class PathFinder
         List<Cell> closedSet = new List<Cell>();
 
         int currentDirection = _startingDirection;
+        int proposedDirection;
 
         for (int z = 0; z < _inputGrid.gridSize.z; z++)
         {
@@ -37,6 +39,12 @@ public class PathFinder
         while (openSet.Count > 0)
         {
             Cell cell = openSet[0];
+
+            if (openSet.Count > 1)
+            {
+                currentDirection = GetDirection(cell.parent, cell);
+            }
+
             for (int i = 1; i < openSet.Count; i++)
             {
                 if (openSet[i].fCost < cell.fCost || openSet[i].fCost == cell.fCost)
@@ -64,20 +72,19 @@ public class PathFinder
                     continue;
                 }
 
-                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour);
+                proposedDirection = GetDirection(cell, neighbour);
 
-                currentDirection = GetDirection(cell, neighbour);
-                List<Cell> potentialCompanionCells = FindListOfPotentialCompanionCells(_inputGrid, neighbour, currentDirection, _availableCells);
+                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour, currentDirection, proposedDirection);
+
+                List<Cell> potentialCompanionCells = FindListOfPotentialCompanionCells(_inputGrid, neighbour, proposedDirection, _availableCells);
 
                 if (potentialCompanionCells.Count > 0)
                 {
                     if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
                     {
                         neighbour.gCost = newCostToNeighbour;
-                        neighbour.hCost = GetDistance(neighbour, targetCell);
+                        neighbour.hCost = GetDistance(neighbour, targetCell, currentDirection, proposedDirection);
                         neighbour.parent = cell;
-
-
 
                         if (!openSet.Contains(neighbour))
                         {
@@ -93,7 +100,9 @@ public class PathFinder
         if (pathSuccess)
         {
             waypoints = RetracePath(startCell, targetCell);
-            totalCostOfTrip = waypoints[waypoints.Count - 1].gCost;
+          //  totalCostOfTrip = waypoints[waypoints.Count - 1].gCost;
+            totalCostOfTrip = targetCell.gCost;
+
             totalCostOfBuild = totalCostOfBuild + totalCostOfTrip;
 
         }
@@ -187,7 +196,7 @@ public class PathFinder
         return path;
     }
 
-    int GetDistance(Cell _cellA, Cell _cellB)
+    int GetDistance(Cell _cellA, Cell _cellB, int _currentDirection, int _proposedDirection)
     {
         int distance;
 
@@ -197,8 +206,14 @@ public class PathFinder
 
         int horizontalCost = 1;
         int verticalCost = 10;
+        int directionChangeCost = 1;
 
-        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost);
+        if (_proposedDirection != _currentDirection)
+        {
+            directionChangeCost = 1000;
+        }
+
+        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) + directionChangeCost;
 
         return distance;
     }

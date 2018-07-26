@@ -22,6 +22,7 @@ public class RobotAction
     int gripRotation;
     Brick brickToMove;
     bool pickupMode;
+    bool backWeight;
     //heel posiiton
     int heelPosition;
 
@@ -47,6 +48,7 @@ public class RobotAction
         int _gripRotation,
         Brick _brickToMove,
         bool _pickupMode,
+        bool _backWeight,
         //heel posiiton
         int _heelPosition
        )
@@ -67,6 +69,7 @@ public class RobotAction
         gripRotation = _gripRotation;
         brickToMove = _brickToMove;
         pickupMode = _pickupMode;
+        backWeight = _backWeight;
         //heel posiiton
         heelPosition = _heelPosition;
     }
@@ -80,7 +83,7 @@ public class RobotAction
 
         if (action == handleBrick)
         {
-            robot.HandleBrick(relativeBrickHeight, distanceInFront, distanceToSide, leadLegForPlacement, gripRotation, brickToMove, pickupMode);
+            robot.HandleBrick(relativeBrickHeight, distanceInFront, distanceToSide, leadLegForPlacement, gripRotation, brickToMove, pickupMode, backWeight);
         }
 
         if (action == takeStep)

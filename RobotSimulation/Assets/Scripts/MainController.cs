@@ -40,7 +40,7 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(75, 20, 75);
+    Vector3Int gridSize = new Vector3Int(90, 20, 90);
     Vector3Int seedPosition = new Vector3Int(8, 1, 8);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
@@ -55,7 +55,7 @@ public class MainController : MonoBehaviour
     public Text totalBuildTimeLabel;
     public Text tripTimeLabel;
 
-    int startingBricks = 22;
+    int startingBricks = 3; // 24
     int numberOfRobots = 1;
 
     void Start()
@@ -303,53 +303,53 @@ public class MainController : MonoBehaviour
 
         if (Input.GetKeyDown("r"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true);
+            buildManager.allRobots[0].HandleBrick(0, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
         }
 
         if (Input.GetKeyDown("t"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 1, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true);
+            buildManager.allRobots[0].HandleBrick(0, 4, 1, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
         }
 
         if (Input.GetKeyDown("y"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], true);
+            buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
         }
 
         if (Input.GetKeyDown("u"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
         if (Input.GetKeyDown("i"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
         if (Input.GetKeyDown("o"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
 
         if (Input.GetKeyDown("p"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(0, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
 
         if (Input.GetKeyDown("j"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
         if (Input.GetKeyDown("k"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
         if (Input.GetKeyDown("l"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
 
         if (Input.GetKeyDown(";"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false);
+            buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
 
         DisplayAllMeshes();
