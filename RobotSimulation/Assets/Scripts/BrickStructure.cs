@@ -37,7 +37,9 @@ public class BrickStructure
             bricksInTargetStructure[i].AssignChildCells(grid);
         }
 
-        bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell);
+      //  BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
+               // bricksInTargetStructure = buildSequence.finalStructureToBuild;
+       bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)

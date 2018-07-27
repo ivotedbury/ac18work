@@ -72,6 +72,11 @@ public class MainController : MonoBehaviour
             allLegMarkers[i].transform.SetParent(legMarkerContainer.transform);
         }
 
+        buildManager.brickStructure.bricksInTargetStructure[0].auxBrick = true;
+        buildManager.brickStructure.bricksInTargetStructure[1].auxBrick = true;
+        buildManager.brickStructure.bricksInTargetStructure[2].auxBrick = true;
+
+
         for (int i = 0; i < buildManager.brickStructure.bricksInTargetStructure.Count; i++)
         {
             if (i < buildManager.startingBricks)
@@ -79,6 +84,7 @@ public class MainController : MonoBehaviour
                 if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
                 {
                     allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, buildManager.brickStructure.bricksInTargetStructure[i].rotation));
+
                 }
 
                 else if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 2)
@@ -100,15 +106,19 @@ public class MainController : MonoBehaviour
                 }
             }
 
+            //make aux bricks red
+            if (buildManager.brickStructure.bricksInTargetStructure[i].auxBrick)
+            {
+                allBrickMeshes[i].GetComponent<Renderer>().material.color = Color.red;
+            }
+
             allBrickMeshes[i].transform.SetParent(brickContainer.transform);
         }
-
-        //  seedMarker.transform.position = buildManager.brickStructure.seedCell.actualPosition;
 
         UpdateAvailableCells();
         CreateGridLines();
 
-        buildManager.PlaceNextBrick();
+         buildManager.PlaceNextBrick(); ///////////////////////////////
         UpdateAvailableCells();
     }
 
@@ -132,20 +142,12 @@ public class MainController : MonoBehaviour
 
         tripTimeLabel.text = "Trip Time: ";
 
-        int timeHours = (int) (overallTime) / 3600;
+        int timeHours = (int)(overallTime) / 3600;
         int timeMinutes = ((int)(overallTime) - (timeHours * 3600)) / 60;
-        int timeSeconds = (((int)overallTime - (timeHours * 3600)) - (timeMinutes*60));
+        int timeSeconds = (((int)overallTime - (timeHours * 3600)) - (timeMinutes * 60));
 
         totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
     }
-
-    //overallTime += Time.deltaTime;
-
-    //    int timeHours = (int)(overallTime) / 3600;
-    //int timeMinutes = ((int)(overallTime) - (timeHours * 3600)) / 60;
-    //int timeSeconds = (((int)overallTime - (timeHours * 3600)) - (timeMinutes * 60));
-
-    //totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
 
     void SetupUI()
     {
@@ -270,8 +272,6 @@ public class MainController : MonoBehaviour
 
     void UpdateAvailableCells()
     {
-      //  buildManager.brickStructure.UpdateAvailableCells();
-
         foreach (GameObject cellMarker in allCellMarkers)
         {
             Destroy(cellMarker);
@@ -294,7 +294,7 @@ public class MainController : MonoBehaviour
     {
         overallTime += Time.deltaTime;
 
-        buildManager.Update();
+         buildManager.Update(); /////////////////////////////////////////////////////////////////////////////////////////////////
 
         if (!buildManager.readyForNextBrick)
         {

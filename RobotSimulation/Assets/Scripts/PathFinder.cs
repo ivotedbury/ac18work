@@ -100,7 +100,6 @@ public class PathFinder
         if (pathSuccess)
         {
             waypoints = RetracePath(startCell, targetCell);
-          //  totalCostOfTrip = waypoints[waypoints.Count - 1].gCost;
             totalCostOfTrip = targetCell.gCost;
 
             totalCostOfBuild = totalCostOfBuild + totalCostOfTrip;
@@ -252,86 +251,5 @@ public class PathFinder
 
         return neighbours;
     }
-
-    //int GetDirection(Cell _startCell, Cell _testCell)
-    //{
-    //    int directionValue = 0;
-
-    //    if (_testCell.position - _startCell.position == new Vector3Int(1, 0, 0))
-    //    {
-    //        directionValue = 0;
-    //    }
-    //    else if (_testCell.position - _startCell.position == new Vector3Int(0, 0, -1))
-    //    {
-    //        directionValue = 1;
-    //    }
-    //    else if (_testCell.position - _startCell.position == new Vector3Int(-1, 0, 0))
-    //    {
-    //        directionValue = 2;
-    //    }
-    //    else if (_testCell.position - _startCell.position == new Vector3Int(0, 0, 1))
-    //    {
-    //        directionValue = 3;
-    //    }
-
-    //    return directionValue;
-    //}
-
-    //Quaternion GetDirection(Cell _startCell, Cell _testCell)
-    //{
-    //    Quaternion currentDirection;
-
-    //    if (_testCell.position - _startCell.position == )
-
-    //    return currentDirection;
-    //}
-
-    //int GetDistance(Cell cellA, Cell cellB, int currentDirection, bool forNeighbourDistance)
-    //{
-    //    int distance;
-
-    //    int distX = Mathf.Abs(cellA.position.x - cellB.position.x);
-    //    int distY = Mathf.Abs(cellA.position.y - cellB.position.y);
-    //    int distZ = Mathf.Abs(cellA.position.z - cellB.position.z);
-
-    //    int xDirectionFactor;
-    //    int yDirectionFactor;
-    //    int zDirectionFactor;
-
-    //    if (forNeighbourDistance)
-    //    {
-    //        if (currentDirection == 0 || currentDirection == 2)
-    //        {
-    //            xDirectionFactor = 1;
-    //            yDirectionFactor = 20;
-    //            zDirectionFactor = 20;
-    //        }
-    //        else
-    //        {
-    //            xDirectionFactor = 20;
-    //            yDirectionFactor = 20;
-    //            zDirectionFactor = 1;
-    //        }
-    //    }
-
-    //    else
-    //    {
-    //        xDirectionFactor = 1;
-    //        yDirectionFactor = 1;
-    //        zDirectionFactor = 1;
-    //    }
-
-    //    if (GetDirection(cellA, cellB) != currentDirection)
-    //    {
-    //        distance = 1000 + ((yDirectionFactor * distY) + (xDirectionFactor * distX) + (zDirectionFactor * distZ)); // add a penalty for turning if test direction isn't the current direction
-    //    }
-
-    //    else
-    //    {
-    //        distance = ((yDirectionFactor * distY) + (xDirectionFactor * distX) + (zDirectionFactor * distZ));
-    //    }
-
-    //    return distance;
-    //}
 
 }
