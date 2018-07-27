@@ -13,8 +13,6 @@ public class BrickStructure
     PathFinder pathFinder = new PathFinder();
     public Cell seedCell;
 
-    public Cell legAPickupPoint;
-
     private int importOffset = 8;
 
     public BrickStructure(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
@@ -22,7 +20,6 @@ public class BrickStructure
         grid = new Grid(_gridSize);
         CreateSeed(_seedCell);
         CreateBricksInArrangment(_brickDataImport);
-        legAPickupPoint = grid.cellsArray[_seedCell.x + 8, _seedCell.y, _seedCell.z];
     }
 
     void CreateBricksInArrangment(TextAsset _brickDataImport)
@@ -37,9 +34,9 @@ public class BrickStructure
             bricksInTargetStructure[i].AssignChildCells(grid);
         }
 
-      //  BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
-               // bricksInTargetStructure = buildSequence.finalStructureToBuild;
-       bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
+      BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
+                bricksInTargetStructure = buildSequence.finalStructureToBuild;
+      // bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)

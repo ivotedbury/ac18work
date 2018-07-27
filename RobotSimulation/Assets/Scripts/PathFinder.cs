@@ -5,7 +5,7 @@ using UnityEngine;
 public class PathFinder
 {
 
-  public  int totalCostOfTrip;
+    public int totalCostOfTrip;
     int totalCostOfBuild = 0;
 
     public List<Cell> FindPath(Grid _inputGrid, List<Cell> _availableCells, Cell _startCell, Cell _targetCell, int _startingDirection)
@@ -33,6 +33,8 @@ public class PathFinder
                 }
             }
         }
+
+
 
         openSet.Add(_startCell);
 

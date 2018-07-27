@@ -25,20 +25,22 @@ public class BuildSequence
         List<Brick> reorderedStructure = new List<Brick>();
         List<Cell> availableCells = new List<Cell>();
 
-        int bestCurrentCost = 100000000;
-        Brick bestCurrentBrick = null;
+        availableCells.Add(_seedCell);
 
-        for (int i = 0; i < _inputStructure.Count; i ++)
+        while(bricksStillToOrder.Count > 0)
         {
-            Debug.Log("BricksStillToOrderCount: " + bricksStillToOrder.Count);
+            int bestCurrentCost = 1000000000;
+            Brick bestCurrentBrick = null;
+            
             for (int j = 0; j < bricksStillToOrder.Count; j++)
             {
-                Debug.Log("Catch1");
-
-                brickPathFinder.CalculatePathForSequencing(_inputGrid, availableCells, _seedCell, bricksStillToOrder[j].originCell);
-                Debug.Log("Catch2");
+                Debug.Log("BricksStillToOrderCount: " + bricksStillToOrder.Count);
+                List<Cell> testPath = new List<Cell>();
+               testPath = brickPathFinder.CalculatePathForSequencing(_inputGrid, availableCells, _seedCell, bricksStillToOrder[j].originCell);
+                Debug.Log("totalCostOfTrip for " + j + ": " + brickPathFinder.totalCostOfTrip);
                 if (brickPathFinder.totalCostOfTrip < bestCurrentCost)
                 {
+                    bestCurrentCost = brickPathFinder.totalCostOfTrip;
                     bestCurrentBrick = bricksStillToOrder[j];
                 }
             }

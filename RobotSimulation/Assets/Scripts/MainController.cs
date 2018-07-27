@@ -40,7 +40,7 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(90, 20, 90);
+    Vector3Int gridSize = new Vector3Int(50, 8, 50);
     Vector3Int seedPosition = new Vector3Int(8, 1, 8);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
@@ -55,7 +55,7 @@ public class MainController : MonoBehaviour
     public Text totalBuildTimeLabel;
     public Text tripTimeLabel;
 
-    int startingBricks = 3; // 24
+    int startingBricks = 20; // 24
     int numberOfRobots = 1;
 
     void Start()
@@ -118,7 +118,7 @@ public class MainController : MonoBehaviour
         UpdateAvailableCells();
         CreateGridLines();
 
-         buildManager.PlaceNextBrick(); ///////////////////////////////
+      //   buildManager.PlaceNextBrick(); ///////////////////////////////
         UpdateAvailableCells();
     }
 
@@ -294,12 +294,12 @@ public class MainController : MonoBehaviour
     {
         overallTime += Time.deltaTime;
 
-         buildManager.Update(); /////////////////////////////////////////////////////////////////////////////////////////////////
+       //  buildManager.Update(); /////////////////////////////////////////////////////////////////////////////////////////////////
 
-        if (!buildManager.readyForNextBrick)
-        {
-            UpdateAvailableCells();
-        }
+        //if (!buildManager.readyForNextBrick)
+        //{
+        //    UpdateAvailableCells();
+        //}
 
         if (Input.GetKeyDown("r"))
         {

@@ -15,6 +15,7 @@ public class Cell
 
     public int gCost;
     public int hCost;
+    public int availableCost;
 
     public Cell parent;
 
@@ -28,6 +29,7 @@ public class Cell
     {
         gCost = 0;
         hCost = 0;
+        availableCost = 0;
     }
     public int fCost
     {

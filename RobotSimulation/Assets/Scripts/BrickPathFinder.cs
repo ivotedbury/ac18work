@@ -26,6 +26,15 @@ public class BrickPathFinder
                 for (int x = 0; x < _inputGrid.gridSize.x; x++)
                 {
                     _inputGrid.cellsArray[x, y, z].ResetCosts();
+
+                    if (_availableCells.Contains(_inputGrid.cellsArray[x, y, z]))
+                    {
+                        _inputGrid.cellsArray[x, y, z].availableCost = 0;
+                    }
+                    else
+                    {
+                        _inputGrid.cellsArray[x, y, z].availableCost = 100000;
+                    }
                 }
             }
         }
@@ -64,21 +73,13 @@ public class BrickPathFinder
                 {
                     continue;
                 }
+                                         
+                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour); //cell.availableCost +
 
-                int availabilityCost = 0;
-
-                if (!_availableCells.Contains(neighbour))
-                {
-                    Debug.Log("neighbourUnavailable");
-                    availabilityCost = 1000;
-                }
-                
-                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour) + availabilityCost;
-
-                if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) //////////////////// PROBLEM HERE
+                if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) //////////////////// PROBLEM HERE + neighbour.availableCost
                 {
                     neighbour.gCost = newCostToNeighbour;
-                    neighbour.hCost = GetDistance(neighbour, targetCell) + availabilityCost;
+                    neighbour.hCost = GetDistance(neighbour, targetCell);
                     neighbour.parent = cell;
 
                     if (!openSet.Contains(neighbour))
@@ -125,9 +126,9 @@ public class BrickPathFinder
         int distZ = Mathf.Abs(_cellB.position.z - _cellA.position.z);
 
         int horizontalCost = 1;
-        int verticalCost = 10;
-
-        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost);
+        int verticalCost = 1000;
+        
+        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) + _cellB.availableCost;
 
         return distance;
     }
@@ -136,9 +137,9 @@ public class BrickPathFinder
     {
         List<Cell> neighbours = new List<Cell>();
 
-        if (_testCell.position.x > 0 && _testCell.position.x < _inputGrid.gridSize.x - 1
-         && _testCell.position.y > 0 && _testCell.position.y < _inputGrid.gridSize.y - 1
-         && _testCell.position.z > 0 && _testCell.position.z < _inputGrid.gridSize.z - 1)
+        if (_testCell.position.x > 3 && _testCell.position.x < _inputGrid.gridSize.x - 4
+         && _testCell.position.y > 0 && _testCell.position.y < _inputGrid.gridSize.y - 4
+         && _testCell.position.z > 3 && _testCell.position.z < _inputGrid.gridSize.z - 4)
         {
             for (int y = -1; y <= 1; y++)
             {

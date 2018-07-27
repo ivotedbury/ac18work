@@ -921,7 +921,7 @@ MonoBehaviour:
   cellMarker: {fileID: 1008602878685338, guid: 0cdbcad41aa76ca458afdae86aa227ca, type: 2}
   lineRendererObject: {fileID: 434548581}
   lineRendererContainer: {fileID: 2072336310}
-  brickImportData: {fileID: 4900000, guid: 42d6555017acacf448b5334936b37f9d, type: 3}
+  brickImportData: {fileID: 4900000, guid: c8b1fc8221e02ba4b8709af35adc1094, type: 3}
   gridLineMaterial: {fileID: 2100000, guid: 43345e9ca4a5c5b45ad46c6ccdfb0809, type: 2}
   timeScaleSlider: {fileID: 620667921}
   timeScaleFactorLabel: {fileID: 592968306}
