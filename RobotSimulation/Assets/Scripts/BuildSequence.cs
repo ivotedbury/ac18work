@@ -15,6 +15,8 @@ public class BuildSequence
     public List<Brick> finalStructureToBuild = new List<Brick>();
     public List<Cell> availableCells = new List<Cell>();
     public List<Cell> forbiddenCells = new List<Cell>();
+    public List<Cell> desiredPath = new List<Cell>();
+    public List<Cell> fullDesiredPath = new List<Cell>();
 
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
@@ -40,11 +42,12 @@ public class BuildSequence
 
         availableCells = FindAvailableCells(completeStructure);
         forbiddenCells = FindForbiddenCells(completeStructure, availableCells);
+       GenerateCompletePaths();
     }
 
-    private List<Brick> GenerateCompletePaths()
+    void GenerateCompletePaths()
     {
-        List<Brick> brickStructureCompletedPaths = new List<Brick>();
+        //List<Brick> brickStructureCompletedPaths = new List<Brick>();
 
         Brick brickToPlaceNext;
         List<Brick> newBricksRequired = new List<Brick>();
@@ -52,37 +55,8 @@ public class BuildSequence
 
         brickToPlaceNext = completeStructure[completeStructure.Count - 1];
 
-        List<Cell> desiredPath = new List<Cell>();
-        desiredPath = brickPathFinder.CalculatePathForSequencing(_inputGrid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell, true);
+        desiredPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell);
 
-        List<Cell> extraCellsRequired = new List<Cell>();
-        foreach (Cell pathCell in desiredPath)
-        {
-            if (!availableCells.Contains(pathCell) && pathCell != pathStartingCell && pathCell != brickToPlaceNext.originCell)
-            {
-                extraCellsRequired.Add(pathCell);
-            }
-        }
-
-        foreach (Cell extraCellRequired in extraCellsRequired)
-        {
-            newBricksRequired.Add(new Brick(grid, extraCellRequired, 0, 2));
-            newBricksRequired[newBricksRequired.Count - 1].auxBrick = true;
-        }
-
-        //}
-
-        foreach (Brick brickInPlace in bricksInPlace)
-        {
-            brickStructureCompletedPaths.Add(brickInPlace);
-        }
-
-        foreach (Brick newBrickRequired in newBricksRequired)
-        {
-            brickStructureCompletedPaths.Add(newBrickRequired);
-        }
-
-        return brickStructureCompletedPaths;
     }
 
     List<Cell> FindAvailableCells(List<Brick> _bricksInPlace)
@@ -318,46 +292,46 @@ public class BuildSequence
 
 
 
-    private List<Brick> ReorderBricks(List<Brick> _inputStructure, Grid _inputGrid, Cell _seedCell)
-    {
-        List<Brick> bricksStillToOrder = new List<Brick>();
-        bricksStillToOrder = _inputStructure;
-        List<Brick> reorderedStructure = new List<Brick>();
-        List<Cell> availableCells = new List<Cell>();
-        List<Cell> forbiddenCells = new List<Cell>();
+    //private List<Brick> ReorderBricks(List<Brick> _inputStructure, Grid _inputGrid, Cell _seedCell)
+    //{
+    //    List<Brick> bricksStillToOrder = new List<Brick>();
+    //    bricksStillToOrder = _inputStructure;
+    //    List<Brick> reorderedStructure = new List<Brick>();
+    //    List<Cell> availableCells = new List<Cell>();
+    //    List<Cell> forbiddenCells = new List<Cell>();
 
-        availableCells.Add(_seedCell);
+    //    availableCells.Add(_seedCell);
 
-        while (bricksStillToOrder.Count > 0)
-        {
-            int bestCurrentCost = 1000000000;
-            Brick bestCurrentBrick = null;
+    //    while (bricksStillToOrder.Count > 0)
+    //    {
+    //        int bestCurrentCost = 1000000000;
+    //        Brick bestCurrentBrick = null;
 
-            for (int j = 0; j < bricksStillToOrder.Count; j++)
-            {
-                Debug.Log("BricksStillToOrderCount: " + bricksStillToOrder.Count);
-                List<Cell> testPath = new List<Cell>();
-                testPath = brickPathFinder.CalculatePathForSequencing(_inputGrid, availableCells, forbiddenCells, _seedCell, bricksStillToOrder[j].originCell, false);
-                Debug.Log("totalCostOfTrip for " + j + ": " + brickPathFinder.totalCostOfTrip);
-                if (brickPathFinder.totalCostOfTrip < bestCurrentCost)
-                {
-                    bestCurrentCost = brickPathFinder.totalCostOfTrip;
-                    bestCurrentBrick = bricksStillToOrder[j];
-                }
-            }
+    //        for (int j = 0; j < bricksStillToOrder.Count; j++)
+    //        {
+    //            Debug.Log("BricksStillToOrderCount: " + bricksStillToOrder.Count);
+    //            List<Cell> testPath = new List<Cell>();
+    //            testPath = brickPathFinder.CalculatePathForSequencing(_inputGrid, availableCells, forbiddenCells, _seedCell, bricksStillToOrder[j].originCell, false);
+    //            Debug.Log("totalCostOfTrip for " + j + ": " + brickPathFinder.totalCostOfTrip);
+    //            if (brickPathFinder.totalCostOfTrip < bestCurrentCost)
+    //            {
+    //                bestCurrentCost = brickPathFinder.totalCostOfTrip;
+    //                bestCurrentBrick = bricksStillToOrder[j];
+    //            }
+    //        }
 
-            if (bestCurrentBrick != null)
-            {
-                reorderedStructure.Add(bestCurrentBrick);
-                bricksStillToOrder.Remove(bestCurrentBrick);
+    //        if (bestCurrentBrick != null)
+    //        {
+    //            reorderedStructure.Add(bestCurrentBrick);
+    //            bricksStillToOrder.Remove(bestCurrentBrick);
 
-                foreach (Cell childCell in bestCurrentBrick.childCells)
-                {
-                    availableCells.Add(childCell);
-                }
-            }
-        }
+    //            foreach (Cell childCell in bestCurrentBrick.childCells)
+    //            {
+    //                availableCells.Add(childCell);
+    //            }
+    //        }
+    //    }
 
-        return reorderedStructure;
-    }
+    //    return reorderedStructure;
+    //}
 }

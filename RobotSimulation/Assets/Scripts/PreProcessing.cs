@@ -44,10 +44,10 @@ public class PreProcessing : MonoBehaviour
         SetupUI();
 
         buildSequence = new BuildSequence(gridSize, seedPosition, brickImportData);
-        
+
         for (int i = 0; i < buildSequence.completeStructure.Count; i++)
         {
-          
+
             if (buildSequence.completeStructure[i].brickType == 1)
             {
                 allBrickMeshes.Add(Instantiate(fullBrickMesh, buildSequence.completeStructure[i].originCell.actualPosition + brickDisplayOffset, buildSequence.completeStructure[i].rotation));
@@ -58,7 +58,7 @@ public class PreProcessing : MonoBehaviour
             {
                 allBrickMeshes.Add(Instantiate(halfBrickMesh, buildSequence.completeStructure[i].originCell.actualPosition + brickDisplayOffset, buildSequence.completeStructure[i].rotation));
             }
-          
+
             //make aux bricks red
             if (buildSequence.completeStructure[i].auxBrick)
             {
@@ -211,10 +211,18 @@ public class PreProcessing : MonoBehaviour
         foreach (Cell cell in buildSequence.forbiddenCells)
         {
             allCellMarkers.Add(Instantiate(cellMarker, cell.actualPosition + new Vector3(0, 0.001f, 0), Quaternion.identity));
-                           allCellMarkers[allCellMarkers.Count - 1].GetComponent<Renderer>().material.color = Color.magenta;
-                      allCellMarkers[allCellMarkers.Count - 1].transform.parent = cellMarkerContainer.transform;
+            allCellMarkers[allCellMarkers.Count - 1].GetComponent<Renderer>().material.color = Color.magenta;
+            allCellMarkers[allCellMarkers.Count - 1].transform.parent = cellMarkerContainer.transform;
+        }
+
+        foreach (Cell cell in buildSequence.desiredPath)
+        {
+            allCellMarkers.Add(Instantiate(cellMarker, cell.actualPosition + new Vector3(0, 0.001f, 0), Quaternion.identity));
+            allCellMarkers[allCellMarkers.Count - 1].GetComponent<Renderer>().material.color = Color.blue;
+            allCellMarkers[allCellMarkers.Count - 1].transform.parent = cellMarkerContainer.transform;
         }
     }
+
 
     void Update()
     {
