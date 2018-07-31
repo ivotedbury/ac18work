@@ -40,8 +40,8 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(50, 8, 50);
-    Vector3Int seedPosition = new Vector3Int(8, 1, 8);
+    Vector3Int gridSize = new Vector3Int(50, 20, 50);
+    Vector3Int seedPosition = new Vector3Int(12, 1, 12);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
     float gridXZDim = 0.05625f;
@@ -55,7 +55,7 @@ public class MainController : MonoBehaviour
     public Text totalBuildTimeLabel;
     public Text tripTimeLabel;
 
-    int startingBricks = 20; // 24
+    int startingBricks = 11; // 24
     int numberOfRobots = 1;
 
     void Start()
@@ -72,15 +72,15 @@ public class MainController : MonoBehaviour
             allLegMarkers[i].transform.SetParent(legMarkerContainer.transform);
         }
 
-        buildManager.brickStructure.bricksInTargetStructure[0].auxBrick = true;
-        buildManager.brickStructure.bricksInTargetStructure[1].auxBrick = true;
-        buildManager.brickStructure.bricksInTargetStructure[2].auxBrick = true;
+        //buildManager.brickStructure.bricksInTargetStructure[0].auxBrick = true;
+        //buildManager.brickStructure.bricksInTargetStructure[1].auxBrick = true;
+        //buildManager.brickStructure.bricksInTargetStructure[2].auxBrick = true;
 
 
         for (int i = 0; i < buildManager.brickStructure.bricksInTargetStructure.Count; i++)
         {
-            if (i < buildManager.startingBricks)
-            {
+            //if (i < buildManager.startingBricks)
+            //{
                 if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
                 {
                     allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, buildManager.brickStructure.bricksInTargetStructure[i].rotation));
@@ -91,20 +91,20 @@ public class MainController : MonoBehaviour
                 {
                     allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, buildManager.brickStructure.bricksInTargetStructure[i].rotation));
                 }
-            }
+            //}
 
-            else
-            {
-                if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
-                {
-                    allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
-                }
+            //else
+            //{
+            //    if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
+            //    {
+            //        allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
+            //    }
 
-                else if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 2)
-                {
-                    allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
-                }
-            }
+            //    else if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 2)
+            //    {
+            //        allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
+            //    }
+            //}
 
             //make aux bricks red
             if (buildManager.brickStructure.bricksInTargetStructure[i].auxBrick)
@@ -352,7 +352,7 @@ public class MainController : MonoBehaviour
             buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
 
-        DisplayAllMeshes();
+    //    DisplayAllMeshes();
 
     }
 

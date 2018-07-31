@@ -7,7 +7,7 @@ public class BrickPathFinder
 
     public int totalCostOfTrip;
 
-    public List<Cell> CalculatePathForSequencing(Grid _inputGrid, List<Cell> _availableCells, Cell _startCell, Cell _targetCell)
+    public List<Cell> CalculatePathForSequencing(Grid _inputGrid, List<Cell> _availableCells, List<Cell> _forbiddenCells, Cell _startCell, Cell _targetCell, bool _forPathCompletion)
     {
         totalCostOfTrip = 0;
         List<Cell> waypoints = new List<Cell>();
@@ -18,7 +18,7 @@ public class BrickPathFinder
 
         List<Cell> openSet = new List<Cell>();
         List<Cell> closedSet = new List<Cell>();
-        
+
         for (int z = 0; z < _inputGrid.gridSize.z; z++)
         {
             for (int y = 0; y < _inputGrid.gridSize.y; y++)
@@ -67,13 +67,95 @@ public class BrickPathFinder
                 break;
             }
 
-            foreach (Cell neighbour in GetCellNeighbours(_inputGrid, cell))
+            Cell neighbour = null;
+            bool continueToNextNeighbour;
+            List<Cell> pathToNeighbour = new List<Cell>();
+
+            List<Cell> cellNeighbours = new List<Cell>();
+            cellNeighbours = GetCellNeighbours(_inputGrid, cell, _forPathCompletion);
+
+            for (int i = 0; i < cellNeighbours.Count; i++)
             {
+                continueToNextNeighbour = false;
+                neighbour = cellNeighbours[i];
+
                 if (closedSet.Contains(neighbour))
                 {
                     continue;
                 }
-                                         
+
+                pathToNeighbour.Clear();
+                pathToNeighbour = RetraceFullCellPath(startCell, cell, neighbour, _inputGrid);
+
+                if (_forbiddenCells.Contains(neighbour))
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < pathToNeighbour.Count; j++)
+                {
+                    if ((neighbour.position.x == pathToNeighbour[j].position.x && neighbour.position.z == pathToNeighbour[j].position.z) ||
+
+                     (neighbour.position.x == pathToNeighbour[j].position.x + 0 && neighbour.position.z == pathToNeighbour[j].position.z + 1) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x + 1 && neighbour.position.z == pathToNeighbour[j].position.z + 1) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x + 1 && neighbour.position.z == pathToNeighbour[j].position.z + 0) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x + 1 && neighbour.position.z == pathToNeighbour[j].position.z - 1) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x + 0 && neighbour.position.z == pathToNeighbour[j].position.z - 1) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z - 1) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z + 0) ||
+                     (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z + 1))
+                    {
+                        continueToNextNeighbour = true;
+                    }
+
+                    for (int k = 0; k < _forbiddenCells.Count; k++)
+                    {
+                        if ((_forbiddenCells[k].position.x == pathToNeighbour[j].position.x && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z) ||
+
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 0 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 1) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 1) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 0) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z - 1) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 0 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z - 1) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x - 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z - 1) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x - 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 0) ||
+                          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x - 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 1))
+                        {
+                            continueToNextNeighbour = true;
+                        }
+                    }
+
+                    for (int m = 0; m < pathToNeighbour.Count; m++)
+                    {
+                        if (m == j)
+                        {
+                            continue;
+                        }
+
+                        if ((pathToNeighbour[m].position.x == pathToNeighbour[j].position.x && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z)
+
+                         //   ||
+
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1)
+                         )
+                        {
+                            continueToNextNeighbour = true;
+                        }
+                    }
+                }
+
+                if (continueToNextNeighbour)
+                {
+                    continue;
+                }
+
                 int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour); //cell.availableCost +
 
                 if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) //////////////////// PROBLEM HERE + neighbour.availableCost
@@ -92,11 +174,92 @@ public class BrickPathFinder
 
         if (pathSuccess)
         {
-            waypoints = RetracePath(startCell, targetCell);
+           // waypoints = RetracePath(startCell, targetCell); ///////////////////////////////////////////////////////////////////////////////////////////////
+            waypoints = RetraceFullCellPath(startCell, targetCell, targetCell, _inputGrid);
+
             totalCostOfTrip = targetCell.gCost;
         }
 
         return waypoints;
+    }
+
+    List<Cell> RetraceFullCellPath(Cell _startCell, Cell _penultimateCell, Cell _endCell, Grid _inputGrid)
+    {
+        List<Cell> path = new List<Cell>();
+
+        Cell currentCell = _endCell;
+        Cell nextCell = _endCell;
+
+        Vector3Int toNextCell;
+
+        //toNextCell = _endCell.position - _penultimateCell.position;
+        //path.Add(currentCell);
+
+        //for (int x = 1; x < Mathf.Abs(toNextCell.x); x++)
+        //{
+        //    if (toNextCell.x > 0)
+        //    {
+        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(-x, 0, 0)));
+        //    }
+        //    else
+        //    {
+        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(x, 0, 0)));
+        //    }
+        //}
+
+        //for (int z = 1; z < Mathf.Abs(toNextCell.z); z++)
+        //{
+        //    if (toNextCell.z > 0)
+        //    {
+        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, -z)));
+        //    }
+        //    else
+        //    {
+        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, z)));
+        //    }
+        //}
+
+        currentCell = _penultimateCell;
+
+        while (currentCell != _startCell) // assemble path in reverse order
+        {
+            path.Add(currentCell);
+
+            nextCell = currentCell.parent;
+            toNextCell = nextCell.position - currentCell.position;
+
+            for (int x = 1; x < Mathf.Abs(toNextCell.x); x++)
+            {
+                if (toNextCell.x > 0)
+                {
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(-x, 0, 0)));
+                }
+                else
+                {
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(x, 0, 0)));
+                }
+            }
+
+            for (int z = 1; z < Mathf.Abs(toNextCell.z); z++)
+            {
+                if (toNextCell.z > 0)
+                {
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, -z)));
+                }
+                else
+                {
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, z)));
+                }
+            }
+
+            currentCell = nextCell;
+        }
+
+        path.Add(_startCell);
+            
+
+        path.Reverse(); // reverse the path to the correct order
+        return path;
     }
 
     List<Cell> RetracePath(Cell _startCell, Cell _endCell)
@@ -127,40 +290,99 @@ public class BrickPathFinder
 
         int horizontalCost = 1;
         int verticalCost = 1000;
-        
+
         distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) + _cellB.availableCost;
 
         return distance;
     }
 
-    List<Cell> GetCellNeighbours(Grid _inputGrid, Cell _testCell)
+    List<Cell> GetCellNeighbours(Grid _inputGrid, Cell _testCell, bool _forPathCompletion)
     {
         List<Cell> neighbours = new List<Cell>();
 
-        if (_testCell.position.x > 3 && _testCell.position.x < _inputGrid.gridSize.x - 4
-         && _testCell.position.y > 0 && _testCell.position.y < _inputGrid.gridSize.y - 4
-         && _testCell.position.z > 3 && _testCell.position.z < _inputGrid.gridSize.z - 4)
+        if (!_forPathCompletion)
         {
-            for (int y = -1; y <= 1; y++)
+            if (_testCell.position.x > 3 && _testCell.position.x < _inputGrid.gridSize.x - 4
+                && _testCell.position.y > 0 && _testCell.position.y < _inputGrid.gridSize.y - 4
+                && _testCell.position.z > 3 && _testCell.position.z < _inputGrid.gridSize.z - 4)
             {
-                for (int z = -4; z <= 4; z++)
+                for (int y = -1; y <= 1; y++)
                 {
-                    if (z == 0)
+                    for (int z = -4; z <= 4; z++)
                     {
-                        continue;
+                        if (z == 0)
+                        {
+                            continue;
+                        }
+
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + z]);
                     }
 
-                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + z]);
+                    for (int x = -4; x <= 4; x++)
+                    {
+                        if (x == 0)
+                        {
+                            continue;
+                        }
+
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + x, _testCell.position.y + y, _testCell.position.z + 0]);
+                    }
                 }
+            }
+        }
 
-                for (int x = -4; x <= 4; x++)
+        else
+        {
+            if (_testCell.position.x > 7 && _testCell.position.x < _inputGrid.gridSize.x - 8
+            && _testCell.position.y > 0 && _testCell.position.y < _inputGrid.gridSize.y - 8
+            && _testCell.position.z > 7 && _testCell.position.z < _inputGrid.gridSize.z - 8)
+            {
+                for (int y = -1; y <= 1; y++)
                 {
-                    if (x == 0)
+                    if (y == -1 || y == 1)
                     {
-                        continue;
-                    }
+                        for (int z = -8; z <= 8; z++)
+                        {
+                            if (z > -5 && z < 5)
+                            {
+                                continue;
+                            }
 
-                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + x, _testCell.position.y + y, _testCell.position.z + 0]);
+                            neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + z]);
+                        }
+
+                        for (int x = -8; x <= 8; x++)
+                        {
+                            if (x > -5 && x < 5)
+                            {
+                                continue;
+                            }
+
+                            neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + x, _testCell.position.y + y, _testCell.position.z + 0]);
+                        }
+                    }
+                    else
+                    {
+                        for (int z = -4; z <= 4; z++)
+                        {
+                            if (z == 0)
+                            {
+                                continue;
+                            }
+
+                            neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + z]);
+                        }
+
+                        for (int x = -4; x <= 4; x++)
+                        {
+                            if (x == 0)
+                            {
+                                continue;
+                            }
+
+                            neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + x, _testCell.position.y + y, _testCell.position.z + 0]);
+                        }
+                    }
                 }
             }
         }

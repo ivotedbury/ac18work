@@ -13,7 +13,7 @@ public class BrickStructure
     PathFinder pathFinder = new PathFinder();
     public Cell seedCell;
 
-    private int importOffset = 8;
+    private int importOffsetXZ = 12;
 
     public BrickStructure(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
@@ -34,9 +34,10 @@ public class BrickStructure
             bricksInTargetStructure[i].AssignChildCells(grid);
         }
 
-      BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
+         bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
+        
+        BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
                 bricksInTargetStructure = buildSequence.finalStructureToBuild;
-      // bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)
@@ -451,7 +452,7 @@ public class BrickStructure
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid.cellsArray[importedBrickItem.brickPosX + importOffset, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffset], importedBrickItem.rotation, importedBrickItem.brickType);
+        convertedBrick = new Brick(grid.cellsArray[importedBrickItem.brickPosX + importOffsetXZ, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffsetXZ], importedBrickItem.rotation, importedBrickItem.brickType);
 
         convertedBrick.childCells = grid.GetChildren(convertedBrick);
 
