@@ -1,0 +1,1 @@
+{"Items":[{"brickPosX":13,"brickPosY":8,"brickPosZ":1,"rotation":90.0,"brickType":2},{"brickPosX":10,"brickPosY":8,"brickPosZ":1,"rotation":90.0,"brickType":1}]}

@@ -5,55 +5,52 @@ using UnityEngine;
 public class BuildSequence
 {
 
-    List<Brick> inputStructure = new List<Brick>();
+    public List<Brick> inputStructure = new List<Brick>();
     List<Brick> additionalStartingBricks = new List<Brick>();
+    public List<Brick> completeStructure = new List<Brick>();
 
+    public Grid grid;
+    public Cell seedCell;
 
     public List<Brick> finalStructureToBuild = new List<Brick>();
+    public List<Cell> availableCells = new List<Cell>();
+    public List<Cell> forbiddenCells = new List<Cell>();
+
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
 
-    public BuildSequence(List<Brick> _inputStructure, Grid _inputGrid, Cell _seedCell)
+    public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
-        inputStructure = _inputStructure;
-        Debug.Log(inputStructure.Count);
-        additionalStartingBricks.Add(new Brick(_inputGrid.GetANeighbour(_seedCell, new Vector3Int(4, 0, 0)), 90, 1));
-        additionalStartingBricks.Add(new Brick(_inputGrid.GetANeighbour(_seedCell, new Vector3Int(8, 0, 0)), 90, 1));
-        additionalStartingBricks.Add(new Brick(_inputGrid.GetANeighbour(_seedCell, new Vector3Int(12, 0, 0)), 90, 1));
+
+        grid = new Grid(_gridSize);
+        CreateSeed(_seedCell);
+
+        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(4, 0, 0)), 90, 1));
+        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(8, 0, 0)), 90, 1));
+        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(12, 0, 0)), 90, 1));
 
 
-        //  finalStructureToBuild = ReorderBricks(intputStructure, _inputGrid, _seedCell);
-        finalStructureToBuild = GenerateCompletePaths(inputStructure, additionalStartingBricks, _inputGrid, _seedCell); // was finalStructureToBuild for reordering
+        completeStructure = additionalStartingBricks;
+        inputStructure = CreateBricksInArrangment(_brickDataImport);
+
+        for (int i = 0; i < inputStructure.Count; i++)
+        {
+            completeStructure.Add(inputStructure[i]);
+        }
+
+        availableCells = FindAvailableCells(completeStructure);
+        forbiddenCells = FindForbiddenCells(completeStructure, availableCells);
     }
 
-    private List<Brick> GenerateCompletePaths(List<Brick> _inputStructure, List<Brick> _additionalStartingBricks, Grid _inputGrid, Cell _seedCell)
+    private List<Brick> GenerateCompletePaths()
     {
         List<Brick> brickStructureCompletedPaths = new List<Brick>();
 
-        List<Cell> availableCells = new List<Cell>();
-        List<Cell> forbiddenCells = new List<Cell>();
-
-        List<Brick> bricksInPlace = new List<Brick>();
         Brick brickToPlaceNext;
         List<Brick> newBricksRequired = new List<Brick>();
-        Cell pathStartingCell = _additionalStartingBricks[2].originCell;
+        Cell pathStartingCell = completeStructure[2].childCells[0];
 
-        //for (int i = _inputStructure.Count - 1; i >= 0; i--)
-        //{
-        int i = _inputStructure.Count - 1;
-
-        brickToPlaceNext = _inputStructure[i];
-        // add the bricks already in place
-        bricksInPlace.Clear();
-
-        bricksInPlace = _additionalStartingBricks;
-        for (int j = 0; j < i; j++)
-        {
-            bricksInPlace.Add(_inputStructure[j]);
-        }
-
-        availableCells = GetAvailableCells(bricksInPlace, _inputGrid);
-        forbiddenCells = GetForbiddenCells(bricksInPlace, availableCells, _inputGrid);
+        brickToPlaceNext = completeStructure[completeStructure.Count - 1];
 
         List<Cell> desiredPath = new List<Cell>();
         desiredPath = brickPathFinder.CalculatePathForSequencing(_inputGrid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell, true);
@@ -66,10 +63,10 @@ public class BuildSequence
                 extraCellsRequired.Add(pathCell);
             }
         }
-        
+
         foreach (Cell extraCellRequired in extraCellsRequired)
         {
-            newBricksRequired.Add(new Brick(extraCellRequired, 0, 2));
+            newBricksRequired.Add(new Brick(grid, extraCellRequired, 0, 2));
             newBricksRequired[newBricksRequired.Count - 1].auxBrick = true;
         }
 
@@ -88,97 +85,238 @@ public class BuildSequence
         return brickStructureCompletedPaths;
     }
 
-    public List<Cell> GetForbiddenCells(List<Brick> _bricksInPlace, List<Cell> _availableCells, Grid _inputGrid)
+    List<Cell> FindAvailableCells(List<Brick> _bricksInPlace)
     {
-        List<Cell> forbiddenCells = new List<Cell>();
+        List<Cell> _availableCells = new List<Cell>();
+        List<Cell> _allChildCells = new List<Cell>();
 
-        List<Cell> allChildCells = new List<Cell>();
-
-        for (int i = 0; i < _bricksInPlace.Count; i++)
+        for (int i = 3; i < _bricksInPlace.Count; i++) // first two bricks are the starting bricks for pickup - cannot alter or add to these.
         {
             for (int j = 0; j < _bricksInPlace[i].childCells.Count; j++)
             {
-                allChildCells.Add(_bricksInPlace[i].childCells[j]);
-               // forbiddenCells.Add(_bricksInPlace[i].childCells[j]);
+                _allChildCells.Add(_bricksInPlace[i].childCells[j]);
+                _availableCells.Add(_bricksInPlace[i].childCells[j]);
             }
         }
 
-        for (int i = 0; i < allChildCells.Count; i++)
+        _availableCells.Add(_bricksInPlace[2].childCells[0]);
+
+        for (int i = 0; i < _allChildCells.Count; i++)
         {
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(0, 0, 0)));
-
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(0, 0, 1)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(1, 0, 1)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(1, 0, 0)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(1, 0, -1)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(0, 0, -1)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(-1, 0, -1)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(-1, 0, 0)));
-            forbiddenCells.Add(_inputGrid.GetANeighbour(allChildCells[i], new Vector3Int(-1, 0, 1)));
-
-        }
-
-        for (int i = 0; i < _availableCells.Count; i++)
-        {
-            forbiddenCells.Remove(_availableCells[i]);
-        }
-
-        return forbiddenCells;
-    }
-
-    public List<Cell> GetAvailableCells(List<Brick> _bricksInPlace, Grid _inputGrid)
-    {
-        List<Cell> availableCells = new List<Cell>();
-
-        List<Cell> allChildCells = new List<Cell>();
-
-        for (int i = 0; i < _bricksInPlace.Count; i++)
-        {
-            for (int j = 0; j < _bricksInPlace[i].childCells.Count; j++)
+            for (int j = 0; j < _allChildCells.Count; j++)
             {
-                allChildCells.Add(_bricksInPlace[i].childCells[j]);
-                availableCells.Add(_bricksInPlace[i].childCells[j]);
-            }
-        }
+                if (grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 1, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 1, 1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 1, 1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 1, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 1, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 1, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 1, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 1, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 1, 1)) == _allChildCells[i] ||
 
-        for (int i = 0; i < allChildCells.Count; i++)
-        {
-            for (int j = 0; j < allChildCells.Count; j++)
-            {
-                if (_inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 1, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 1, 1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 1, 1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 1, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 1, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 1, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 1, 1)) == allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 2, 1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 2, 1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 2, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 2, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 2, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 2, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 2, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 2, 1)) == _allChildCells[i] ||
 
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 2, 1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 2, 1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 2, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 2, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 2, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 2, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 2, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 2, 1)) == allChildCells[i] ||
-
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 3, 1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 3, 1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 3, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(1, 3, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(0, 3, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 3, -1)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 3, 0)) == allChildCells[i] ||
-                    _inputGrid.GetANeighbour(allChildCells[j], new Vector3Int(-1, 3, 1)) == allChildCells[i])
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 3, 1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 3, 1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 3, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(1, 3, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(0, 3, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 3, -1)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 3, 0)) == _allChildCells[i] ||
+                    grid.GetANeighbour(_allChildCells[j], new Vector3Int(-1, 3, 1)) == _allChildCells[i])
                 {
-                    availableCells.Remove(allChildCells[j]);
+                    _availableCells.Remove(_allChildCells[j]);
                 }
             }
         }
-        return availableCells;
+
+        return _availableCells;
     }
+
+    List<Cell> FindForbiddenCells(List<Brick> _bricksInPlace, List<Cell> _availableCells)
+    {
+        List<Cell> _forbiddenCells = new List<Cell>();
+        List<Cell> _forbiddenChildCells = new List<Cell>();
+        List<Brick> _bricksInScene = new List<Brick>();
+
+        for (int i = 0; i < _bricksInPlace.Count; i++)
+        {
+            _bricksInScene.Add(_bricksInPlace[i]);
+        }
+
+        _bricksInScene.Insert(0, new Brick(grid, seedCell, 90, 1));
+
+        for (int i = 0; i < _bricksInScene.Count; i++)
+        {
+            for (int j = 0; j < _bricksInScene[i].childCells.Count; j++)
+            {
+                if (i == 3 && j == 1)
+                {
+                    continue;
+                }
+                if (!_availableCells.Contains(_bricksInScene[i].childCells[j]))
+                {
+                    _forbiddenChildCells.Add(_bricksInScene[i].childCells[j]);
+                }
+            }
+        }
+
+        for (int y = 1; y < grid.gridSize.y - 1; y++)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < _bricksInScene[i].childCells.Count; j++)
+                {
+                    if (i == 3 && (j == 0 || j == 1))
+                    {
+                        continue;
+                    }
+                    _forbiddenChildCells.Add(grid.GetANeighbour(_bricksInScene[i].childCells[j], new Vector3Int(0, y, 0)));
+                }
+            }
+        }
+
+        for (int i = 0; i < _forbiddenChildCells.Count; i++)
+        {
+            List<Cell> _candidateCells = new List<Cell> {
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(0,0,0)),
+
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(0,0,1)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(1,0,1)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(1,0,0)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(1,0,-1)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(0,0,-1)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(-1,0,-1)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(-1,0,0)),
+                grid.GetANeighbour(_forbiddenChildCells[i], new Vector3Int(-1,0,1)),
+            };
+
+            for (int j = 0; j < _candidateCells.Count; j++)
+            {
+                if (!_forbiddenCells.Contains(_candidateCells[j]))
+                {
+                    _forbiddenCells.Add(_candidateCells[j]);
+                }
+            }
+
+        }
+
+        // _forbiddenCells = _forbiddenChildCells;
+
+        return _forbiddenCells;
+    }
+
+    void CreateSeed(Vector3Int _seed)
+    {
+        seedCell = grid.cellsArray[_seed.x, _seed.y, _seed.z];
+    }
+
+
+    List<Brick> CreateBricksInArrangment(TextAsset _brickDataImport)
+    {
+        List<Brick> _inputStructure = new List<Brick>();
+        string importDataString = _brickDataImport.ToString();
+
+        BrickImportItem[] brickImportArray = JsonHelper.FromJson<BrickImportItem>(importDataString);
+
+        for (int i = 0; i < brickImportArray.Length; i++)
+        {
+            _inputStructure.Add(ConvertToBrick(brickImportArray[i]));
+        }
+
+        _inputStructure = ReorderBricks(_inputStructure, seedCell); //////////////////////////////////////////////////
+
+        return _inputStructure;
+    }
+
+    Brick ConvertToBrick(BrickImportItem importedBrickItem)
+    {
+        Brick convertedBrick = null;
+
+        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + seedCell.position.x, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + seedCell.position.z], importedBrickItem.rotation, importedBrickItem.brickType);
+
+        // convertedBrick.childCells = grid.GetChildren(convertedBrick);
+
+        return convertedBrick;
+    }
+
+    List<Brick> ReorderBricks(List<Brick> _inputTargetStructure, Cell _inputSeed)
+    {
+        List<Brick> reorderedTargetStructure = new List<Brick>();
+
+        float currentClosestDistance;
+        float currentFurthestDistance;
+
+        float testDistance;
+        int listLength = _inputTargetStructure.Count;
+
+        Brick bestCurrentBrick = null;
+        bool betterBrickFound = false;
+
+        for (int currentSearchLayer = 1; currentSearchLayer < grid.gridSize.y; currentSearchLayer++)
+        {
+            for (int listCounter = 0; listCounter < listLength; listCounter++)
+            {
+                currentClosestDistance = 1000000;
+                currentFurthestDistance = 0;
+                betterBrickFound = false;
+
+                if (currentSearchLayer == 1)
+                {
+
+                    for (int i = 0; i < _inputTargetStructure.Count; i++)
+                    {
+                        if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
+                        {
+                            testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+
+                            if (testDistance < currentClosestDistance)
+                            {
+                                currentClosestDistance = testDistance;
+                                bestCurrentBrick = _inputTargetStructure[i];
+                                betterBrickFound = true;
+                            }
+                        }
+                    }
+                }
+
+                else
+                {
+                    for (int i = 0; i < _inputTargetStructure.Count; i++)
+                    {
+                        if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
+                        {
+                            testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+
+                            if (testDistance > currentFurthestDistance)
+                            {
+                                currentFurthestDistance = testDistance;
+                                bestCurrentBrick = _inputTargetStructure[i];
+                                betterBrickFound = true;
+                            }
+                        }
+                    }
+                }
+
+                if (betterBrickFound)
+                {
+                    reorderedTargetStructure.Add(bestCurrentBrick);
+                    _inputTargetStructure.Remove(bestCurrentBrick);
+                }
+            }
+        }
+        return reorderedTargetStructure;
+    }
+
+
 
     private List<Brick> ReorderBricks(List<Brick> _inputStructure, Grid _inputGrid, Cell _seedCell)
     {

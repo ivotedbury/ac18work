@@ -31,13 +31,13 @@ public class BrickStructure
         for (int i = 0; i < brickImportArray.Length; i++)
         {
             bricksInTargetStructure.Add(ConvertToBrick(brickImportArray[i]));
-            bricksInTargetStructure[i].AssignChildCells(grid);
+           // bricksInTargetStructure[i].AssignChildCells(grid);
         }
 
          bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
         
-        BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
-                bricksInTargetStructure = buildSequence.finalStructureToBuild;
+     //   BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
+           //     bricksInTargetStructure = buildSequence.finalStructureToBuild;
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)
@@ -452,7 +452,7 @@ public class BrickStructure
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid.cellsArray[importedBrickItem.brickPosX + importOffsetXZ, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffsetXZ], importedBrickItem.rotation, importedBrickItem.brickType);
+        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + importOffsetXZ, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffsetXZ], importedBrickItem.rotation, importedBrickItem.brickType);
 
         convertedBrick.childCells = grid.GetChildren(convertedBrick);
 

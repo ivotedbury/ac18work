@@ -30,7 +30,7 @@ public class BuildManager
         startingBricks = _startingBricks;
         nextBrickToPlace = startingBricks;
 
-        for (int i = 0; i < startingBricks; i++)
+        for (int i = 0; i < brickStructure.bricksInTargetStructure.Count; i++)
         {
             brickStructure.bricksInPlace.Add(brickStructure.bricksInTargetStructure[i]);
         }
