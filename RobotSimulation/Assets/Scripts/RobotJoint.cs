@@ -128,6 +128,11 @@ public class RobotJoint
         }
     }
 
+    public float GetTimeForMove()
+    {
+        return timeForMove;
+    }
+
     public void SetLerpValues(int legCRailMoveType)
     {
         if (thisJoint == legCRail)

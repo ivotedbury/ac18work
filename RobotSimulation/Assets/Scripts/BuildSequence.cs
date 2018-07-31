@@ -66,8 +66,7 @@ public class BuildSequence
                 extraCellsRequired.Add(pathCell);
             }
         }
-
-
+        
         foreach (Cell extraCellRequired in extraCellsRequired)
         {
             newBricksRequired.Add(new Brick(extraCellRequired, 0, 2));

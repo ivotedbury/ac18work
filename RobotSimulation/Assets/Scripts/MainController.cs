@@ -40,8 +40,8 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(50, 20, 50);
-    Vector3Int seedPosition = new Vector3Int(12, 1, 12);
+    Vector3Int gridSize = new Vector3Int(75, 20, 75);
+    Vector3Int seedPosition = new Vector3Int(20, 1, 20);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
     float gridXZDim = 0.05625f;

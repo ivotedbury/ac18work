@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Robot
 {
+    bool simulateMovements = true;
+    float totalProgramTime = 0;
+
     //joint names
     const char legARail = 'A';
     const char legAVertical = 'B';
@@ -131,8 +134,16 @@ public class Robot
 
     public void UpdateRobot()
     {
-        CarryOutMoves();
-        UpdateReferenceTransforms();
+        if (simulateMovements)
+        {
+            CarryOutMoves();
+            UpdateReferenceTransforms();
+        }
+
+        else
+        {
+            totalProgramTime += AddUpTimeForMoves();
+        }
     }
 
     float[] LiftLeg(int _legToLift, int _gridStepsToMove)
@@ -1054,6 +1065,46 @@ public class Robot
             }
         }
 
+    }
+
+    public float AddUpTimeForMoves()
+    {
+        float timeForMoves = 0;
+        float longestTimeForMove = 0;
+        if (legARailJoint.JointNeedsToMove() ||
+          legAVerticalJoint.JointNeedsToMove() ||
+          legARotationJoint.JointNeedsToMove() ||
+          legBRailJoint.JointNeedsToMove() ||
+          legBVerticalJoint.JointNeedsToMove() ||
+          legCRailJoint.JointNeedsToMove() ||
+          legCGripJoint.JointNeedsToMove() ||
+          legCRotationJoint.JointNeedsToMove())
+        {
+            moveInProgress = true;
+        }
+
+        else
+        {
+            moveInProgress = false;
+        }
+
+        if (!moveInProgress && stepInProgress)
+        {
+            MakeMove();
+        }
+
+        foreach (RobotJoint joint in allJoints)
+        {
+            if (joint.GetTimeForMove() > longestTimeForMove)
+            {
+                longestTimeForMove = joint.GetTimeForMove();
+            }
+            joint.currentPos = joint.targetPos;
+        }
+
+        timeForMoves = longestTimeForMove;
+
+        return timeForMoves;
     }
 
     public void CarryOutMoves()

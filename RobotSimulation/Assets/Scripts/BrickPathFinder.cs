@@ -70,6 +70,7 @@ public class BrickPathFinder
             Cell neighbour = null;
             bool continueToNextNeighbour;
             List<Cell> pathToNeighbour = new List<Cell>();
+            List<Cell> cellToNeighbour = new List<Cell>();
 
             List<Cell> cellNeighbours = new List<Cell>();
             cellNeighbours = GetCellNeighbours(_inputGrid, cell, _forPathCompletion);
@@ -85,14 +86,21 @@ public class BrickPathFinder
                 }
 
                 pathToNeighbour.Clear();
-                pathToNeighbour = RetraceFullCellPath(startCell, cell, neighbour, _inputGrid);
+
+                if (cell != _startCell && RetracePath(startCell, cell).Count > 1)
+                {
+                    pathToNeighbour = RetraceFullCellPath(startCell, cell, neighbour, _inputGrid); //2 was previously "cell"
+                }
+
+                cellToNeighbour.Clear();
+                cellToNeighbour = GetCellToNeighbour(cell, neighbour, _inputGrid);
 
                 if (_forbiddenCells.Contains(neighbour))
                 {
                     continue;
                 }
 
-                for (int j = 0; j < pathToNeighbour.Count; j++)
+                for (int j = 0; j < pathToNeighbour.Count-2; j++)
                 {
                     if ((neighbour.position.x == pathToNeighbour[j].position.x && neighbour.position.z == pathToNeighbour[j].position.z) ||
 
@@ -125,30 +133,47 @@ public class BrickPathFinder
                         }
                     }
 
-                    for (int m = 0; m < pathToNeighbour.Count; m++)
-                    {
-                        if (m == j)
-                        {
-                            continue;
-                        }
+                    //for (int m = 0; m < cellToNeighbour.Count; m++)
+                    //{
+                    //    if ((cellToNeighbour[m].position.x == pathToNeighbour[j].position.x && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z) ||
 
-                        if ((pathToNeighbour[m].position.x == pathToNeighbour[j].position.x && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z)
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1))
+                    //    {
+                    //        continueToNextNeighbour = true;
+                    //    }
+                    //}
 
-                         //   ||
+                    //for (int m = 0; m < pathToNeighbour.Count; m++)
+                    //{
+                    //    if (m == j)
+                    //    {
+                    //        continue;
+                    //    }
 
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
-                         //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1)
-                         )
-                        {
-                            continueToNextNeighbour = true;
-                        }
-                    }
+                    //    if ((pathToNeighbour[m].position.x == pathToNeighbour[j].position.x && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z)
+
+                    //     //   ||
+
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1)
+                    //     )
+                    //    {
+                    //        continueToNextNeighbour = true;
+                    //    }
+                    //}
                 }
 
                 if (continueToNextNeighbour)
@@ -174,13 +199,46 @@ public class BrickPathFinder
 
         if (pathSuccess)
         {
-           // waypoints = RetracePath(startCell, targetCell); ///////////////////////////////////////////////////////////////////////////////////////////////
+            // waypoints = RetracePath(startCell, targetCell); ///////////////////////////////////////////////////////////////////////////////////////////////
             waypoints = RetraceFullCellPath(startCell, targetCell, targetCell, _inputGrid);
 
             totalCostOfTrip = targetCell.gCost;
         }
 
         return waypoints;
+    }
+
+    List<Cell> GetCellToNeighbour(Cell _startCell, Cell _neighbourCell, Grid _inputGrid)
+    {
+        List<Cell> cellToNeighbour = new List<Cell>();
+
+        Vector3Int toNextCell = _neighbourCell.position - _startCell.position;
+
+        for (int x = 1; x < Mathf.Abs(toNextCell.x); x++)
+        {
+            if (toNextCell.x > 0)
+            {
+                cellToNeighbour.Add(_inputGrid.GetANeighbour(_startCell, new Vector3Int(x, 0, 0)));
+            }
+            else
+            {
+                cellToNeighbour.Add(_inputGrid.GetANeighbour(_startCell, new Vector3Int(-x, 0, 0)));
+            }
+        }
+
+        for (int z = 1; z < Mathf.Abs(toNextCell.z); z++)
+        {
+            if (toNextCell.z > 0)
+            {
+                cellToNeighbour.Add(_inputGrid.GetANeighbour(_startCell, new Vector3Int(0, 0, z)));
+            }
+            else
+            {
+                cellToNeighbour.Add(_inputGrid.GetANeighbour(_startCell, new Vector3Int(0, 0, -z)));
+            }
+        }
+
+        return cellToNeighbour;
     }
 
     List<Cell> RetraceFullCellPath(Cell _startCell, Cell _penultimateCell, Cell _endCell, Grid _inputGrid)
@@ -192,32 +250,32 @@ public class BrickPathFinder
 
         Vector3Int toNextCell;
 
-        //toNextCell = _endCell.position - _penultimateCell.position;
-        //path.Add(currentCell);
+        toNextCell = _penultimateCell.position - _endCell.position;
+        path.Add(currentCell);
 
-        //for (int x = 1; x < Mathf.Abs(toNextCell.x); x++)
-        //{
-        //    if (toNextCell.x > 0)
-        //    {
-        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(-x, 0, 0)));
-        //    }
-        //    else
-        //    {
-        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(x, 0, 0)));
-        //    }
-        //}
+        for (int x = 1; x < Mathf.Abs(toNextCell.x); x++)
+        {
+            if (toNextCell.x > 0)
+            {
+                path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(x, 0, 0)));
+            }
+            else
+            {
+                path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(-x, 0, 0)));
+            }
+        }
 
-        //for (int z = 1; z < Mathf.Abs(toNextCell.z); z++)
-        //{
-        //    if (toNextCell.z > 0)
-        //    {
-        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, -z)));
-        //    }
-        //    else
-        //    {
-        //        path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, z)));
-        //    }
-        //}
+        for (int z = 1; z < Mathf.Abs(toNextCell.z); z++)
+        {
+            if (toNextCell.z > 0)
+            {
+                path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, z)));
+            }
+            else
+            {
+                path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, -z)));
+            }
+        }
 
         currentCell = _penultimateCell;
 
@@ -232,11 +290,11 @@ public class BrickPathFinder
             {
                 if (toNextCell.x > 0)
                 {
-                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(-x, 0, 0)));
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(x, 0, 0)));
                 }
                 else
                 {
-                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(x, 0, 0)));
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(-x, 0, 0)));
                 }
             }
 
@@ -244,11 +302,11 @@ public class BrickPathFinder
             {
                 if (toNextCell.z > 0)
                 {
-                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, -z)));
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, z)));
                 }
                 else
                 {
-                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, z)));
+                    path.Add(_inputGrid.GetANeighbour(currentCell, new Vector3Int(0, 0, -z)));
                 }
             }
 
@@ -256,7 +314,7 @@ public class BrickPathFinder
         }
 
         path.Add(_startCell);
-            
+
 
         path.Reverse(); // reverse the path to the correct order
         return path;

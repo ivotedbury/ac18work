@@ -13,7 +13,7 @@ public class BrickStructure
     PathFinder pathFinder = new PathFinder();
     public Cell seedCell;
 
-    private int importOffsetXZ = 12;
+    private int importOffsetXZ = 20;
 
     public BrickStructure(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
