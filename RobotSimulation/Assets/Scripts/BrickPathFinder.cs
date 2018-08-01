@@ -33,7 +33,7 @@ public class BrickPathFinder
                     }
                     else
                     {
-                        _inputGrid.cellsArray[x, y, z].availableCost = 100 * Mathf.Pow(y, 2);
+                        _inputGrid.cellsArray[x, y, z].availableCost = 100 * Mathf.Pow(y, 3);
                     }
                 }
             }
