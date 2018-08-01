@@ -55,7 +55,7 @@ public class BuildSequence
 
         brickToPlaceNext = completeStructure[completeStructure.Count - 1];
 
-        desiredPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell);
+        desiredPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell, 1);
 
     }
 
