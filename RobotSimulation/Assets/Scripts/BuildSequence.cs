@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class BuildSequence
 {
-
-    public List<Brick> inputStructure = new List<Brick>();
+        public List<Brick> inputStructure = new List<Brick>();
     List<Brick> additionalStartingBricks = new List<Brick>();
     public List<Brick> completeStructure = new List<Brick>();
 
@@ -17,11 +16,9 @@ public class BuildSequence
     public List<Cell> forbiddenCells = new List<Cell>();
     public List<Cell> desiredPath = new List<Cell>();
     public List<Cell> fullDesiredPath = new List<Cell>();
-    
+
     BrickPathFinder brickPathFinder = new BrickPathFinder();
-
-
-
+    
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
 
@@ -43,10 +40,9 @@ public class BuildSequence
 
         availableCells = FindAvailableCells(completeStructure);
         forbiddenCells = FindForbiddenCells(completeStructure, availableCells);
-       GenerateCompletePaths();
     }
 
-    void GenerateCompletePaths()
+    public void GenerateCompletePaths()
     {
         //List<Brick> brickStructureCompletedPaths = new List<Brick>();
 
@@ -57,7 +53,32 @@ public class BuildSequence
         brickToPlaceNext = completeStructure[completeStructure.Count - 1];
 
         desiredPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell, 1);
+    }
 
+    public void GenerateAdditionalBricks(TextAsset _correspondingBrickDataFile)
+    {
+        List<Cell> cellsInPath = new List<Cell>();
+
+        cellsInPath = ConvertCellsFromImport(_correspondingBrickDataFile);
+        Debug.Log(cellsInPath.Count);
+    }
+
+    List<Cell> ConvertCellsFromImport(TextAsset _correspondingBrickDataFile)
+    {
+        List<Cell> cellsInPath = new List<Cell>();
+
+        string pathImportPath = "Assets/ExportData/" + _correspondingBrickDataFile.name.ToString() + "_additionalPath.txt";
+        
+        string importDataString = System.IO.File.ReadAllText(pathImportPath);
+
+        CellImportItem[] cellImportArray = JsonHelper.FromJson<CellImportItem>(importDataString);
+
+        for (int i = 0; i < cellImportArray.Length; i++)
+        {
+            cellsInPath.Add(new Cell(new Vector3Int(cellImportArray[i].posX, cellImportArray[i].posY, cellImportArray[i].posZ)));
+        }
+
+        return cellsInPath;
     }
 
     List<Cell> FindAvailableCells(List<Brick> _bricksInPlace)

@@ -17,6 +17,7 @@ public class PreProcessing : MonoBehaviour
     public GameObject lineRendererContainer;
 
     public TextAsset brickImportData;
+ //   public TextAsset cellImportData;
 
     public Material gridLineMaterial;
 
@@ -40,11 +41,69 @@ public class PreProcessing : MonoBehaviour
     float timeScaleFactor = 10f;
     float overallTime = 0;
 
+    public Button completePath;
+    public Button generateBricks;
+
     void Start()
     {
-        SetupUI();
-
         buildSequence = new BuildSequence(gridSize, seedPosition, brickImportData);
+
+        CreateBricks();
+        CreateGridLines();
+        UpdateCellDisplay();
+
+        Button completePathButton = completePath.GetComponent<Button>();
+        Button generateBricksButton = generateBricks.GetComponent<Button>();
+        completePathButton.onClick.AddListener(CompletePath);
+        generateBricksButton.onClick.AddListener(GenerateBricks);
+
+    }
+
+    void CompletePath()
+    {
+        buildSequence.GenerateCompletePaths();
+        WritePathData();
+        Debug.Log("data has been written");
+        UpdateCellDisplay();
+    }
+
+    void GenerateBricks()
+    {
+        buildSequence.GenerateAdditionalBricks(brickImportData);
+
+        foreach (GameObject brickMesh in allBrickMeshes)
+        {
+            Destroy(brickMesh);
+        }
+        allBrickMeshes.Clear();
+
+        CreateBricks();
+    }
+
+    void WritePathData()
+    {
+        string pathExportPath = "Assets/ExportData/" + brickImportData.name.ToString() + "_additionalPath.txt";
+
+        CellImportItem[] cellPathToExport = ConvertToCellImportItem(buildSequence.desiredPath);
+
+        string dataToExport = JsonHelper.ToJson<CellImportItem>(cellPathToExport, true).ToString();
+        Debug.Log(dataToExport);
+
+        System.IO.File.WriteAllText(pathExportPath, dataToExport);
+    }
+
+    private void OnGUI()
+    {
+
+    }
+
+    void SetupUI()
+    {
+
+    }
+
+    void CreateBricks()
+    {
 
         for (int i = 0; i < buildSequence.completeStructure.Count; i++)
         {
@@ -52,7 +111,6 @@ public class PreProcessing : MonoBehaviour
             if (buildSequence.completeStructure[i].brickType == 1)
             {
                 allBrickMeshes.Add(Instantiate(fullBrickMesh, buildSequence.completeStructure[i].originCell.actualPosition + brickDisplayOffset, buildSequence.completeStructure[i].rotation));
-
             }
 
             else if (buildSequence.completeStructure[i].brickType == 2)
@@ -68,35 +126,6 @@ public class PreProcessing : MonoBehaviour
 
             allBrickMeshes[i].transform.SetParent(brickContainer.transform);
         }
-
-        CreateGridLines();
-
-        UpdateCellDisplay();
-
-        WritePathData();
-        Debug.Log("data has been written");
-    }
-
-    void WritePathData()
-    {
-        string pathExportPath = "Assets/ExportData/cellPath1.txt";
-        StreamWriter writer = new StreamWriter(pathExportPath, true);
-
-        CellImportItem[] cellPathToExport = ConvertToCellImportItem(buildSequence.desiredPath);
-
-        string dataToExport = JsonHelper.ToJson<CellImportItem>(cellPathToExport, true).ToString();
-        Debug.Log(dataToExport);
-        writer.Write(dataToExport);
-    }
-
-    private void OnGUI()
-    {
-
-    }
-
-    void SetupUI()
-    {
-
     }
 
     CellImportItem[] ConvertToCellImportItem(List<Cell> _inputCellList)
