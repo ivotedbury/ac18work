@@ -5,8 +5,8 @@ using UnityEngine;
 public class PathFinder
 {
 
-    public int totalCostOfTrip;
-    int totalCostOfBuild = 0;
+    public float totalCostOfTrip;
+    float totalCostOfBuild = 0;
 
     public List<Cell> FindPath(Grid _inputGrid, List<Cell> _availableCells, Cell _startCell, Cell _targetCell, int _startingDirection)
     {
@@ -76,7 +76,7 @@ public class PathFinder
 
                 proposedDirection = GetDirection(cell, neighbour);
 
-                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour, currentDirection, proposedDirection);
+                float newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour, currentDirection, proposedDirection);
 
                 List<Cell> potentialCompanionCells = FindListOfPotentialCompanionCells(_inputGrid, neighbour, proposedDirection, _availableCells);
 

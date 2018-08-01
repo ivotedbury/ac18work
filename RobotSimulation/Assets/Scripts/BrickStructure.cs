@@ -342,13 +342,13 @@ public class BrickStructure
             }
         }
 
-        int bestTripCost = 100000000;
+        float bestTripCost = 100000000;
 
         for (int i = 0; i < finalListDropOffCells.Count; i++)
         {
             List<Cell> potentialPath = new List<Cell>();
             potentialPath = pathFinder.FindPath(grid, availableCells, bricksInTargetStructure[0].originCell, finalListDropOffCells[i], 1);
-            int testTripCost = bestTripCost;
+            float testTripCost = bestTripCost;
             if (potentialPath.Count > 0)
             {
                 testTripCost = pathFinder.totalCostOfTrip;

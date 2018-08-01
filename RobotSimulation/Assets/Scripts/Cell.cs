@@ -13,9 +13,9 @@ public class Cell
 
     public int currentStatus = 0; // normal / start / path / end
 
-    public int gCost;
-    public int hCost;
-    public int availableCost;
+    public float gCost;
+    public float hCost;
+    public float availableCost;
 
     public Cell parent;
 
@@ -31,7 +31,7 @@ public class Cell
         hCost = 0;
         availableCost = 0;
     }
-    public int fCost
+    public float fCost
     {
         get
         {

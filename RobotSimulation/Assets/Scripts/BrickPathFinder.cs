@@ -5,7 +5,7 @@ using UnityEngine;
 public class BrickPathFinder
 {
 
-    public int totalCostOfTrip;
+    public float totalCostOfTrip;
 
     public List<Cell> CalculatePathForSequencing(Grid _inputGrid, List<Cell> _availableCells, List<Cell> _forbiddenCells, Cell _startCell, Cell _targetCell)
     {
@@ -33,7 +33,7 @@ public class BrickPathFinder
                     }
                     else
                     {
-                        _inputGrid.cellsArray[x, y, z].availableCost = 100000 * y; ///////////////////////////////make this y squared (reduce costs to floats to give more scale)
+                        _inputGrid.cellsArray[x, y, z].availableCost = 100 * Mathf.Pow(y, 2);
                     }
                 }
             }
@@ -89,8 +89,8 @@ public class BrickPathFinder
 
                 //   if (cell != _startCell && RetracePath(startCell, cell).Count > 1)
                 //   {
-                pathToNeighbour = RetracePath(_startCell, cell);
-                //pathToNeighbour = RetraceFullCellPath(startCell, cell,  _inputGrid); //2 was previously "cell"
+                //pathToNeighbour = RetracePath(_startCell, cell);
+                pathToNeighbour = RetraceFullCellPath(startCell, cell, neighbour, _inputGrid); //2 was previously "cell"
                 //  }
                 //else
                 //{
@@ -105,7 +105,7 @@ public class BrickPathFinder
                     continue;
                 }
 
-                for (int j = 0; j < pathToNeighbour.Count-1; j++)
+                for (int j = 0; j < pathToNeighbour.Count - 1; j++)
                 {
                     if ((neighbour.position.x == pathToNeighbour[j].position.x && neighbour.position.z == pathToNeighbour[j].position.z) ||
 
@@ -116,16 +116,22 @@ public class BrickPathFinder
                      (neighbour.position.x == pathToNeighbour[j].position.x + 0 && neighbour.position.z == pathToNeighbour[j].position.z - 1) ||
                      (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z - 1) ||
                      (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z + 0) ||
-                     (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z + 1))
+                     (neighbour.position.x == pathToNeighbour[j].position.x - 1 && neighbour.position.z == pathToNeighbour[j].position.z + 1) ||
+                     
+                     _forbiddenCells.Contains(pathToNeighbour[j]))
                     {
                         continueToNextNeighbour = true;
                         break;
                     }
 
+                    if (continueToNextNeighbour)
+                    {
+                        break;
+                    }
 
-                    //    for (int k = 0; k < _forbiddenCells.Count; k++)
-                    //    {
-                    //        if ((_forbiddenCells[k].position.x == pathToNeighbour[j].position.x && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z) ||
+                    //for (int k = 0; k < _forbiddenCells.Count; k++)
+                    //{
+                    //    if ((_forbiddenCells[k].position.x == pathToNeighbour[j].position.x && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z))
 
                     //          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 0 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 1) ||
                     //          (_forbiddenCells[k].position.x == pathToNeighbour[j].position.x + 1 && _forbiddenCells[k].position.z == pathToNeighbour[j].position.z + 1) ||
@@ -145,67 +151,66 @@ public class BrickPathFinder
                     //          (_forbiddenCells[k].position.x == neighbour.position.x + 0 && _forbiddenCells[k].position.z == neighbour.position.z - 1) ||
                     //          (_forbiddenCells[k].position.x == neighbour.position.x - 1 && _forbiddenCells[k].position.z == neighbour.position.z - 1) ||
                     //          (_forbiddenCells[k].position.x == neighbour.position.x - 1 && _forbiddenCells[k].position.z == neighbour.position.z + 0) ||
-                    //          (_forbiddenCells[k].position.x == neighbour.position.x - 1 && _forbiddenCells[k].position.z == neighbour.position.z + 1))
-                    //        {
-                    //            continueToNextNeighbour = true;
-                    //            break;
-                    //        }
+                    //          (_forbiddenCells[k].position.x == neighbour.position.x - 1 && _forbiddenCells[k].position.z == neighbour.position.z + 1)
+
+                    //    {
+                    //        continueToNextNeighbour = true;
+                    //        break;
+                    //    }
+                    //}
+
+
+
+                    //for (int m = 0; m < cellToNeighbour.Count; m++)
+                    //{
+                    //    if ((cellToNeighbour[m].position.x == pathToNeighbour[j].position.x && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z) ||
+
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1))
+                    //    {
+                    //        continueToNextNeighbour = true;
+                    //    }
+                    //}
+
+                    //for (int m = 0; m < pathToNeighbour.Count; m++)
+                    //{
+                    //    if (m == j)
+                    //    {
+                    //        continue;
+                    //    }
+
+                    //    if ((pathToNeighbour[m].position.x == pathToNeighbour[j].position.x && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z)
+
+                    //     //   ||
+
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
+                    //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1)
+                    //     )
+                    //    {
+                    //        continueToNextNeighbour = true;
+                    //    }
+                    //}
+
+
+                    //if (continueToNextNeighbour)
+                    //{
+                    //    continue;
+                    //}
                 }
 
-                if (continueToNextNeighbour)
-                {
-                    break;
-                }
-
-                //for (int m = 0; m < cellToNeighbour.Count; m++)
-                //{
-                //    if ((cellToNeighbour[m].position.x == pathToNeighbour[j].position.x && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z) ||
-
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
-                //        (cellToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && cellToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1))
-                //    {
-                //        continueToNextNeighbour = true;
-                //    }
-                //}
-
-                //for (int m = 0; m < pathToNeighbour.Count; m++)
-                //{
-                //    if (m == j)
-                //    {
-                //        continue;
-                //    }
-
-                //    if ((pathToNeighbour[m].position.x == pathToNeighbour[j].position.x && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z)
-
-                //     //   ||
-
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x + 0 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z - 1) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 0) ||
-                //     //(pathToNeighbour[m].position.x == pathToNeighbour[j].position.x - 1 && pathToNeighbour[m].position.z == pathToNeighbour[j].position.z + 1)
-                //     )
-                //    {
-                //        continueToNextNeighbour = true;
-                //    }
-                //}
-
-
-                //if (continueToNextNeighbour)
-                //{
-                //    continue;
-                //}
-
-                int newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour) + cell.availableCost; //cell.availableCost +
+                float newCostToNeighbour = cell.gCost + GetDistance(cell, neighbour) + cell.availableCost; //cell.availableCost +
 
                 if (newCostToNeighbour < neighbour.gCost + neighbour.availableCost || !openSet.Contains(neighbour)) //////////////////// PROBLEM HERE + neighbour.availableCost
                 {
@@ -367,16 +372,16 @@ public class BrickPathFinder
         return path;
     }
 
-    int GetDistance(Cell _cellA, Cell _cellB)
+    float GetDistance(Cell _cellA, Cell _cellB)
     {
-        int distance;
+        float distance;
 
-        int distX = Mathf.Abs(_cellB.position.x - _cellA.position.x);
-        int distY = Mathf.Abs(_cellB.position.y - _cellA.position.y);
-        int distZ = Mathf.Abs(_cellB.position.z - _cellA.position.z);
+        float distX = Mathf.Abs(_cellB.position.x - _cellA.position.x);
+        float distY = Mathf.Abs(_cellB.position.y - _cellA.position.y);
+        float distZ = Mathf.Abs(_cellB.position.z - _cellA.position.z);
 
-        int horizontalCost = 1;
-        int verticalCost = 1000;
+        float horizontalCost = 0.001f;
+        float verticalCost = 1f;
 
         distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) + _cellB.availableCost;
 
@@ -397,7 +402,7 @@ public class BrickPathFinder
                 {
                     for (int z = -8; z <= 8; z++)
                     {
-                        if (z > -5 && z < 5)
+                        if (z > -8 && z < 8) // if (z > -5 && z < 5)
                         {
                             continue;
                         }
@@ -407,7 +412,7 @@ public class BrickPathFinder
 
                     for (int x = -8; x <= 8; x++)
                     {
-                        if (x > -5 && x < 5)
+                        if (x > -8 && x < 8) // if (x > -5 && x < 5)
                         {
                             continue;
                         }
@@ -419,7 +424,7 @@ public class BrickPathFinder
                 {
                     for (int z = -4; z <= 4; z++)
                     {
-                        if (z == 0)
+                        if (z == 0 || z == 1)
                         {
                             continue;
                         }
@@ -429,7 +434,7 @@ public class BrickPathFinder
 
                     for (int x = -4; x <= 4; x++)
                     {
-                        if (x == 0)
+                        if (x == 0 || x == 1)
                         {
                             continue;
                         }
