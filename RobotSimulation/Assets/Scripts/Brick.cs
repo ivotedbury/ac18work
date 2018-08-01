@@ -12,12 +12,14 @@ public class Brick
     public bool auxBrick;
     public int distanceFromSeedForSequencing;
 
-    public Brick(Grid _inputGrid, Cell _inputOriginCell, float _inputRotation, int _brickType) // creates a Brick given a origin cell in the grid and a rotation
+    public Brick(Grid _inputGrid, Cell _inputOriginCell, float _inputRotation, int _brickType, bool _auxBrick) // creates a Brick given a origin cell in the grid and a rotation
     {
         originCell = _inputOriginCell;
         rotation = Quaternion.Euler(0, _inputRotation, 0);
         brickType = _brickType;
-        auxBrick = false;
+
+        auxBrick = _auxBrick;
+
         AssignChildCells(_inputGrid);
     }
 

@@ -179,7 +179,9 @@ namespace BrickManager
 
             public int brickType; //0 = normal, 1 = half
 
-            public Brick(Vector3d _gridPos, float _rotation, int _type)
+            public bool auxBrick;
+
+            public Brick(Vector3d _gridPos, float _rotation, int _type, bool _auxBrick)
             {
                 //   gridPosition = _gridPos;
 
@@ -190,6 +192,8 @@ namespace BrickManager
                 rotation = _rotation;
 
                 brickType = _type;
+
+                auxBrick = _auxBrick;
             }
         }
 
@@ -201,6 +205,7 @@ namespace BrickManager
             Vector3d brickPosition;
             float rotationAngle = 0;
             int thisbrickType;
+            bool thisAuxBrick = false;
 
             Plane brickPlane = new Plane(_brickOrigins, _brickX, _brickY);
 
@@ -212,21 +217,31 @@ namespace BrickManager
 
             rotationAngle = (float)Math.Round(Vector3d.VectorAngle(brickPlane.XAxis, Plane.WorldXY.XAxis) * 180 / Math.PI);
 
-            //Vector3d xDirection = new Vector3d(_brickX - _brickOrigins);
+            Vector3d xDirection = new Vector3d(_brickX - _brickOrigins);
             Vector3d yDirection = new Vector3d(_brickY - _brickOrigins);
 
-            int yLength = (int)Math.Round(yDirection.Length/_gridDimX);
+            int xLength = (int)(2 * xDirection.Length / _gridDimX);
+            int yLength = (int)Math.Round(yDirection.Length / _gridDimX);
+
+            if (xLength == 2)
+            {
+                thisAuxBrick = true;
+            }
+            else if (xLength == 2)
+            {
+                thisAuxBrick = false;
+            }
 
             if (yLength == 1)
             {
                 thisbrickType = 2;
             }
-            else 
+            else
             {
                 thisbrickType = 1;
             }
 
-            Brick outputBrick = new Brick(brickPosition, rotationAngle, thisbrickType);
+            Brick outputBrick = new Brick(brickPosition, rotationAngle, thisbrickType, thisAuxBrick);
 
 
             return outputBrick;

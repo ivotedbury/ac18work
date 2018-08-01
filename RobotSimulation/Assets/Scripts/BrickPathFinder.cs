@@ -369,22 +369,27 @@ public class BrickPathFinder
                 {
                     // -4, -2, 2, 4
 
-                    if (_currentDirection == 0)
-                    {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 2]);                                      
-                    }
-                    else if (_currentDirection == 1)
-                    {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 2, _testCell.position.y + y, _testCell.position.z]);
-                    }
-                    else if (_currentDirection == 2)
-                    {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z - 2]);
-                    }
-                    else if (_currentDirection == 3)
-                    {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 2 , _testCell.position.y + y, _testCell.position.z]);
-                    }
+                    //if (_currentDirection == 0)
+                    //{
+                    //    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 2]);                                      
+                    //}
+                    //else if (_currentDirection == 1)
+                    //{
+                    //    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 2, _testCell.position.y + y, _testCell.position.z]);
+                    //}
+                    //else if (_currentDirection == 2)
+                    //{
+                    //    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z - 2]);
+                    //}
+                    //else if (_currentDirection == 3)
+                    //{
+                    //    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 2 , _testCell.position.y + y, _testCell.position.z]);
+                    //}
+
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 2]);
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 2, _testCell.position.y + y, _testCell.position.z]);
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z - 2]);
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 2, _testCell.position.y + y, _testCell.position.z]);
 
                     neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 4]);
                     neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 4, _testCell.position.y + y, _testCell.position.z]);

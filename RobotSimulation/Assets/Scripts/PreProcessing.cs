@@ -31,7 +31,7 @@ public class PreProcessing : MonoBehaviour
 
     BuildSequence buildSequence;
 
-    Vector3Int gridSize = new Vector3Int(75, 20, 75);
+    Vector3Int gridSize = new Vector3Int(100, 20, 100);
     Vector3Int seedPosition = new Vector3Int(20, 1, 20);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);

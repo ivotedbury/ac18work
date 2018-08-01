@@ -26,14 +26,9 @@ public class BuildSequence
         grid = new Grid(_gridSize);
         CreateSeed(_seedCell);
 
-        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(4, 0, 0)), 90, 1));
-        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(8, 0, 0)), 90, 1));
-        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(12, 0, 0)), 90, 1));
-
-        foreach (Brick additionalStartinBrick in additionalStartingBricks)
-        {
-            additionalStartinBrick.auxBrick = true;
-        }
+        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(4, 0, 0)), 90, 1, true));
+        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(8, 0, 0)), 90, 1, true));
+        additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(12, 0, 0)), 90, 1, true));
 
         completeStructure = additionalStartingBricks;
         inputStructure = CreateBricksInArrangment(_brickDataImport);
@@ -86,8 +81,7 @@ public class BuildSequence
         {
             int requiredDirection = brickPathFinder.GetDirection(_desiredPath[pathCounter - 1], _desiredPath[pathCounter]);
 
-            _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2));
-            _additionalBricks[_additionalBricks.Count - 1].auxBrick = true;
+            _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2, true));
 
             pathCounter += 2;
         }
@@ -125,8 +119,7 @@ public class BuildSequence
                         newBrickRotation = 90;
                     }
 
-                    _compactedAdditionalBricks.Add(new Brick(grid, grid.cellsArray[newBrickOriginCellPosition.x, newBrickOriginCellPosition.y, newBrickOriginCellPosition.z], newBrickRotation, 1));
-                    _compactedAdditionalBricks[_compactedAdditionalBricks.Count - 1].auxBrick = true;
+                    _compactedAdditionalBricks.Add(new Brick(grid, grid.cellsArray[newBrickOriginCellPosition.x, newBrickOriginCellPosition.y, newBrickOriginCellPosition.z], newBrickRotation, 1, true));
 
                     if (additionalBricksCounter == _additionalBricks.Count - 2)
                     {
@@ -165,7 +158,7 @@ public class BuildSequence
                 {
                     subBrickRotation = 90;
                 }
-                _supportedFinalAdditionalBricks.Add(new Brick(grid, grid.GetANeighbour(brick.originCell, new Vector3Int(0, -i, 0)), subBrickRotation, brick.brickType));
+                _supportedFinalAdditionalBricks.Add(new Brick(grid, grid.GetANeighbour(brick.originCell, new Vector3Int(0, -i, 0)), subBrickRotation, brick.brickType, brick.auxBrick));
                 _supportedFinalAdditionalBricks[_supportedFinalAdditionalBricks.Count - 1].auxBrick = true;
             }
         }
@@ -257,7 +250,7 @@ public class BuildSequence
             _bricksInScene.Add(_bricksInPlace[i]);
         }
 
-        _bricksInScene.Insert(0, new Brick(grid, seedCell, 90, 1));
+        _bricksInScene.Insert(0, new Brick(grid, seedCell, 90, 1, true));
 
         for (int i = 0; i < _bricksInScene.Count; i++)
         {
@@ -344,7 +337,7 @@ public class BuildSequence
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + seedCell.position.x, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + seedCell.position.z], importedBrickItem.rotation, importedBrickItem.brickType);
+        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + seedCell.position.x, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + seedCell.position.z], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
 
         // convertedBrick.childCells = grid.GetChildren(convertedBrick);
 

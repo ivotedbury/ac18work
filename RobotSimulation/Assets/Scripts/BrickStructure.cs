@@ -452,7 +452,7 @@ public class BrickStructure
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + importOffsetXZ, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffsetXZ], importedBrickItem.rotation, importedBrickItem.brickType);
+        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + importOffsetXZ, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffsetXZ], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
 
         convertedBrick.childCells = grid.GetChildren(convertedBrick);
 
