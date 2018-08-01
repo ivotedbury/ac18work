@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class BuildSequence
 {
-        public List<Brick> inputStructure = new List<Brick>();
+    public List<Brick> inputStructure = new List<Brick>();
     List<Brick> additionalStartingBricks = new List<Brick>();
     public List<Brick> completeStructure = new List<Brick>();
+    List<Brick> newBricksRequired = new List<Brick>();
 
     public Grid grid;
     public Cell seedCell;
@@ -18,7 +19,7 @@ public class BuildSequence
     public List<Cell> fullDesiredPath = new List<Cell>();
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
-    
+
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
 
@@ -29,6 +30,10 @@ public class BuildSequence
         additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(8, 0, 0)), 90, 1));
         additionalStartingBricks.Add(new Brick(grid, grid.GetANeighbour(seedCell, new Vector3Int(12, 0, 0)), 90, 1));
 
+        foreach (Brick additionalStartinBrick in additionalStartingBricks)
+        {
+            additionalStartinBrick.auxBrick = true;
+        }
 
         completeStructure = additionalStartingBricks;
         inputStructure = CreateBricksInArrangment(_brickDataImport);
@@ -47,7 +52,6 @@ public class BuildSequence
         //List<Brick> brickStructureCompletedPaths = new List<Brick>();
 
         Brick brickToPlaceNext;
-        List<Brick> newBricksRequired = new List<Brick>();
         Cell pathStartingCell = completeStructure[2].childCells[0];
 
         brickToPlaceNext = completeStructure[completeStructure.Count - 1];
@@ -60,15 +64,120 @@ public class BuildSequence
         List<Cell> cellsInPath = new List<Cell>();
 
         cellsInPath = ConvertCellsFromImport(_correspondingBrickDataFile);
-        Debug.Log(cellsInPath.Count);
+
+        desiredPath.Clear();
+        desiredPath = cellsInPath;
+
+        newBricksRequired = ConvertPathToBricks(desiredPath);
+
+        for (int i = 0; i < newBricksRequired.Count; i++)
+        {
+            completeStructure.Add(newBricksRequired[i]);
+        }
     }
 
+    List<Brick> ConvertPathToBricks(List<Cell> _desiredPath)
+    {
+        List<Brick> _additionalBricks = new List<Brick>();
+
+        int pathCounter = 2;
+
+        while (pathCounter < _desiredPath.Count - 3)
+        {
+            int requiredDirection = brickPathFinder.GetDirection(_desiredPath[pathCounter - 1], _desiredPath[pathCounter]);
+
+            _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2));
+            _additionalBricks[_additionalBricks.Count - 1].auxBrick = true;
+
+            pathCounter += 2;
+        }
+
+        List<Brick> _compactedAdditionalBricks = new List<Brick>();
+
+        int additionalBricksCounter = 1;
+        while (additionalBricksCounter < _additionalBricks.Count - 1)
+        {
+            if (_additionalBricks[additionalBricksCounter - 1].brickType == 2 && _additionalBricks[additionalBricksCounter].brickType == 2)
+            {
+                if (
+                    ((_additionalBricks[additionalBricksCounter - 1].rotation == Quaternion.Euler(0, 0, 0) ||
+                    _additionalBricks[additionalBricksCounter - 1].rotation == Quaternion.Euler(0, 180, 0))
+                    &&
+                    (_additionalBricks[additionalBricksCounter].rotation == Quaternion.Euler(0, 0, 0) ||
+                    _additionalBricks[additionalBricksCounter].rotation == Quaternion.Euler(0, 180, 0)))
+
+                    ||
+
+                    ((_additionalBricks[additionalBricksCounter - 1].rotation == Quaternion.Euler(0, 90, 0) ||
+                    _additionalBricks[additionalBricksCounter - 1].rotation == Quaternion.Euler(0, 270, 0))
+                    &&
+                    (_additionalBricks[additionalBricksCounter].rotation == Quaternion.Euler(0, 90, 0) ||
+                    _additionalBricks[additionalBricksCounter].rotation == Quaternion.Euler(0, 270, 0))))
+                {
+                    Vector3Int newBrickOriginCellPosition = new Vector3Int((_additionalBricks[additionalBricksCounter - 1].originCell.position.x + _additionalBricks[additionalBricksCounter].originCell.position.x) / 2,
+                                                                   (_additionalBricks[additionalBricksCounter - 1].originCell.position.y + _additionalBricks[additionalBricksCounter].originCell.position.y) / 2,
+                                                                   (_additionalBricks[additionalBricksCounter - 1].originCell.position.z + _additionalBricks[additionalBricksCounter].originCell.position.z) / 2);
+
+                    int newBrickRotation = 0;
+
+                    if (_additionalBricks[additionalBricksCounter].rotation == Quaternion.Euler(0, 90, 0) || _additionalBricks[additionalBricksCounter].rotation == Quaternion.Euler(0, 270, 0))
+                    {
+                        newBrickRotation = 90;
+                    }
+
+                    _compactedAdditionalBricks.Add(new Brick(grid, grid.cellsArray[newBrickOriginCellPosition.x, newBrickOriginCellPosition.y, newBrickOriginCellPosition.z], newBrickRotation, 1));
+                    _compactedAdditionalBricks[_compactedAdditionalBricks.Count - 1].auxBrick = true;
+
+                    if (additionalBricksCounter == _additionalBricks.Count - 2)
+                    {
+                        _compactedAdditionalBricks.Add(_additionalBricks[additionalBricksCounter + 1]);
+                        additionalBricksCounter++;
+                    }
+                    else
+                    {
+                        additionalBricksCounter += 2;
+                    }
+                }
+                else
+                {
+                    _compactedAdditionalBricks.Add(_additionalBricks[additionalBricksCounter - 1]);
+
+                    additionalBricksCounter++;
+                }
+            }
+            else
+            {
+                additionalBricksCounter++;
+            }
+        }
+
+        List<Brick> _supportedFinalAdditionalBricks = new List<Brick>();
+
+        foreach (Brick brick in _compactedAdditionalBricks)
+        {
+            _supportedFinalAdditionalBricks.Add(brick);
+
+            for (int i = 1; i < brick.originCell.position.y; i++)
+            {
+                int subBrickRotation = 0;
+
+                if (brick.rotation == Quaternion.Euler(0, 90, 0) || brick.rotation == Quaternion.Euler(0, 270, 0))
+                {
+                    subBrickRotation = 90;
+                }
+                _supportedFinalAdditionalBricks.Add(new Brick(grid, grid.GetANeighbour(brick.originCell, new Vector3Int(0, -i, 0)), subBrickRotation, brick.brickType));
+                _supportedFinalAdditionalBricks[_supportedFinalAdditionalBricks.Count - 1].auxBrick = true;
+            }
+        }
+
+        return _supportedFinalAdditionalBricks;
+    }
     List<Cell> ConvertCellsFromImport(TextAsset _correspondingBrickDataFile)
     {
         List<Cell> cellsInPath = new List<Cell>();
 
         string pathImportPath = "Assets/ExportData/" + _correspondingBrickDataFile.name.ToString() + "_additionalPath.txt";
-        
+
         string importDataString = System.IO.File.ReadAllText(pathImportPath);
 
         CellImportItem[] cellImportArray = JsonHelper.FromJson<CellImportItem>(importDataString);
@@ -204,8 +313,6 @@ public class BuildSequence
             }
 
         }
-
-        // _forbiddenCells = _forbiddenChildCells;
 
         return _forbiddenCells;
     }

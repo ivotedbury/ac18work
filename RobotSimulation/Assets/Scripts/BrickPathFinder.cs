@@ -50,11 +50,7 @@ public class BrickPathFinder
 
             Cell cell = openSet[0];
 
-            if (openSet.Count > 1)
-            {
-                currentDirection = GetDirection(cell.parent, cell);
-                Debug.Log(currentDirection);
-            }
+      
 
             for (int i = 1; i < openSet.Count; i++)
             {
@@ -65,6 +61,12 @@ public class BrickPathFinder
                         cell = openSet[i];
                     }
                 }
+            }
+
+            if (openSet.Count > 1)
+            {
+                currentDirection = GetDirection(cell.parent, cell);
+                Debug.Log(currentDirection);
             }
 
             openSet.Remove(cell);
@@ -161,7 +163,7 @@ public class BrickPathFinder
         return waypoints;
     }
 
-    int GetDirection(Cell _start, Cell _end)
+   public int GetDirection(Cell _start, Cell _end)
     {
         int direction = 0;
 
@@ -365,25 +367,55 @@ public class BrickPathFinder
 
                 else
                 {
-                    for (int z = -4; z <= 4; z++)
-                    {
-                        if (z == 0 || z == 1)
-                        {
-                            continue;
-                        }
+                    // -4, -2, 2, 4
 
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + z]);
+                    if (_currentDirection == 0)
+                    {
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 2]);                                      
+                    }
+                    else if (_currentDirection == 1)
+                    {
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 2, _testCell.position.y + y, _testCell.position.z]);
+                    }
+                    else if (_currentDirection == 2)
+                    {
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z - 2]);
+                    }
+                    else if (_currentDirection == 3)
+                    {
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 2 , _testCell.position.y + y, _testCell.position.z]);
                     }
 
-                    for (int x = -4; x <= 4; x++)
-                    {
-                        if (x == 0 || x == 1)
-                        {
-                            continue;
-                        }
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 4]);
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 4, _testCell.position.y + y, _testCell.position.z]);
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z - 4]);
+                    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 4, _testCell.position.y + y, _testCell.position.z]);
 
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + x, _testCell.position.y + y, _testCell.position.z + 0]);
-                    }
+                    //neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z + 6]);
+                    //neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 6, _testCell.position.y + y, _testCell.position.z]);
+                    //neighbours.Add(_inputGrid.cellsArray[_testCell.position.x, _testCell.position.y + y, _testCell.position.z - 6]);
+                    //neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 6, _testCell.position.y + y, _testCell.position.z]);
+
+                    //for (int z = -4; z <= 4; z++)
+                    //{
+
+                    //    if (z == 0 || z == 1 || z == 3)
+                    //    {
+                    //        continue;
+                    //    }
+
+                    //    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + z]);
+                    //}
+
+                    //for (int x = -4; x <= 4; x++)
+                    //{
+                    //    if (x == 0 || x == 1 || x == 3)
+                    //    {
+                    //        continue;
+                    //    }
+
+                    //    neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + x, _testCell.position.y + y, _testCell.position.z + 0]);
+                    //}
                 }
             }
         }

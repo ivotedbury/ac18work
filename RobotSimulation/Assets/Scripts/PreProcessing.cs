@@ -78,6 +78,7 @@ public class PreProcessing : MonoBehaviour
         allBrickMeshes.Clear();
 
         CreateBricks();
+        UpdateCellDisplay();
     }
 
     void WritePathData()
