@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Cell
 {
-    public Vector3Int position { get; set; }
-    public Vector3 actualPosition { get; set; }
+    public Vector3Int position;
+    public Vector3 actualPosition;
 
     float gridDimX = 0.05625f;
     float gridDimY = 0.0625f; // 0.0725 with mortar space

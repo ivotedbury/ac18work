@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 public class PreProcessing : MonoBehaviour
 {
@@ -71,6 +72,21 @@ public class PreProcessing : MonoBehaviour
         CreateGridLines();
 
         UpdateCellDisplay();
+
+        WritePathData();
+        Debug.Log("data has been written");
+    }
+
+    void WritePathData()
+    {
+        string pathExportPath = "Assets/ExportData/cellPath1.txt";
+        StreamWriter writer = new StreamWriter(pathExportPath, true);
+
+        CellImportItem[] cellPathToExport = ConvertToCellImportItem(buildSequence.desiredPath);
+
+        string dataToExport = JsonHelper.ToJson<CellImportItem>(cellPathToExport, true).ToString();
+        Debug.Log(dataToExport);
+        writer.Write(dataToExport);
     }
 
     private void OnGUI()
@@ -81,6 +97,21 @@ public class PreProcessing : MonoBehaviour
     void SetupUI()
     {
 
+    }
+
+    CellImportItem[] ConvertToCellImportItem(List<Cell> _inputCellList)
+    {
+        CellImportItem[] outputCellImportItemArray = new CellImportItem[_inputCellList.Count];
+
+        for (int i = 0; i < _inputCellList.Count; i++)
+        {
+            outputCellImportItemArray[i] = new CellImportItem();
+            outputCellImportItemArray[i].posX = _inputCellList[i].position.x;
+            outputCellImportItemArray[i].posY = _inputCellList[i].position.y;
+            outputCellImportItemArray[i].posZ = _inputCellList[i].position.z;
+        }
+
+        return outputCellImportItemArray;
     }
 
     void CreateGridLines()

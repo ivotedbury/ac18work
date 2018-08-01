@@ -17,9 +17,10 @@ public class BuildSequence
     public List<Cell> forbiddenCells = new List<Cell>();
     public List<Cell> desiredPath = new List<Cell>();
     public List<Cell> fullDesiredPath = new List<Cell>();
-
-
+    
     BrickPathFinder brickPathFinder = new BrickPathFinder();
+
+
 
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
