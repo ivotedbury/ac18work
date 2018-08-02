@@ -17,7 +17,7 @@ public class PreProcessing : MonoBehaviour
     public GameObject lineRendererContainer;
 
     public TextAsset brickImportData;
- //   public TextAsset cellImportData;
+    //   public TextAsset cellImportData;
 
     public Material gridLineMaterial;
 
@@ -43,6 +43,8 @@ public class PreProcessing : MonoBehaviour
 
     public Button completePath;
     public Button generateBricks;
+    public Button reorderExport;
+
 
     void Start()
     {
@@ -54,8 +56,11 @@ public class PreProcessing : MonoBehaviour
 
         Button completePathButton = completePath.GetComponent<Button>();
         Button generateBricksButton = generateBricks.GetComponent<Button>();
+        Button reorderExportButton = reorderExport.GetComponent<Button>();
+
         completePathButton.onClick.AddListener(CompletePath);
         generateBricksButton.onClick.AddListener(GenerateBricks);
+        reorderExportButton.onClick.AddListener(ReorderExport);
 
     }
 
@@ -79,6 +84,20 @@ public class PreProcessing : MonoBehaviour
 
         CreateBricks();
         UpdateCellDisplay();
+    }
+
+    void ReorderExport()
+    {
+        buildSequence.ReorderFinalBricks();
+
+        string pathExportPath = "Assets/ExportData/" + brickImportData.name.ToString() + "_allBricksInBuild.txt";
+
+        BrickImportItem[] bricksToExport = ConvertToBrickImportItem(buildSequence.finalStructureToBuild);
+
+        string dataToExport = JsonHelper.ToJson<BrickImportItem>(bricksToExport, true).ToString();
+        Debug.Log(dataToExport);
+
+        System.IO.File.WriteAllText(pathExportPath, dataToExport);
     }
 
     void WritePathData()
@@ -127,6 +146,32 @@ public class PreProcessing : MonoBehaviour
 
             allBrickMeshes[i].transform.SetParent(brickContainer.transform);
         }
+    }
+
+    BrickImportItem[] ConvertToBrickImportItem(List<Brick> _inputBrickList)
+    {
+        BrickImportItem[] outputBrickImportItemArray = new BrickImportItem[_inputBrickList.Count];
+
+        for (int i = 0; i < _inputBrickList.Count; i++)
+        {
+            int rotation = 0;
+
+            if (_inputBrickList[i].rotation == Quaternion.Euler(0, 90, 0) || _inputBrickList[i].rotation == Quaternion.Euler(0, 270, 0))
+            {
+                rotation = 90;
+            }
+
+            outputBrickImportItemArray[i] = new BrickImportItem();
+            outputBrickImportItemArray[i].brickPosX = _inputBrickList[i].originCell.position.x;
+            outputBrickImportItemArray[i].brickPosY = _inputBrickList[i].originCell.position.z;
+            outputBrickImportItemArray[i].brickPosZ = _inputBrickList[i].originCell.position.y;
+            outputBrickImportItemArray[i].brickType = _inputBrickList[i].brickType;
+            outputBrickImportItemArray[i].auxBrick = _inputBrickList[i].auxBrick;
+            outputBrickImportItemArray[i].rotation = rotation;
+
+        }
+
+        return outputBrickImportItemArray;
     }
 
     CellImportItem[] ConvertToCellImportItem(List<Cell> _inputCellList)

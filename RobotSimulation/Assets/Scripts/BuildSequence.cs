@@ -20,9 +20,10 @@ public class BuildSequence
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
 
+    bool simpleReorder = false;
+
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
-
         grid = new Grid(_gridSize);
         CreateSeed(_seedCell);
 
@@ -40,6 +41,11 @@ public class BuildSequence
 
         availableCells = FindAvailableCells(completeStructure);
         forbiddenCells = FindForbiddenCells(completeStructure, availableCells);
+    }
+
+    public void ReorderFinalBricks()
+    {
+        
     }
 
     public void GenerateCompletePaths()
@@ -328,7 +334,15 @@ public class BuildSequence
             _inputStructure.Add(ConvertToBrick(brickImportArray[i]));
         }
 
-        _inputStructure = ReorderBricks(_inputStructure, seedCell); //////////////////////////////////////////////////
+        if (simpleReorder)
+        {
+                        _inputStructure = ReorderBricks(_inputStructure, seedCell);
+        }
+
+        else
+        {
+            _inputStructure = ThoroughReorderBricks(_inputStructure, seedCell);
+        }
 
         return _inputStructure;
     }
@@ -342,6 +356,49 @@ public class BuildSequence
         // convertedBrick.childCells = grid.GetChildren(convertedBrick);
 
         return convertedBrick;
+    }
+
+    private List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell)
+    {
+        List<Brick> bricksStillToOrder = new List<Brick>();
+        bricksStillToOrder = _inputStructure;
+        List<Brick> reorderedStructure = new List<Brick>();
+        List<Cell> availableCells = new List<Cell>();
+        List<Cell> forbiddenCells = new List<Cell>();
+
+        availableCells.Add(_seedCell);
+
+        while (bricksStillToOrder.Count > 0)
+        {
+            int bestCurrentCost = 1000000000;
+            Brick bestCurrentBrick = null;
+
+            for (int j = 0; j < bricksStillToOrder.Count; j++)
+            {
+                Debug.Log("BricksStillToOrderCount: " + bricksStillToOrder.Count);
+                List<Cell> testPath = new List<Cell>();
+                testPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, _seedCell, bricksStillToOrder[j].originCell);
+                Debug.Log("totalCostOfTrip for " + j + ": " + brickPathFinder.totalCostOfTrip);
+                if (brickPathFinder.totalCostOfTrip < bestCurrentCost)
+                {
+                    bestCurrentCost = brickPathFinder.totalCostOfTrip;
+                    bestCurrentBrick = bricksStillToOrder[j];
+                }
+            }
+
+            if (bestCurrentBrick != null)
+            {
+                reorderedStructure.Add(bestCurrentBrick);
+                bricksStillToOrder.Remove(bestCurrentBrick);
+
+                foreach (Cell childCell in bestCurrentBrick.childCells)
+                {
+                    availableCells.Add(childCell);
+                }
+            }
+        }
+
+        return reorderedStructure;
     }
 
     List<Brick> ReorderBricks(List<Brick> _inputTargetStructure, Cell _inputSeed)
