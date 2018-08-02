@@ -45,7 +45,15 @@ public class BuildSequence
 
     public void ReorderFinalBricks()
     {
-        
+        if (simpleReorder)
+        {
+            finalStructureToBuild = ReorderBricks(completeStructure, seedCell);
+        }
+
+        else
+        {
+            finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell);
+        }
     }
 
     public void GenerateCompletePaths()
@@ -83,19 +91,39 @@ public class BuildSequence
 
         int pathCounter = 2;
 
-        while (pathCounter < _desiredPath.Count - 3)
+        int pathCounterLimit = 3;
+
+        if (_desiredPath.Count % 2 == 1)
+        {
+         // pathCounterLimit = 4;
+        }
+
+        List<Cell> occupiedCells = new List<Cell>();
+
+
+        while (pathCounter < _desiredPath.Count - pathCounterLimit)
         {
             int requiredDirection = brickPathFinder.GetDirection(_desiredPath[pathCounter - 1], _desiredPath[pathCounter]);
+            bool cellIsAvailable = true; // test to see if the path is going through bricks already in the desired structure
+            for (int i = 0; i < availableCells.Count; i++)
+            {
+                if (availableCells[i].position == _desiredPath[pathCounter].position)
+                {
+                    cellIsAvailable = false;
+                }
+            }
 
-            _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2, true));
-
+            if (cellIsAvailable)
+            {
+                _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2, true));
+            }
             pathCounter += 2;
         }
 
         List<Brick> _compactedAdditionalBricks = new List<Brick>();
 
         int additionalBricksCounter = 1;
-        while (additionalBricksCounter < _additionalBricks.Count - 1)
+        while (additionalBricksCounter < _additionalBricks.Count)
         {
             if (_additionalBricks[additionalBricksCounter - 1].brickType == 2 && _additionalBricks[additionalBricksCounter].brickType == 2)
             {
@@ -336,7 +364,7 @@ public class BuildSequence
 
         if (simpleReorder)
         {
-                        _inputStructure = ReorderBricks(_inputStructure, seedCell);
+            _inputStructure = ReorderBricks(_inputStructure, seedCell);
         }
 
         else
@@ -358,47 +386,45 @@ public class BuildSequence
         return convertedBrick;
     }
 
-    private List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell)
+    List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell)
     {
-        List<Brick> bricksStillToOrder = new List<Brick>();
-        bricksStillToOrder = _inputStructure;
-        List<Brick> reorderedStructure = new List<Brick>();
-        List<Cell> availableCells = new List<Cell>();
-        List<Cell> forbiddenCells = new List<Cell>();
+        List<Brick> _bricksStillToOrder = new List<Brick>();
+        _bricksStillToOrder = _inputStructure;
+        List<Brick> _reorderedStructure = new List<Brick>();
+        List<Cell> _availableCells = new List<Cell>();
 
-        availableCells.Add(_seedCell);
+        _availableCells.Add(_seedCell);
 
-        while (bricksStillToOrder.Count > 0)
+        while (_bricksStillToOrder.Count > 0)
         {
-            int bestCurrentCost = 1000000000;
+            float bestCurrentCost = 1000000000;
             Brick bestCurrentBrick = null;
 
-            for (int j = 0; j < bricksStillToOrder.Count; j++)
+            for (int j = 0; j < _bricksStillToOrder.Count; j++)
             {
-                Debug.Log("BricksStillToOrderCount: " + bricksStillToOrder.Count);
                 List<Cell> testPath = new List<Cell>();
-                testPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, _seedCell, bricksStillToOrder[j].originCell);
-                Debug.Log("totalCostOfTrip for " + j + ": " + brickPathFinder.totalCostOfTrip);
+                testPath = brickPathFinder.CalculatePathForOrdering(grid, _availableCells, _seedCell, _bricksStillToOrder[j].originCell);
+
                 if (brickPathFinder.totalCostOfTrip < bestCurrentCost)
                 {
                     bestCurrentCost = brickPathFinder.totalCostOfTrip;
-                    bestCurrentBrick = bricksStillToOrder[j];
+                    bestCurrentBrick = _bricksStillToOrder[j];
                 }
             }
 
             if (bestCurrentBrick != null)
             {
-                reorderedStructure.Add(bestCurrentBrick);
-                bricksStillToOrder.Remove(bestCurrentBrick);
+                _reorderedStructure.Add(bestCurrentBrick);
+                _bricksStillToOrder.Remove(bestCurrentBrick);
 
                 foreach (Cell childCell in bestCurrentBrick.childCells)
                 {
-                    availableCells.Add(childCell);
+                    _availableCells.Add(childCell);
                 }
             }
         }
 
-        return reorderedStructure;
+        return _reorderedStructure;
     }
 
     List<Brick> ReorderBricks(List<Brick> _inputTargetStructure, Cell _inputSeed)
