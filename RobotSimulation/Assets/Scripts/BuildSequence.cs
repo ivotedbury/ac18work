@@ -20,7 +20,7 @@ public class BuildSequence
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
 
-    bool simpleReorder = true;
+    bool simpleReorder = false;
 
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
@@ -65,7 +65,8 @@ public class BuildSequence
 
         else
         {
-            finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell, true);
+            //finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell, true);
+            finalStructureToBuild = OtherReorderBricks(completeStructure, seedCell, true);
         }
     }
 
@@ -398,6 +399,113 @@ public class BuildSequence
         // convertedBrick.childCells = grid.GetChildren(convertedBrick);
 
         return convertedBrick;
+    }
+
+    List<Brick> OtherReorderBricks(List<Brick> _inputStructure, Cell _seedCell, bool _forFinal)
+    {
+        foreach (Cell cell in grid.cellsList)
+        {
+            cell.ResetCosts();
+        }
+
+        List<Brick> _bricksStillToOrder = new List<Brick>();
+        _bricksStillToOrder = _inputStructure;
+        List<Brick> _reorderedStructure = new List<Brick>();
+
+        //  List<Cell> _availableCells = new List<Cell>();
+
+        //  _availableCells.Add(_seedCell);
+        float bestCurrentDistance = 10000000;
+        float testDistance = 0;
+        Brick bestCurrentBrick = null;
+
+        for (int i = 0; i < _bricksStillToOrder.Count; i++)
+        {
+            testDistance = brickPathFinder.GetDistanceForOrdering(_seedCell, _bricksStillToOrder[i].originCell);
+
+            if (testDistance < bestCurrentDistance)
+            {
+                bestCurrentBrick = _bricksStillToOrder[i];
+                bestCurrentDistance = testDistance;
+            }
+        }
+
+        _reorderedStructure.Add(bestCurrentBrick);
+        _bricksStillToOrder.Remove(bestCurrentBrick);
+
+        Brick lastBrickPlaced = bestCurrentBrick;
+
+        for (int layerHeight = 1; layerHeight < grid.gridSize.y - 1; layerHeight++)
+        {
+            List<Brick> bricksInCurrentLayer = new List<Brick>();
+            List<Brick> reorderedBricksInCurrentLayer = new List<Brick>();
+
+            for (int i = 0; i < _bricksStillToOrder.Count; i++)
+            {
+                if (_bricksStillToOrder[i].originCell.position.y == layerHeight)
+                {
+                    bricksInCurrentLayer.Add(_bricksStillToOrder[i]);
+                }
+            }
+
+            while (bricksInCurrentLayer.Count > 0)
+            {
+                bestCurrentDistance = 10000000;
+                bestCurrentBrick = null;
+
+                for (int j = 0; j < bricksInCurrentLayer.Count; j++)
+                {
+                    testDistance = brickPathFinder.GetDistanceForOrdering(lastBrickPlaced.originCell, bricksInCurrentLayer[j].originCell);
+
+                    if (testDistance < bestCurrentDistance)
+                    {
+                        bestCurrentBrick = bricksInCurrentLayer[j];
+                        bestCurrentDistance = testDistance;
+                    }
+                }
+
+                reorderedBricksInCurrentLayer.Add(bestCurrentBrick);
+                bricksInCurrentLayer.Remove(bestCurrentBrick);
+            }
+
+            if (layerHeight > 1)
+            {
+                reorderedBricksInCurrentLayer.Reverse();
+            }
+
+            _reorderedStructure.AddRange(reorderedBricksInCurrentLayer);
+
+        }
+
+        return _reorderedStructure;
+    }
+
+    bool BrickIsReachable(Grid _inputGrid, Brick _startingBrick, Brick _testBrick)
+    {
+        bool _brickIsReachable = false;
+        List<Cell> _potentialNeighbours = new List<Cell>();
+
+        for (int x = -5; x <= 5; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int z = -5; z <= 5; z++)
+                {
+                    if (x == 0 && z == 0)
+                    {
+                        continue;
+                    }
+
+                    _potentialNeighbours.Add(_inputGrid.GetANeighbour(_startingBrick.originCell, new Vector3Int(z, y, z)));
+                }
+            }
+        }
+
+        if (_potentialNeighbours.Contains(_testBrick.originCell))
+        {
+            _brickIsReachable = true;
+        }
+        return _brickIsReachable;
     }
 
     List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell, bool _forFinal)

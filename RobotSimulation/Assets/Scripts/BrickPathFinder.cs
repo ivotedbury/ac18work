@@ -542,7 +542,7 @@ public class BrickPathFinder
         return path;
     }
 
-    float GetDistanceForOrdering(Cell _cellA, Cell _cellB)
+   public float GetDistanceForOrdering(Cell _cellA, Cell _cellB)
     {
         float distance;
 

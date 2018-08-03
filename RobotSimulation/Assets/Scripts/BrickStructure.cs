@@ -24,7 +24,7 @@ public class BrickStructure
 
     void CreateBricksInArrangment(TextAsset _brickDataImport)
     {
-                string brickImportPath = "Assets/ExportData/" + _brickDataImport.name.ToString() + "_allBricksInBuild.txt";
+        string brickImportPath = "Assets/ExportData/" + _brickDataImport.name.ToString() + "_allBricksInBuild.txt";
 
         string importDataString = System.IO.File.ReadAllText(brickImportPath);
 
@@ -349,9 +349,9 @@ public class BrickStructure
             {
                 testTripCost = pathFinder.totalCostOfTrip;
             }
-          //  Debug.Log("potentialPath length: " + potentialPath.Count);
-        //    Debug.Log("finalListDropOffCells position: " + i + "-" + finalListDropOffCells[i].position);
-          //  Debug.Log("testTripCost " + i + "-" + testTripCost);
+            //  Debug.Log("potentialPath length: " + potentialPath.Count);
+            //    Debug.Log("finalListDropOffCells position: " + i + "-" + finalListDropOffCells[i].position);
+            //  Debug.Log("testTripCost " + i + "-" + testTripCost);
 
             if (testTripCost < bestTripCost)
             {
@@ -362,7 +362,7 @@ public class BrickStructure
 
         }
 
-      //  Debug.Log("dropOffCell Position: " + dropOffCell.position);
+        //  Debug.Log("dropOffCell Position: " + dropOffCell.position);
 
         return dropOffCell;
     }
@@ -434,9 +434,9 @@ public class BrickStructure
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX , importedBrickItem.brickPosZ, importedBrickItem.brickPosY], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
+        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX, importedBrickItem.brickPosZ, importedBrickItem.brickPosY], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
 
-        convertedBrick.childCells = grid.GetChildren(convertedBrick);
+       // convertedBrick.childCells = grid.GetChildren(convertedBrick);
 
         return convertedBrick;
     }

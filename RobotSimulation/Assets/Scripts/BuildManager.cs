@@ -23,14 +23,13 @@ public class BuildManager
     List<Cell> outwardPath;
     List<Cell> returnPath;
 
-
     public BuildManager(Vector3Int _gridSize, Vector3Int _seedPosition, TextAsset _brickImportData, int _startingBricks, int _numberOfRobots)
     {
         brickStructure = new BrickStructure(_gridSize, _seedPosition, _brickImportData);
         startingBricks = _startingBricks;
         nextBrickToPlace = startingBricks;
-
-        for (int i = 0; i < brickStructure.bricksInTargetStructure.Count; i++)
+        // was bricksInTargetStructure
+        for (int i = 0; i < startingBricks; i++)
         {
             brickStructure.bricksInPlace.Add(brickStructure.bricksInTargetStructure[i]);
         }
