@@ -9,48 +9,8 @@
             "auxBrick": true
         },
         {
-            "brickPosX": 22,
-            "brickPosY": 24,
-            "brickPosZ": 1,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 21,
-            "brickPosY": 27,
-            "brickPosZ": 1,
-            "rotation": 0.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 26,
-            "brickPosY": 24,
-            "brickPosZ": 1,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
             "brickPosX": 28,
             "brickPosY": 20,
-            "brickPosZ": 1,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 21,
-            "brickPosY": 30,
-            "brickPosZ": 1,
-            "rotation": 0.0,
-            "brickType": 2,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 30,
-            "brickPosY": 24,
             "brickPosZ": 1,
             "rotation": 90.0,
             "brickType": 1,
@@ -81,12 +41,12 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 33,
-            "brickPosY": 23,
-            "brickPosZ": 1,
-            "rotation": 0.0,
-            "brickType": 1,
-            "auxBrick": true
+            "brickPosX": 21,
+            "brickPosY": 32,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
         },
         {
             "brickPosX": 18,
@@ -95,46 +55,6 @@
             "rotation": 90.0,
             "brickType": 1,
             "auxBrick": false
-        },
-        {
-            "brickPosX": 21,
-            "brickPosY": 32,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 2,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 21,
-            "brickPosY": 30,
-            "brickPosZ": 2,
-            "rotation": 0.0,
-            "brickType": 2,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 26,
-            "brickPosY": 24,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 21,
-            "brickPosY": 27,
-            "brickPosZ": 2,
-            "rotation": 0.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 22,
-            "brickPosY": 24,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
         }
     ]
 }

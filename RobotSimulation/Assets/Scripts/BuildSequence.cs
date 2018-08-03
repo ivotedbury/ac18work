@@ -20,7 +20,7 @@ public class BuildSequence
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
 
-    bool simpleReorder = false;
+    bool simpleReorder = true;
 
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
@@ -43,6 +43,19 @@ public class BuildSequence
         forbiddenCells = FindForbiddenCells(completeStructure, availableCells);
     }
 
+    public void ReorderBricks()
+    {
+        if (simpleReorder)
+        {
+            completeStructure = ReorderBricks(completeStructure, seedCell);
+        }
+
+        else
+        {
+            completeStructure = ThoroughReorderBricks(completeStructure, seedCell, false);
+        }
+    }
+
     public void ReorderFinalBricks()
     {
         if (simpleReorder)
@@ -52,13 +65,13 @@ public class BuildSequence
 
         else
         {
-            finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell);
+            finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell, true);
         }
     }
 
     public void GenerateCompletePaths()
     {
-        //List<Brick> brickStructureCompletedPaths = new List<Brick>();
+        ReorderBricks();
 
         Brick brickToPlaceNext;
         Cell pathStartingCell = completeStructure[2].childCells[0];
@@ -95,7 +108,7 @@ public class BuildSequence
 
         if (_desiredPath.Count % 2 == 1)
         {
-         // pathCounterLimit = 4;
+            // pathCounterLimit = 4;
         }
 
         List<Cell> occupiedCells = new List<Cell>();
@@ -158,7 +171,8 @@ public class BuildSequence
                     if (additionalBricksCounter == _additionalBricks.Count - 2)
                     {
                         _compactedAdditionalBricks.Add(_additionalBricks[additionalBricksCounter + 1]);
-                        additionalBricksCounter++;
+                        break;
+                        // additionalBricksCounter++;
                     }
                     else
                     {
@@ -362,15 +376,15 @@ public class BuildSequence
             _inputStructure.Add(ConvertToBrick(brickImportArray[i]));
         }
 
-        if (simpleReorder)
-        {
-            _inputStructure = ReorderBricks(_inputStructure, seedCell);
-        }
+        //if (simpleReorder)
+        //{
+        //    _inputStructure = ReorderBricks(_inputStructure, seedCell);
+        //}
 
-        else
-        {
-            _inputStructure = ThoroughReorderBricks(_inputStructure, seedCell);
-        }
+        //else
+        //{
+        //    _inputStructure = ThoroughReorderBricks(_inputStructure, seedCell, false);
+        //}
 
         return _inputStructure;
     }
@@ -386,7 +400,7 @@ public class BuildSequence
         return convertedBrick;
     }
 
-    List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell)
+    List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell, bool _forFinal)
     {
         List<Brick> _bricksStillToOrder = new List<Brick>();
         _bricksStillToOrder = _inputStructure;
@@ -395,9 +409,20 @@ public class BuildSequence
 
         _availableCells.Add(_seedCell);
 
+        if (_forFinal)
+        {
+            for (int i = 0; i < _inputStructure.Count; i++)
+            {
+                for (int j = 0; j < _inputStructure[i].childCells.Count; j++)
+                {
+                    _availableCells.Add(_inputStructure[i].childCells[j]);
+                }
+            }
+        }
+
         while (_bricksStillToOrder.Count > 0)
         {
-            float bestCurrentCost = 1000000000;
+            float bestCurrentCost = 100000000;
             Brick bestCurrentBrick = null;
 
             for (int j = 0; j < _bricksStillToOrder.Count; j++)
@@ -417,9 +442,12 @@ public class BuildSequence
                 _reorderedStructure.Add(bestCurrentBrick);
                 _bricksStillToOrder.Remove(bestCurrentBrick);
 
-                foreach (Cell childCell in bestCurrentBrick.childCells)
+                if (!_forFinal)
                 {
-                    _availableCells.Add(childCell);
+                    foreach (Cell childCell in bestCurrentBrick.childCells)
+                    {
+                        _availableCells.Add(childCell);
+                    }
                 }
             }
         }

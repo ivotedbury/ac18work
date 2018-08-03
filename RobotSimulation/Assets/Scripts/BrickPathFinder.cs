@@ -458,7 +458,7 @@ public class BrickPathFinder
                     }
                     else
                     {
-                        _inputGrid.cellsArray[x, y, z].availableCost = 1000000;
+                        _inputGrid.cellsArray[x, y, z].availableCost = 10000;
                     }
                 }
             }
@@ -546,14 +546,14 @@ public class BrickPathFinder
     {
         float distance;
 
-        int distX = Mathf.Abs(_cellB.position.x - _cellA.position.x);
-        int distY = Mathf.Abs(_cellB.position.y - _cellA.position.y);
-        int distZ = Mathf.Abs(_cellB.position.z - _cellA.position.z);
+        float distX = Mathf.Abs(_cellB.position.x - _cellA.position.x);
+        float distY = Mathf.Abs(_cellB.position.y - _cellA.position.y);
+        float distZ = Mathf.Abs(_cellB.position.z - _cellA.position.z);
 
-        int horizontalCost = 1;
-        int verticalCost = 1000;
+        float horizontalCost = 0.01f;
+        float verticalCost = 10;
 
-        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) + _cellB.availableCost;
+        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost * 1.1f) + _cellB.availableCost;
 
         return distance;
     }
