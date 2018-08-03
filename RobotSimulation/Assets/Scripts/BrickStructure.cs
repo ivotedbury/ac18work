@@ -24,20 +24,18 @@ public class BrickStructure
 
     void CreateBricksInArrangment(TextAsset _brickDataImport)
     {
-        string importDataString = _brickDataImport.ToString();
+                string brickImportPath = "Assets/ExportData/" + _brickDataImport.name.ToString() + "_allBricksInBuild.txt";
+
+        string importDataString = System.IO.File.ReadAllText(brickImportPath);
 
         BrickImportItem[] brickImportArray = JsonHelper.FromJson<BrickImportItem>(importDataString);
 
         for (int i = 0; i < brickImportArray.Length; i++)
         {
             bricksInTargetStructure.Add(ConvertToBrick(brickImportArray[i]));
-           // bricksInTargetStructure[i].AssignChildCells(grid);
         }
 
-         bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
-        
-     //   BuildSequence buildSequence = new BuildSequence(bricksInTargetStructure, grid, seedCell);
-           //     bricksInTargetStructure = buildSequence.finalStructureToBuild;
+        //   bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)
@@ -165,8 +163,6 @@ public class BrickStructure
                 availableListofCompanions.Add(potentialListOfCompanions[i]);
             }
         }
-
-       // Debug.Log("A " + _cell.position + "B " + availableListofCompanions.Count);
 
         Cell companionCell = null;
 
@@ -353,9 +349,9 @@ public class BrickStructure
             {
                 testTripCost = pathFinder.totalCostOfTrip;
             }
-            Debug.Log("potentialPath length: " + potentialPath.Count);
-            Debug.Log("finalListDropOffCells position: " + i + "-" + finalListDropOffCells[i].position);
-            Debug.Log("testTripCost " + i + "-" + testTripCost);
+          //  Debug.Log("potentialPath length: " + potentialPath.Count);
+        //    Debug.Log("finalListDropOffCells position: " + i + "-" + finalListDropOffCells[i].position);
+          //  Debug.Log("testTripCost " + i + "-" + testTripCost);
 
             if (testTripCost < bestTripCost)
             {
@@ -366,21 +362,7 @@ public class BrickStructure
 
         }
 
-
-
-        //    float bestCurrentDistance = 10000000;
-
-        //for (int i = 0; i < finalListDropOffCells.Count; i++)
-        //{
-        //    float distanceFromSeed = (finalListDropOffCells[i].position - seedCell.position).magnitude;
-        //    if (distanceFromSeed < bestCurrentDistance)
-        //    {
-        //        dropOffCell = finalListDropOffCells[i];
-        //        bestCurrentDistance = distanceFromSeed;
-        //    }
-        //}
-
-        Debug.Log("dropOffCell Position: "+ dropOffCell.position);
+      //  Debug.Log("dropOffCell Position: " + dropOffCell.position);
 
         return dropOffCell;
     }
@@ -448,11 +430,11 @@ public class BrickStructure
         seedCell = grid.cellsArray[_seed.x, _seed.y, _seed.z];
     }
 
-    Brick ConvertToBrick(BrickImportItem importedBrickItem)
+    Brick ConvertToBrick(BrickImportItem importedBrickItem) ///////// + seedCell.position.x //  + seedCell.position.z
     {
         Brick convertedBrick = null;
 
-        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX + importOffsetXZ, importedBrickItem.brickPosZ, importedBrickItem.brickPosY + importOffsetXZ], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
+        convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX , importedBrickItem.brickPosZ, importedBrickItem.brickPosY], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
 
         convertedBrick.childCells = grid.GetChildren(convertedBrick);
 

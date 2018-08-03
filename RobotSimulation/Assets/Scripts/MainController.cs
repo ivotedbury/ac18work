@@ -40,7 +40,7 @@ public class MainController : MonoBehaviour
 
     BuildManager buildManager;
 
-    Vector3Int gridSize = new Vector3Int(75, 20, 75);
+    Vector3Int gridSize = new Vector3Int(100, 20, 100);
     Vector3Int seedPosition = new Vector3Int(20, 1, 20);
 
     Vector3 brickDisplayOffset = new Vector3(0, -0.0625f, 0);
@@ -55,7 +55,7 @@ public class MainController : MonoBehaviour
     public Text totalBuildTimeLabel;
     public Text tripTimeLabel;
 
-    int startingBricks = 11; // 24
+    int startingBricks = 3; // 24
     int numberOfRobots = 1;
 
     void Start()
@@ -72,15 +72,10 @@ public class MainController : MonoBehaviour
             allLegMarkers[i].transform.SetParent(legMarkerContainer.transform);
         }
 
-        //buildManager.brickStructure.bricksInTargetStructure[0].auxBrick = true;
-        //buildManager.brickStructure.bricksInTargetStructure[1].auxBrick = true;
-        //buildManager.brickStructure.bricksInTargetStructure[2].auxBrick = true;
-
-
         for (int i = 0; i < buildManager.brickStructure.bricksInTargetStructure.Count; i++)
         {
-            //if (i < buildManager.startingBricks)
-            //{
+            if (i < buildManager.startingBricks)
+            {
                 if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
                 {
                     allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, buildManager.brickStructure.bricksInTargetStructure[i].rotation));
@@ -91,20 +86,20 @@ public class MainController : MonoBehaviour
                 {
                     allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.bricksInTargetStructure[i].originCell.actualPosition + brickDisplayOffset, buildManager.brickStructure.bricksInTargetStructure[i].rotation));
                 }
-            //}
+            }
 
-            //else
-            //{
-            //    if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
-            //    {
-            //        allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
-            //    }
+            else
+            {
+                if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 1)
+                {
+                    allBrickMeshes.Add(Instantiate(fullBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
+                }
 
-            //    else if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 2)
-            //    {
-            //        allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
-            //    }
-            //}
+                else if (buildManager.brickStructure.bricksInTargetStructure[i].brickType == 2)
+                {
+                    allBrickMeshes.Add(Instantiate(halfBrickMesh, buildManager.brickStructure.seedCell.actualPosition + brickDisplayOffset, Quaternion.Euler(0, 90, 0)));
+                }
+            }
 
             //make aux bricks red
             if (buildManager.brickStructure.bricksInTargetStructure[i].auxBrick)
@@ -118,7 +113,7 @@ public class MainController : MonoBehaviour
         UpdateAvailableCells();
         CreateGridLines();
 
-      //   buildManager.PlaceNextBrick(); ///////////////////////////////
+        buildManager.PlaceNextBrick(); ///////////////////////////////
         UpdateAvailableCells();
     }
 
@@ -294,12 +289,12 @@ public class MainController : MonoBehaviour
     {
         overallTime += Time.deltaTime;
 
-       //  buildManager.Update(); /////////////////////////////////////////////////////////////////////////////////////////////////
+        buildManager.Update(); 
 
-        //if (!buildManager.readyForNextBrick)
-        //{
-        //    UpdateAvailableCells();
-        //}
+        if (!buildManager.readyForNextBrick)
+        {
+            UpdateAvailableCells();
+        }
 
         if (Input.GetKeyDown("r"))
         {
@@ -352,7 +347,7 @@ public class MainController : MonoBehaviour
             buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
 
-    //    DisplayAllMeshes();
+        DisplayAllMeshes();
 
     }
 

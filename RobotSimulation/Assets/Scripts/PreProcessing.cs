@@ -90,14 +90,14 @@ public class PreProcessing : MonoBehaviour
     {
         buildSequence.ReorderFinalBricks();
 
-        string pathExportPath = "Assets/ExportData/" + brickImportData.name.ToString() + "_allBricksInBuild.txt";
+        string allBricksExportPath = "Assets/ExportData/" + brickImportData.name.ToString() + "_allBricksInBuild.txt";
 
         BrickImportItem[] bricksToExport = ConvertToBrickImportItem(buildSequence.finalStructureToBuild);
 
         string dataToExport = JsonHelper.ToJson<BrickImportItem>(bricksToExport, true).ToString();
         Debug.Log(dataToExport);
 
-        System.IO.File.WriteAllText(pathExportPath, dataToExport);
+        System.IO.File.WriteAllText(allBricksExportPath, dataToExport);
     }
 
     void WritePathData()

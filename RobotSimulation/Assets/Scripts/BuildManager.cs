@@ -520,9 +520,4 @@ public class BuildManager
             cellOnPath.currentStatus = 2;
         }
     }
-
-
-
-    //public void ConvertPathToMoves(Brick _targetBrick, Cell _pickupCell, Robot _robot, )
-
 }
