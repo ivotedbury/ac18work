@@ -26,6 +26,11 @@ public class RobotAction
     //heel posiiton
     int heelPosition;
 
+    //time and cost of an action
+
+   public float time;
+    public float motorSteps;
+    
 
     const int changeFootAHeelPosition = 0;
     const int handleBrick = 1;

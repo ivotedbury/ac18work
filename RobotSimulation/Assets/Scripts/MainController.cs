@@ -54,11 +54,22 @@ public class MainController : MonoBehaviour
     public Text timeScaleFactorLabel;
     public Text totalBuildTimeLabel;
     public Text tripTimeLabel;
+    public Button startSimulation;
+    public Button calculateBuildTime;
 
     int startingBricks = 3; // 24
     int numberOfRobots = 1;
 
-    void Start()
+    bool runBuild = false;
+    bool runMeshSimulation = false;
+    bool buildInProgress = false;
+    bool manualMode = false;
+    bool buildComplete = false;
+
+    BuildDataSet thisBuildDataSet;
+
+
+void Start()
     {
         SetupUI();
 
@@ -113,8 +124,7 @@ public class MainController : MonoBehaviour
         UpdateAvailableCells();
         CreateGridLines();
 
-        buildManager.PlaceNextBrick(); ///////////////////////////////
-        UpdateAvailableCells();
+
     }
 
     private void OnGUI()
@@ -149,12 +159,110 @@ public class MainController : MonoBehaviour
         Time.timeScale = timeScaleFactor;
         timeScaleSlider.value = timeScaleFactor;
         timeScaleSlider.onValueChanged.AddListener(delegate { TimeScaleSliderChange(); });
+
+        Button startSimulationButton = startSimulation.GetComponent<Button>();
+        Button calculateBuildTimeButton = calculateBuildTime.GetComponent<Button>();
+
+        startSimulationButton.onClick.AddListener(StartBuildSimulation);
+        calculateBuildTimeButton.onClick.AddListener(CalculateBuildTime);
+    }
+
+    void StartBuildSimulation()
+    {
+        runBuild = true;
+        runMeshSimulation = true;
+
+        buildManager.PlaceNextBrick(); ///////////////////////////////
+        UpdateAvailableCells();
+    }
+
+    void CalculateBuildTime()
+    {
+        runBuild = true;
+        thisBuildDataSet = new BuildDataSet(buildManager.brickStructure.bricksInTargetStructure);
+        Debug.Log("totalBricks = " + thisBuildDataSet.totalBricks);
+
     }
 
     void TimeScaleSliderChange()
     {
         timeScaleFactor = timeScaleSlider.value;
         Time.timeScale = timeScaleFactor;
+    }
+
+    void Update()
+    {
+
+        if (runBuild)
+        {
+            buildManager.Update();
+
+            if (!buildManager.readyForNextBrick)
+            {
+                UpdateAvailableCells();
+            }
+
+            if (buildManager.buildComplete)
+            {
+                PopulateDataSet(thisBuildDataSet);
+                ExportBuildData(thisBuildDataSet);
+                runBuild = false;
+            }
+        }
+
+        if (manualMode)
+        {
+            DoManualCommands();
+        }
+
+        if (runMeshSimulation)
+        {
+            DisplayAllMeshes();
+            overallTime += Time.deltaTime;
+        }
+    }
+
+    void PopulateDataSet(BuildDataSet _data)
+    {
+        _data.pathCountOut = buildManager.pathCountOut;
+        _data.pathCountBack = buildManager.pathCountBack;
+        _data.climbingOut = buildManager.climbingOut;
+        _data.climbingBack = buildManager.climbingBack;
+        _data.climbingOutAverage = buildManager.climbingOutAverage;
+        _data.climbingBackAverage = buildManager.climbingBackAverage;
+        _data.distanceOut = buildManager.distanceOut;
+        _data.distanceBack = buildManager.distanceBack;
+        _data.distanceOutAverage = buildManager.distanceOutAverage;
+        _data.distanceBackAverage = buildManager.distanceBackAverage;
+    }
+
+    void ExportBuildData(BuildDataSet _data)
+    {
+        string buildDataExportPath = "Assets/ExportData/BuildDataSets/" + brickImportData.name.ToString() + "_buildDataSet.txt";
+
+        DataSetExportItem[] _dataExport = new DataSetExportItem[1];
+        _dataExport[0] = ConvertDataForExport(_data);
+
+        string dataToExport = JsonUtility.ToJson(_data);
+       // string dataToExport = JsonHelper.ToJson<DataSetExportItem>(_dataExport, true).ToString();
+        Debug.Log(dataToExport);
+
+        System.IO.File.WriteAllText(buildDataExportPath, dataToExport);
+    }
+
+    DataSetExportItem ConvertDataForExport(BuildDataSet _input)
+    {
+        DataSetExportItem _output = new DataSetExportItem();
+
+        _output.totalBricks = _input.totalBricks;
+        _output.auxBricks = _input.auxBricks;
+        _output.targetBricks = _input.targetBricks;
+        _output.targetBricksFull = _input.targetBricksFull;
+        _output.targetBricksHalf = _input.targetBricksHalf;
+        _output.auxBricksFull = _input.auxBricksFull;
+        _output.auxBricksHalf = _input.auxBricksHalf;
+
+        return _output;
     }
 
     void CreateGridLines()
@@ -285,17 +393,17 @@ public class MainController : MonoBehaviour
         }
     }
 
-    void Update()
+    void DisplayAllMeshes()
     {
-        overallTime += Time.deltaTime;
-
-        buildManager.Update(); 
-
-        if (!buildManager.readyForNextBrick)
+        for (int i = 0; i < buildManager.allRobots.Count; i++)
         {
-            UpdateAvailableCells();
+            buildManager.allRobots[i].UpdateRobot();
+            DisplayRobot(buildManager.allRobots[i], allRobotMeshes[i], allLegMarkers[i]);
         }
+    }
 
+    void DoManualCommands()
+    {
         if (Input.GetKeyDown("r"))
         {
             buildManager.allRobots[0].HandleBrick(0, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
@@ -346,21 +454,7 @@ public class MainController : MonoBehaviour
         {
             buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
         }
-
-        DisplayAllMeshes();
-
     }
-
-
-    void DisplayAllMeshes()
-    {
-        for (int i = 0; i < buildManager.allRobots.Count; i++)
-        {
-            buildManager.allRobots[i].UpdateRobot();
-            DisplayRobot(buildManager.allRobots[i], allRobotMeshes[i], allLegMarkers[i]);
-        }
-    }
-
 
     void DisplayRobot(Robot robotToDisplay, GameObject meshToDisplay, GameObject _legMarkerMesh)
     {

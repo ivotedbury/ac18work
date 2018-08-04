@@ -9,7 +9,7 @@ public class BuildManager
 
     public int startingBricks;
 
-    int nextBrickToPlace;
+    public int nextBrickToPlace;
 
     const int changeFootAHeelPosition = 0;
     const int handleBrick = 1;
@@ -17,11 +17,33 @@ public class BuildManager
 
     int actionCounter = 0;
     public bool readyForNextBrick = true;
+    public bool buildComplete = false;
 
     List<RobotAction> robotActions = new List<RobotAction>();
 
-    List<Cell> outwardPath;
-    List<Cell> returnPath;
+    public List<Cell> outwardPath;
+    public List<Cell> returnPath;
+
+    //data for the build
+    public List<float> tripTimeOut = new List<float>();
+    public List<float> tripTimeBack = new List<float>();
+
+    public List<float> tripCostOut = new List<float>();
+    public List<float> tripCostReturn = new List<float>();
+
+    public List<float> pathCountOut = new List<float>();
+    public List<float> pathCountBack = new List<float>();
+    public List<float> climbingOut = new List<float>();
+    public List<float> climbingBack = new List<float>();
+    public List<float> climbingOutAverage = new List<float>();
+    public List<float> climbingBackAverage = new List<float>();
+    public List<float> distanceOut = new List<float>();
+    public List<float> distanceBack = new List<float>();
+    public List<float> distanceOutAverage = new List<float>();
+    public List<float> distanceBackAverage = new List<float>();
+
+
+    public List<List<RobotAction>> allRobotActions = new List<List<RobotAction>>();
 
     public BuildManager(Vector3Int _gridSize, Vector3Int _seedPosition, TextAsset _brickImportData, int _startingBricks, int _numberOfRobots)
     {
@@ -42,26 +64,34 @@ public class BuildManager
 
     public void Update()
     {
-        if (readyForNextBrick)
+        if (buildComplete == false)
         {
-            actionCounter = 0;
-            PlaceNextBrick();
-            readyForNextBrick = false;
-        }
-
-        if (actionCounter < robotActions.Count)
-        {
-            if (!allRobots[0].moveInProgress)
+            if (readyForNextBrick)
             {
-                robotActions[actionCounter].PerformAction();
-                actionCounter++;
+                actionCounter = 0;
+                PlaceNextBrick();
+                readyForNextBrick = false;
             }
-        }
-        else
-        {
-            brickStructure.bricksInPlace.Add(brickStructure.bricksInTargetStructure[nextBrickToPlace]);
-            nextBrickToPlace++;
-            readyForNextBrick = true;
+
+            if (actionCounter < robotActions.Count)
+            {
+                if (!allRobots[0].moveInProgress)
+                {
+                    robotActions[actionCounter].PerformAction();
+                    actionCounter++;
+                }
+            }
+            else
+            {
+                brickStructure.bricksInPlace.Add(brickStructure.bricksInTargetStructure[nextBrickToPlace]);
+                nextBrickToPlace++;
+                readyForNextBrick = true;
+            }
+
+            if (nextBrickToPlace == brickStructure.bricksInTargetStructure.Count)
+            {
+                buildComplete = true;
+            }
         }
     }
 
@@ -74,6 +104,69 @@ public class BuildManager
         GeneratePath();
 
         robotActions = ConvertPath(outwardPath, returnPath);
+        // allRobotActions.AddRange(robotActions);
+    }
+
+    void ProcessPath(List<Cell> _pathToProcess, bool _isOutward)
+    {
+        float pathLength = _pathToProcess.Count - 1;
+        float averageStepDistance = 0;
+        float totalDistance = 0;
+        float averageHeightChange = 0;
+        float totalHeightChange = 0;
+
+        for (int i = 1; i < _pathToProcess.Count; i++)
+        {
+            totalDistance += Mathf.Abs((_pathToProcess[i].position.x - _pathToProcess[i - 1].position.x) + (_pathToProcess[i].position.z - _pathToProcess[i - 1].position.z));
+            totalHeightChange += _pathToProcess[i].position.y - _pathToProcess[i - 1].position.y;
+        }
+
+        averageStepDistance = totalDistance / pathLength;
+        averageHeightChange = totalHeightChange / pathLength;
+
+        if (_isOutward)
+        {
+            pathCountOut.Add(pathLength);
+            distanceOut.Add(totalDistance);
+            distanceOutAverage.Add(averageStepDistance);
+            climbingOut.Add(totalHeightChange);
+            climbingOutAverage.Add(averageHeightChange);
+        }
+        else
+        {
+            pathCountBack.Add(pathLength);
+            distanceBack.Add(totalDistance);
+            distanceBackAverage.Add(averageStepDistance);
+            climbingBack.Add(totalHeightChange);
+            climbingBackAverage.Add(averageHeightChange);
+        }
+    }
+
+    public void GeneratePath()
+    {
+        Cell dropOffPoint = brickStructure.FindDropOffCell(brickStructure.bricksInTargetStructure[nextBrickToPlace], brickStructure.availableCells);
+
+        outwardPath = brickStructure.FindPathOneWay(brickStructure.bricksInPlace[1].originCell, dropOffPoint, 1);
+        tripCostOut.Add(brickStructure.pathFinder.totalCostOfTrip);
+        ProcessPath(outwardPath, true);
+
+        returnPath = brickStructure.FindPathOneWay(dropOffPoint, brickStructure.bricksInPlace[0].originCell, 3);
+        tripCostReturn.Add(brickStructure.pathFinder.totalCostOfTrip);
+        ProcessPath(returnPath, false);
+
+        foreach (Cell anyCell in brickStructure.grid.cellsList)
+        {
+            anyCell.currentStatus = 0;
+        }
+
+        foreach (Cell cellOnPath in outwardPath)
+        {
+            cellOnPath.currentStatus = 2;
+        }
+        foreach (Cell cellOnPath in returnPath)
+        {
+            cellOnPath.currentStatus = 2;
+        }
     }
 
     List<RobotAction> ConvertPath(List<Cell> _outwardPath, List<Cell> _returnPath)
@@ -497,26 +590,5 @@ public class BuildManager
         return _robotOrientation;
     }
 
-    public void GeneratePath()
-    {
-        Cell dropOffPoint = brickStructure.FindDropOffCell(brickStructure.bricksInTargetStructure[nextBrickToPlace], brickStructure.availableCells);
-        //    Cell rearLegDropOffPoint = brickStructure.grid.GetANeighbour(dropOffPoint, new Vector3Int(-4, 0, 0));
-        outwardPath = brickStructure.FindPathOneWay(brickStructure.bricksInPlace[1].originCell, dropOffPoint, 1);
-        returnPath = brickStructure.FindPathOneWay(dropOffPoint, brickStructure.bricksInPlace[0].originCell, 3);
-        Debug.Log(outwardPath.Count);
 
-        foreach (Cell anyCell in brickStructure.grid.cellsList)
-        {
-            anyCell.currentStatus = 0;
-        }
-
-        foreach (Cell cellOnPath in outwardPath)
-        {
-            cellOnPath.currentStatus = 2;
-        }
-        foreach (Cell cellOnPath in returnPath)
-        {
-            cellOnPath.currentStatus = 2;
-        }
-    }
 }

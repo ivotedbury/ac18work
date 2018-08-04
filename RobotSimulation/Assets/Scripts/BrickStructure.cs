@@ -10,7 +10,7 @@ public class BrickStructure
     public List<Cell> availableCells = new List<Cell>();
 
     public Grid grid;
-    PathFinder pathFinder = new PathFinder();
+  public PathFinder pathFinder = new PathFinder();
     public Cell seedCell;
 
     private int importOffsetXZ = 20;
