@@ -17,7 +17,8 @@ public class RobotJoint
     float startPos;
     float startTime;
     float elapsedTime;
-    float timeForMove;
+   public float timeForMove;
+    public float distanceToMove;
 
     //overall constants
     const char legARail = 'A';
@@ -32,7 +33,7 @@ public class RobotJoint
     //speeds
     float legARailSpeed = 2800;
     float legAVerticalSpeed = 500;
-    float legARotationSpeed = 500;
+    float legARotationSpeed = 200;
     float legBRailSpeed = 2800;
     float legBVerticalSpeed = 500;
     float legCRailSpeed = 2800;
@@ -43,7 +44,7 @@ public class RobotJoint
     float legCRailSpeedWithHalfBrickForLegA; //5
     float legCRailSpeedWithHalfBrickForLegB; //6
     float legCGripSpeed = 2800;
-    float legCRotationSpeed = 500;
+    float legCRotationSpeed = 200;
 
     //reset positions
     int legARailResetPos = 6125;
@@ -169,6 +170,8 @@ public class RobotJoint
 
         if (targetPos != currentPos)
         {
+            distanceToMove = Mathf.Abs(targetPos - currentPos);
+
             startPos = currentPos;
             startTime = overallTime;//Time.time
             elapsedTime = 0;

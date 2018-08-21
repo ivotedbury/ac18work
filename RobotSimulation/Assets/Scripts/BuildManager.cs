@@ -42,8 +42,8 @@ public class BuildManager
     public List<float> distanceOutAverage = new List<float>();
     public List<float> distanceBackAverage = new List<float>();
 
-
-    public List<List<RobotAction>> allRobotActions = new List<List<RobotAction>>();
+    public bool analysisMode = false;
+    public List<RobotAction> allRobotActions = new List<RobotAction>();
 
     public BuildManager(Vector3Int _gridSize, Vector3Int _seedPosition, TextAsset _brickImportData, int _startingBricks, int _numberOfRobots)
     {
@@ -104,7 +104,16 @@ public class BuildManager
         GeneratePath();
 
         robotActions = ConvertPath(outwardPath, returnPath);
-        // allRobotActions.AddRange(robotActions);
+
+        if (analysisMode)
+        {
+            foreach (RobotAction action in robotActions)
+            {
+                allRobots[0].GetTimeForAction();
+            }
+        }
+
+        allRobotActions.AddRange(robotActions);
     }
 
     void ProcessPath(List<Cell> _pathToProcess, bool _isOutward)

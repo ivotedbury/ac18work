@@ -69,7 +69,7 @@ public class MainController : MonoBehaviour
     BuildDataSet thisBuildDataSet;
 
 
-void Start()
+    void Start()
     {
         SetupUI();
 
@@ -145,7 +145,6 @@ void Start()
         }
         timeScaleFactorLabel.text = "Timescale Factor: " + timescaleFactorForLabel.ToString();
 
-        tripTimeLabel.text = "Trip Time: ";
 
         int timeHours = (int)(overallTime) / 3600;
         int timeMinutes = ((int)(overallTime) - (timeHours * 3600)) / 60;
@@ -178,7 +177,9 @@ void Start()
 
     void CalculateBuildTime()
     {
+        buildManager.allRobots[0].simulateMovements = false;
         runBuild = true;
+        runMeshSimulation = true;
         thisBuildDataSet = new BuildDataSet(buildManager.brickStructure.bricksInTargetStructure);
         Debug.Log("totalBricks = " + thisBuildDataSet.totalBricks);
 
@@ -218,8 +219,12 @@ void Start()
         if (runMeshSimulation)
         {
             DisplayAllMeshes();
-            overallTime += Time.deltaTime;
+            if (!buildManager.buildComplete)
+            {
+                overallTime += Time.deltaTime;
+            }
         }
+
     }
 
     void PopulateDataSet(BuildDataSet _data)
@@ -234,6 +239,28 @@ void Start()
         _data.distanceBack = buildManager.distanceBack;
         _data.distanceOutAverage = buildManager.distanceOutAverage;
         _data.distanceBackAverage = buildManager.distanceBackAverage;
+        _data.robotActions = buildManager.allRobotActions;
+
+        _data.moveTimeList = buildManager.allRobots[0].moveTimeList;
+
+        _data.legARailJointPosition = buildManager.allRobots[0].legARailJointPosition;
+        _data.legAVerticalJointPosition = buildManager.allRobots[0].legAVerticalJointPosition;
+        _data.legARotationJointPosition = buildManager.allRobots[0].legARotationJointPosition;
+        _data.legBRailJointPosition = buildManager.allRobots[0].legBRailJointPosition;
+        _data.legBVerticalJointPosition = buildManager.allRobots[0].legBVerticalJointPosition;
+        _data.legCRailJointPosition = buildManager.allRobots[0].legCRailJointPosition;
+        _data.legCGripJointPosition = buildManager.allRobots[0].legCGripJointPosition;
+        _data.legCRotationJointPosition = buildManager.allRobots[0].legCRotationJointPosition;
+
+        _data.legARailJointDistToMove = buildManager.allRobots[0].legARailJointDistToMove;
+        _data.legAVerticalJointDistToMove = buildManager.allRobots[0].legAVerticalJointDistToMove;
+        _data.legARotationJointDistToMove = buildManager.allRobots[0].legARotationJointDistToMove;
+        _data.legBRailJointDistToMove = buildManager.allRobots[0].legBRailJointDistToMove;
+        _data.legBVerticalJointDistToMove = buildManager.allRobots[0].legBVerticalJointDistToMove;
+        _data.legCRailJointDistToMove = buildManager.allRobots[0].legCRailJointDistToMove;
+        _data.legCGripJointDistToMove = buildManager.allRobots[0].legCGripJointDistToMove;
+        _data.legCRotationJointDistToMove = buildManager.allRobots[0].legCRotationJointDistToMove;
+
     }
 
     void ExportBuildData(BuildDataSet _data)
@@ -244,7 +271,7 @@ void Start()
         _dataExport[0] = ConvertDataForExport(_data);
 
         string dataToExport = JsonUtility.ToJson(_data);
-       // string dataToExport = JsonHelper.ToJson<DataSetExportItem>(_dataExport, true).ToString();
+        // string dataToExport = JsonHelper.ToJson<DataSetExportItem>(_dataExport, true).ToString();
         Debug.Log(dataToExport);
 
         System.IO.File.WriteAllText(buildDataExportPath, dataToExport);
@@ -261,6 +288,27 @@ void Start()
         _output.targetBricksHalf = _input.targetBricksHalf;
         _output.auxBricksFull = _input.auxBricksFull;
         _output.auxBricksHalf = _input.auxBricksHalf;
+
+        _output.robotActions = _input.robotActions;
+        _output.moveTimeList = _input.moveTimeList;
+
+        _output.legARailJointPosition = _input.legARailJointPosition;
+        _output.legAVerticalJointPosition = _input.legAVerticalJointPosition;
+        _output.legARotationJointPosition = _input.legARotationJointPosition;
+        _output.legBRailJointPosition = _input.legBRailJointPosition;
+        _output.legBVerticalJointPosition = _input.legBVerticalJointPosition;
+        _output.legCRailJointPosition = _input.legCRailJointPosition;
+        _output.legCGripJointPosition = _input.legCGripJointPosition;
+        _output.legCRotationJointPosition = _input.legCRotationJointPosition;
+
+        _output.legARailJointDistToMove = _input.legARailJointDistToMove;
+        _output.legAVerticalJointDistToMove = _input.legAVerticalJointDistToMove;
+        _output.legARotationJointDistToMove = _input.legARotationJointDistToMove;
+        _output.legBRailJointDistToMove = _input.legBRailJointDistToMove;
+        _output.legBVerticalJointDistToMove = _input.legBVerticalJointDistToMove;
+        _output.legCRailJointDistToMove = _input.legCRailJointDistToMove;
+        _output.legCGripJointDistToMove = _input.legCGripJointDistToMove;
+        _output.legCRotationJointDistToMove = _input.legCRotationJointDistToMove;
 
         return _output;
     }

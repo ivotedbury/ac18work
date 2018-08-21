@@ -7,7 +7,7 @@ public class RobotAction
 
 
     Robot robot;
-    int action; 
+    int action;
     //step
     int stepGradient;
     int stepSize;
@@ -28,9 +28,9 @@ public class RobotAction
 
     //time and cost of an action
 
-   public float time;
+    public float time;
     public float motorSteps;
-    
+
 
     const int changeFootAHeelPosition = 0;
     const int handleBrick = 1;
