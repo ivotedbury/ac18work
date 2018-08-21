@@ -331,7 +331,7 @@ MonoBehaviour:
   cellMarker: {fileID: 601872869}
   lineRendererObject: {fileID: 358794052}
   lineRendererContainer: {fileID: 2086937406}
-  brickImportData: {fileID: 4900000, guid: 12dbde805f0c4ca42bda5fa19cab1c62, type: 3}
+  brickImportData: {fileID: 4900000, guid: 9acbfdb9a9112ac44bbd35a17430e809, type: 3}
   gridLineMaterial: {fileID: 2100000, guid: 6c7a1118ff054d442baac72972c24028, type: 2}
   completePath: {fileID: 2105639352}
   generateBricks: {fileID: 583573458}

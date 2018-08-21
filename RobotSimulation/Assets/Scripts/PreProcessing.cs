@@ -105,7 +105,7 @@ public class PreProcessing : MonoBehaviour
         string pathExportPath = "Assets/ExportData/" + brickImportData.name.ToString() + "_additionalPath.txt";
 
         CellImportItem[] cellPathToExport = ConvertToCellImportItem(buildSequence.desiredPath);
-
+        Debug.Log(cellPathToExport.Length);
         string dataToExport = JsonHelper.ToJson<CellImportItem>(cellPathToExport, true).ToString();
         Debug.Log(dataToExport);
 
@@ -124,7 +124,6 @@ public class PreProcessing : MonoBehaviour
 
     void CreateBricks()
     {
-
         for (int i = 0; i < buildSequence.completeStructure.Count; i++)
         {
 

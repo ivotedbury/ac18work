@@ -222,7 +222,11 @@ public class BuildSequence
 
         string importDataString = System.IO.File.ReadAllText(pathImportPath);
 
+        Debug.Log(importDataString);
+
         CellImportItem[] cellImportArray = JsonHelper.FromJson<CellImportItem>(importDataString);
+
+        Debug.Log("inport" + cellImportArray.Length);
 
         for (int i = 0; i < cellImportArray.Length; i++)
         {
