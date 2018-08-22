@@ -63,11 +63,11 @@ public class MainController : MonoBehaviour
     bool runBuild = false;
     bool runMeshSimulation = false;
     bool buildInProgress = false;
-    bool manualMode = false;
+    bool manualMode = true;/////////////////////////
     bool buildComplete = false;
 
     BuildDataSet thisBuildDataSet;
-
+    string robotKeyframeSet;
 
     void Start()
     {
@@ -214,6 +214,7 @@ public class MainController : MonoBehaviour
         if (manualMode)
         {
             DoManualCommands();
+            DisplayAllMeshes();
         }
 
         if (runMeshSimulation)
@@ -452,56 +453,144 @@ public class MainController : MonoBehaviour
 
     void DoManualCommands()
     {
-        if (Input.GetKeyDown("r"))
-        {
-            buildManager.allRobots[0].HandleBrick(0, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
-        }
-
         if (Input.GetKeyDown("t"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 1, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
+            buildManager.allRobots[0].TakeStep(0, 8, 0, 4, 0, 0);
+            robotKeyframeSet = "stepFourLeadLegA";
         }
-
+        ///
         if (Input.GetKeyDown("y"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
+            buildManager.allRobots[0].TakeStep(0, 8, 1, 4, 0, 0);
+            robotKeyframeSet = "stepFourLeadLegB";
         }
-
+        ///
         if (Input.GetKeyDown("u"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            buildManager.allRobots[0].TakeStep(0, 5, 1, 2, 0, 180);
+            robotKeyframeSet = "stepUpFourLeadLegB";
         }
         if (Input.GetKeyDown("i"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+             buildManager.allRobots[0].TakeStep(1, 8, 1, 2, 0, 180);
+            robotKeyframeSet = "stepUpFourLeadLegB";
         }
+        ///
         if (Input.GetKeyDown("o"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            buildManager.allRobots[0].TakeStep(0, 5, 0, 2, 0, 180);
+            robotKeyframeSet = "stepDownFourLeadLegA";
         }
-
         if (Input.GetKeyDown("p"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            buildManager.allRobots[0].TakeStep(-1, 8, 0, 2, 0, 180);
+            robotKeyframeSet = "stepDownFourLeadLegA";
         }
+        ///
 
+        if (Input.GetKeyDown("h"))
+        {
+            buildManager.allRobots[0].TakeStep(0, 8, 0, 4, 180, 0);
+            robotKeyframeSet = "stepFourLeadLegATurn180";
+        }
+        ///
         if (Input.GetKeyDown("j"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            buildManager.allRobots[0].TakeStep(0, 8, 0, 4, 90, 0);
+            robotKeyframeSet = "stepFourLeadLegATurn90";
         }
-        if (Input.GetKeyDown("k"))
+        ///
+        if (Input.GetKeyDown("v"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[4], true, true);
+            robotKeyframeSet = "pickUpWhole4InFrontLegA";
         }
-        if (Input.GetKeyDown("l"))
+        ///
+        if (Input.GetKeyDown("b"))
         {
-            buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[4], false, true);
+            robotKeyframeSet = "placeWhole4InFrontLegA";
         }
 
-        if (Input.GetKeyDown(";"))
+
+
+        //if (Input.GetKeyDown("y"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], true, false);
+        //}
+
+        //if (Input.GetKeyDown("u"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+        //if (Input.GetKeyDown("i"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(0, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+        //if (Input.GetKeyDown("o"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(-1, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+
+        //if (Input.GetKeyDown("p"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(0, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+
+        //if (Input.GetKeyDown("j"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+        //if (Input.GetKeyDown("k"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 0, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+        //if (Input.GetKeyDown("l"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(-1, 4, -2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+
+        //if (Input.GetKeyDown(";"))
+        //{
+        //    buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+        //}
+
+        if (Input.GetKeyDown("0"))
         {
-            buildManager.allRobots[0].HandleBrick(0, 4, 2, 0, 90, buildManager.brickStructure.bricksInTargetStructure[5], false, false);
+            ExportRobotJointPositions();
         }
+
+    }
+
+    void ExportRobotJointPositions()
+    {
+        string buildDataExportPath = "Assets/RobotKeyframes/" + robotKeyframeSet;
+
+        RobotKeyframeExportItem _actionData = new RobotKeyframeExportItem();
+
+        _actionData.legARailPositions = buildManager.allRobots[0].legARailJointPosition;
+        _actionData.legAVerticalPositions = buildManager.allRobots[0].legAVerticalJointPosition;
+        _actionData.legARotationPositions = buildManager.allRobots[0].legARotationJointPosition;
+        _actionData.legBRailPositions = buildManager.allRobots[0].legBRailJointPosition;
+        _actionData.legBVerticalPositions = buildManager.allRobots[0].legBVerticalJointPosition;
+        _actionData.legCRailPositions = buildManager.allRobots[0].legCRailJointPosition;
+        _actionData.legCGripPositions = buildManager.allRobots[0].legCGripJointPosition;
+        _actionData.legCRotationPositions = buildManager.allRobots[0].legCRotationJointPosition;
+
+        string dataToExport = JsonUtility.ToJson(_actionData);
+
+        Debug.Log(dataToExport);
+
+        System.IO.File.WriteAllText(buildDataExportPath, dataToExport);
+
+        buildManager.allRobots[0].legARailJointPosition.Clear();
+        buildManager.allRobots[0].legAVerticalJointPosition.Clear();
+        buildManager.allRobots[0].legARotationJointPosition.Clear();
+        buildManager.allRobots[0].legBRailJointPosition.Clear();
+        buildManager.allRobots[0].legBVerticalJointPosition.Clear();
+        buildManager.allRobots[0].legCRailJointPosition.Clear();
+        buildManager.allRobots[0].legCGripJointPosition.Clear();
+        buildManager.allRobots[0].legCRotationJointPosition.Clear();
     }
 
     void DisplayRobot(Robot robotToDisplay, GameObject meshToDisplay, GameObject _legMarkerMesh)
