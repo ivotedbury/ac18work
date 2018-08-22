@@ -511,8 +511,27 @@ public class MainController : MonoBehaviour
             buildManager.allRobots[0].HandleBrick(-1, 4, 0, 0, 0, buildManager.brickStructure.bricksInTargetStructure[4], false, true);
             robotKeyframeSet = "placeWhole4InFrontLegA";
         }
+        ///
+        if (Input.GetKeyDown("n"))
+        {
+            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[4], true, true);
+            robotKeyframeSet = "pickUpWhole4InFrontLegB";
+        }
+        ///
+        if (Input.GetKeyDown("m"))
+        {
+            buildManager.allRobots[0].HandleBrick(-1, 4, 0, 1, 0, buildManager.brickStructure.bricksInTargetStructure[4], false, true);
+            robotKeyframeSet = "placeWhole4InFrontLegB";
+        }
 
-
+        if (Input.GetKeyDown("j"))
+        {
+            buildManager.allRobots[0].brickBeingCarried = buildManager.brickStructure.bricksInTargetStructure[4];
+            buildManager.allRobots[0].brickTypeCurrentlyCarried = 1;
+            buildManager.allRobots[0].TakeStep(0, 8, 0, 4, 0, 0);
+            robotKeyframeSet = "stepFourLeadLegAWithWholeBrick";
+        }
+        ///
 
         //if (Input.GetKeyDown("y"))
         //{
