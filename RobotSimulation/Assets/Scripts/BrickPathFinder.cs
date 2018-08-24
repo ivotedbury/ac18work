@@ -349,19 +349,19 @@ public class BrickPathFinder
                 {
                     if (_currentDirection == 0)
                     {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + 8]);
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z + 8]); //was +8
                     }
                     else if (_currentDirection == 1)
                     {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 8, _testCell.position.y + y, _testCell.position.z]);
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 8, _testCell.position.y + y, _testCell.position.z]); // was +8
                     }
                     else if (_currentDirection == 2)
                     {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z - 8]);
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x + 0, _testCell.position.y + y, _testCell.position.z - 8]); // was -8
                     }
                     else if (_currentDirection == 3)
                     {
-                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 8, _testCell.position.y + y, _testCell.position.z]);
+                        neighbours.Add(_inputGrid.cellsArray[_testCell.position.x - 8, _testCell.position.y + y, _testCell.position.z]); // was -4
                     }
                 }
 
@@ -404,7 +404,7 @@ public class BrickPathFinder
                     for (int z = -4; z <= 4; z++)
                     {
 
-                        if (z == 0 || z == 1 || z == 3)
+                        if (z == 0 || z == 1 || z == 3) //was 1
                         {
                             continue;
                         }
@@ -414,7 +414,7 @@ public class BrickPathFinder
 
                     for (int x = -4; x <= 4; x++)
                     {
-                        if (x == 0 || x == 1 || x == 3)
+                        if (x == 0 || x == 1 || x == 3) // was 1
                         {
                             continue;
                         }
@@ -553,7 +553,7 @@ public class BrickPathFinder
         float horizontalCost = 0.01f;
         float verticalCost = 10;
 
-        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost * 1.1f) + _cellB.availableCost;
+        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost * 1.0001f) + _cellB.availableCost;
 
         return distance;
     }

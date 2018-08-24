@@ -35,7 +35,7 @@ public class BrickStructure
             bricksInTargetStructure.Add(ConvertToBrick(brickImportArray[i]));
         }
 
-        //   bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
+    //  bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)
