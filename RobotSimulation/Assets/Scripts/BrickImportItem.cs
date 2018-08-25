@@ -14,6 +14,5 @@ public class BrickImportItem {
 
     public int brickType;
 
-    public bool auxBrick = false;
-
+    public bool auxBrick;
 }

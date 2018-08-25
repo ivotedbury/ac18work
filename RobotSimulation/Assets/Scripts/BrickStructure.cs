@@ -10,7 +10,7 @@ public class BrickStructure
     public List<Cell> availableCells = new List<Cell>();
 
     public Grid grid;
-  public PathFinder pathFinder = new PathFinder();
+    public PathFinder pathFinder = new PathFinder();
     public Cell seedCell;
 
     private int importOffsetXZ = 20;
@@ -35,7 +35,7 @@ public class BrickStructure
             bricksInTargetStructure.Add(ConvertToBrick(brickImportArray[i]));
         }
 
-    //  bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
+        //  bricksInTargetStructure = ReorderBricks(bricksInTargetStructure, seedCell); //////////////////////////////////////////////////
     }
 
     public List<Cell> FindPathOneWay(Cell _startCell, Cell _endCell, int _startDiection)
@@ -436,7 +436,7 @@ public class BrickStructure
 
         convertedBrick = new Brick(grid, grid.cellsArray[importedBrickItem.brickPosX, importedBrickItem.brickPosZ, importedBrickItem.brickPosY], importedBrickItem.rotation, importedBrickItem.brickType, importedBrickItem.auxBrick);
 
-       // convertedBrick.childCells = grid.GetChildren(convertedBrick);
+        // convertedBrick.childCells = grid.GetChildren(convertedBrick);
 
         return convertedBrick;
     }

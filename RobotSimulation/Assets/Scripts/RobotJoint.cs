@@ -31,20 +31,36 @@ public class RobotJoint
     const char legCRotation = 'H';
 
     //speeds
-    float legARailSpeed = 2800;
-    float legAVerticalSpeed = 500;
-    float legARotationSpeed = 200;
-    float legBRailSpeed = 2800;
-    float legBVerticalSpeed = 500;
-    float legCRailSpeed = 2800;
+    float legARailSpeed = 350;
+    float legAVerticalSpeed = 120;
+    float legARotationSpeed = 75;
+    float legBRailSpeed = 350;
+    float legBVerticalSpeed = 120;
+    float legCRailSpeed = 350f;
     float legCRailSpeedForLegA; //1
     float legCRailSpeedForLegB; //2
     float legCRailSpeedWithBrickForLegA; //3
     float legCRailSpeedWithBrickForLegB; //4
     float legCRailSpeedWithHalfBrickForLegA; //5
     float legCRailSpeedWithHalfBrickForLegB; //6
-    float legCGripSpeed = 2800;
-    float legCRotationSpeed = 200;
+    float legCGripSpeed = 350f;
+    float legCRotationSpeed = 7.5f;
+
+    ////speeds
+    //float legARailSpeed = 2800;
+    //float legAVerticalSpeed = 500;
+    //float legARotationSpeed = 200;
+    //float legBRailSpeed = 2800;
+    //float legBVerticalSpeed = 500;
+    //float legCRailSpeed = 2800;
+    //float legCRailSpeedForLegA; //1
+    //float legCRailSpeedForLegB; //2
+    //float legCRailSpeedWithBrickForLegA; //3
+    //float legCRailSpeedWithBrickForLegB; //4
+    //float legCRailSpeedWithHalfBrickForLegA; //5
+    //float legCRailSpeedWithHalfBrickForLegB; //6
+    //float legCGripSpeed = 2800;
+    //float legCRotationSpeed = 200;
 
     //reset positions
     int legARailResetPos = 6125;
@@ -72,7 +88,7 @@ public class RobotJoint
     public float halfBrickLegAFactor;
     public float halfBrickLegBFactor;
 
-    float speedFactor = 2f;
+    float speedFactor = 7.142857f;
     float overallTime = 0;
 
     public RobotJoint(char _thisJoint)

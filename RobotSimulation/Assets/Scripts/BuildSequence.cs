@@ -66,9 +66,10 @@ public class BuildSequence
 
         else
         {
-            availableCells = FindAvailableCells(completeStructure);
-            finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell, true);
+            // availableCells = FindAvailableCells(completeStructure);
+            // finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell, true);
             //finalStructureToBuild = OtherReorderBricks(completeStructure, seedCell, true);
+            finalStructureToBuild = AlternativeReorderBricks(completeStructure, seedCell);
         }
     }
 
@@ -515,6 +516,80 @@ public class BuildSequence
             _brickIsReachable = true;
         }
         return _brickIsReachable;
+    }
+
+    List<Brick> AlternativeReorderBricks(List<Brick> _inputStructure, Cell _seedCell)
+    {
+        List<Brick> _bricksStillToOrder = new List<Brick>();
+        _bricksStillToOrder = _inputStructure;
+        List<Brick> _reorderedStructure = new List<Brick>();
+        List<Brick> bricksInCurrentLayer = new List<Brick>();
+        List<Brick> reorderedBricksInCurrentLayer = new List<Brick>();
+        bool thereAreBricksInThisLayer;
+        Cell currentStart = _seedCell;
+
+        while (_bricksStillToOrder.Count > 0)
+        {
+
+            for (int layerHeight = 1; layerHeight < grid.gridSize.y - 1; layerHeight++)
+            {
+                bricksInCurrentLayer.Clear();
+                reorderedBricksInCurrentLayer.Clear();
+
+                for (int i = 0; i < _bricksStillToOrder.Count; i++)
+                {
+                    if (_bricksStillToOrder[i].originCell.position.y == layerHeight)
+                    {
+                        bricksInCurrentLayer.Add(_bricksStillToOrder[i]);
+                    }
+                }
+
+                if (bricksInCurrentLayer.Count > 0)
+                {
+                    thereAreBricksInThisLayer = true;
+                }
+                else
+                {
+                    thereAreBricksInThisLayer = false;
+                }
+
+                while (bricksInCurrentLayer.Count > 0)
+                {
+                    float smallestDistance = 1000000000;
+                    Brick closestBrick = null;
+
+                    for (int i = 0; i < bricksInCurrentLayer.Count; i++)
+                    {
+                        float testDistance = brickPathFinder.GetDistanceForOrdering(currentStart, bricksInCurrentLayer[i].originCell);
+                        if (testDistance < smallestDistance)
+                        {
+                            smallestDistance = testDistance;
+                            closestBrick = bricksInCurrentLayer[i];
+                        }
+                    }
+
+                    bricksInCurrentLayer.Remove(closestBrick);
+                    reorderedBricksInCurrentLayer.Add(closestBrick);
+                    currentStart = closestBrick.originCell;
+                }
+
+                if (thereAreBricksInThisLayer)
+                {
+                    currentStart = reorderedBricksInCurrentLayer[0].originCell;
+                    for (int i = 0; i < reorderedBricksInCurrentLayer.Count; i++)
+                    {
+                        _bricksStillToOrder.Remove(reorderedBricksInCurrentLayer[i]);
+                    }
+                    if (layerHeight != 1)
+                    {
+                        reorderedBricksInCurrentLayer.Reverse();
+                    }
+                    _reorderedStructure.AddRange(reorderedBricksInCurrentLayer);
+                }
+            }
+        }
+
+        return _reorderedStructure;
     }
 
     List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell, bool _forFinal)

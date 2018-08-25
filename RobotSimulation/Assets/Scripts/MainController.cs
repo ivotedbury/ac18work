@@ -47,7 +47,7 @@ public class MainController : MonoBehaviour
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0625f;
 
-    float timeScaleFactor = 10f;
+    float timeScaleFactor = 1f;
     float overallTime = 0;
 
     public Slider timeScaleSlider;
