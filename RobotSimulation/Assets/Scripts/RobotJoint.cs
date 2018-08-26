@@ -44,7 +44,7 @@ public class RobotJoint
     float legCRailSpeedWithHalfBrickForLegA; //5
     float legCRailSpeedWithHalfBrickForLegB; //6
     float legCGripSpeed = 350f;
-    float legCRotationSpeed = 7.5f;
+    float legCRotationSpeed = 75f;
 
     ////speeds
     //float legARailSpeed = 2800;
