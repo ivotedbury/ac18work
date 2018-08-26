@@ -240,9 +240,9 @@ public class MainController : MonoBehaviour
         _data.distanceBack = buildManager.distanceBack;
         _data.distanceOutAverage = buildManager.distanceOutAverage;
         _data.distanceBackAverage = buildManager.distanceBackAverage;
-        _data.robotActions = buildManager.allRobotActions;
 
         _data.moveTimeList = buildManager.allRobots[0].moveTimeList;
+        _data.totalProgramTime = buildManager.allRobots[0].totalProgramTime;
 
         _data.legARailJointPosition = buildManager.allRobots[0].legARailJointPosition;
         _data.legAVerticalJointPosition = buildManager.allRobots[0].legAVerticalJointPosition;
@@ -290,8 +290,19 @@ public class MainController : MonoBehaviour
         _output.auxBricksFull = _input.auxBricksFull;
         _output.auxBricksHalf = _input.auxBricksHalf;
 
-        _output.robotActions = _input.robotActions;
+        _output.pathCountOut = _input.pathCountOut;
+        _output.pathCountBack = _input.pathCountBack;
+        _output.climbingOut = _input.climbingOut;
+        _output.climbingBack = _input.climbingBack;
+        _output.climbingOutAverage = _input.climbingOutAverage;
+        _output.climbingBackAverage = _input.climbingBackAverage;
+        _output.distanceOut = _input.distanceOut;
+        _output.distanceBack = _input.distanceBack;
+        _output.distanceOutAverage = _input.distanceOutAverage;
+        _output.distanceBackAverage = _input.distanceBackAverage;
+
         _output.moveTimeList = _input.moveTimeList;
+        _output.totalProgramTime = _input.totalProgramTime;
 
         _output.legARailJointPosition = _input.legARailJointPosition;
         _output.legAVerticalJointPosition = _input.legAVerticalJointPosition;

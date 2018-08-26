@@ -12,7 +12,7 @@ public class BuildDataSet
     public int auxBricksFull;
     public int auxBricksHalf;
 
-    public List<Brick> bricksInStructure = new List<Brick>();
+   // public List<Brick> bricksInStructure = new List<Brick>();
 
     public List<float> pathCountOut = new List<float>();
     public List<float> pathCountBack = new List<float>();
@@ -25,9 +25,10 @@ public class BuildDataSet
     public List<float> distanceOutAverage = new List<float>();
     public List<float> distanceBackAverage = new List<float>();
 
-    public List<RobotAction> robotActions = new List<RobotAction>();
+    public List<Brick> bricksInStructure = new List<Brick>();
+  //  public List<RobotAction> robotActions = new List<RobotAction>();
     public List<float> moveTimeList = new List<float>();
-    public float totalProgramTime;
+    public double totalProgramTime;
 
     public List<float> legARailJointPosition = new List<float>();
     public List<float> legAVerticalJointPosition = new List<float>();

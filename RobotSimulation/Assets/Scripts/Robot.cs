@@ -5,7 +5,7 @@ using UnityEngine;
 public class Robot
 {
     public bool simulateMovements = true;
-    public float totalProgramTime = 0;
+    public double totalProgramTime = 0;
 
     //joint names
     const char legARail = 'A';
@@ -97,7 +97,6 @@ public class Robot
     public List<RobotAction> actionList = new List<RobotAction>();
 
     public List<float> moveTimeList = new List<float>();
-    float overAllTime = 0;
 
     public List<float> legARailJointPosition = new List<float>();
     public List<float> legAVerticalJointPosition = new List<float>();
@@ -1152,17 +1151,17 @@ public class Robot
 
         timeForMoves = longestTimeForMove;
         Debug.Log("TIME FOR MOVES:" + timeForMoves);
+        totalProgramTime += timeForMoves; 
+       // moveTimeList.Add(timeForMoves); 
 
-        moveTimeList.Add(timeForMoves); 
-
-        legARailJointDistToMove.Add(legARailJoint.distanceToMove);
-        legAVerticalJointDistToMove.Add(legAVerticalJoint.distanceToMove);
-        legARotationJointDistToMove.Add(legARotationJoint.distanceToMove);
-        legBRailJointDistToMove.Add(legBRailJoint.distanceToMove);
+     /* legARailJointDistToMove.Add(legARailJoint.distanceToMove); ///////////////////////////////////HERE
+       legAVerticalJointDistToMove.Add(legAVerticalJoint.distanceToMove);
+       legARotationJointDistToMove.Add(legARotationJoint.distanceToMove);
+       legBRailJointDistToMove.Add(legBRailJoint.distanceToMove);
         legBVerticalJointDistToMove.Add(legBVerticalJoint.distanceToMove);
         legCRailJointDistToMove.Add(legCRailJoint.distanceToMove);
-        legCGripJointDistToMove.Add(legCGripJoint.distanceToMove);
-        legCRotationJointDistToMove.Add(legCRotationJoint.distanceToMove);
+       legCGripJointDistToMove.Add(legCGripJoint.distanceToMove);
+        legCRotationJointDistToMove.Add(legCRotationJoint.distanceToMove);*/
     }
 
     //public float AddUpTimeForMoves()

@@ -4,7 +4,8 @@ using UnityEngine;
 
 [System.Serializable]
 
-public class DataSetExportItem {
+public class DataSetExportItem
+{
     public int totalBricks;
     public int auxBricks;
     public int targetBricks;
@@ -13,8 +14,20 @@ public class DataSetExportItem {
     public int auxBricksFull;
     public int auxBricksHalf;
 
-    public List <RobotAction> robotActions = new List<RobotAction>();
+    public List<float> pathCountOut = new List<float>();
+    public List<float> pathCountBack = new List<float>();
+    public List<float> climbingOut = new List<float>();
+    public List<float> climbingBack = new List<float>();
+    public List<float> climbingOutAverage = new List<float>();
+    public List<float> climbingBackAverage = new List<float>();
+    public List<float> distanceOut = new List<float>();
+    public List<float> distanceBack = new List<float>();
+    public List<float> distanceOutAverage = new List<float>();
+    public List<float> distanceBackAverage = new List<float>();
+
+    // public List <RobotAction> robotActions = new List<RobotAction>();
     public List<float> moveTimeList = new List<float>();
+    public double totalProgramTime;
 
     public List<float> legARailJointPosition = new List<float>();
     public List<float> legAVerticalJointPosition = new List<float>();
