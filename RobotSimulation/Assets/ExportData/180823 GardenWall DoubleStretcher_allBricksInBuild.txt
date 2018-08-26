@@ -201,7 +201,127 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 52,
+            "brickPosX": 93,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 92,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 92,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 90,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 88,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 86,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 84,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 82,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 80,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 78,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 76,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 75,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 72,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 68,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 64,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 60,
             "brickPosY": 20,
             "brickPosZ": 2,
             "rotation": 90.0,
@@ -217,7 +337,7 @@
             "auxBrick": true
         },
         {
-            "brickPosX": 60,
+            "brickPosX": 52,
             "brickPosY": 20,
             "brickPosZ": 2,
             "rotation": 90.0,
@@ -225,127 +345,111 @@
             "auxBrick": true
         },
         {
-            "brickPosX": 64,
-            "brickPosY": 20,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 68,
-            "brickPosY": 20,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 72,
-            "brickPosY": 20,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 75,
-            "brickPosY": 20,
-            "brickPosZ": 2,
+            "brickPosX": 93,
+            "brickPosY": 18,
+            "brickPosZ": 3,
             "rotation": 90.0,
             "brickType": 2,
             "auxBrick": false
         },
         {
-            "brickPosX": 76,
-            "brickPosY": 18,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 78,
+            "brickPosX": 92,
             "brickPosY": 20,
-            "brickPosZ": 2,
+            "brickPosZ": 3,
             "rotation": 90.0,
             "brickType": 1,
             "auxBrick": false
         },
         {
-            "brickPosX": 80,
-            "brickPosY": 18,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 82,
+            "brickPosX": 92,
             "brickPosY": 20,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 84,
-            "brickPosY": 18,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 86,
-            "brickPosY": 20,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 88,
-            "brickPosY": 18,
-            "brickPosZ": 2,
+            "brickPosZ": 3,
             "rotation": 90.0,
             "brickType": 1,
             "auxBrick": false
         },
         {
             "brickPosX": 90,
-            "brickPosY": 20,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 92,
             "brickPosY": 18,
-            "brickPosZ": 2,
+            "brickPosZ": 3,
             "rotation": 90.0,
             "brickType": 1,
             "auxBrick": false
         },
         {
-            "brickPosX": 92,
-            "brickPosY": 18,
-            "brickPosZ": 2,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 93,
+            "brickPosX": 88,
             "brickPosY": 20,
-            "brickPosZ": 2,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 86,
+            "brickPosY": 18,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 84,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 82,
+            "brickPosY": 18,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 80,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 78,
+            "brickPosY": 18,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 76,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 75,
+            "brickPosY": 18,
+            "brickPosZ": 3,
             "rotation": 90.0,
             "brickType": 2,
             "auxBrick": false
         },
         {
-            "brickPosX": 60,
+            "brickPosX": 72,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 68,
             "brickPosY": 20,
             "brickPosZ": 3,
             "rotation": 90.0,
@@ -361,7 +465,7 @@
             "auxBrick": true
         },
         {
-            "brickPosX": 68,
+            "brickPosX": 60,
             "brickPosY": 20,
             "brickPosZ": 3,
             "rotation": 90.0,
@@ -369,116 +473,100 @@
             "auxBrick": true
         },
         {
-            "brickPosX": 72,
+            "brickPosX": 93,
             "brickPosY": 20,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": true
-        },
-        {
-            "brickPosX": 75,
-            "brickPosY": 18,
-            "brickPosZ": 3,
+            "brickPosZ": 4,
             "rotation": 90.0,
             "brickType": 2,
             "auxBrick": false
         },
         {
-            "brickPosX": 76,
-            "brickPosY": 20,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 78,
+            "brickPosX": 92,
             "brickPosY": 18,
-            "brickPosZ": 3,
+            "brickPosZ": 4,
             "rotation": 90.0,
             "brickType": 1,
             "auxBrick": false
         },
         {
-            "brickPosX": 80,
-            "brickPosY": 20,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 82,
+            "brickPosX": 92,
             "brickPosY": 18,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 84,
-            "brickPosY": 20,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 86,
-            "brickPosY": 18,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 88,
-            "brickPosY": 20,
-            "brickPosZ": 3,
+            "brickPosZ": 4,
             "rotation": 90.0,
             "brickType": 1,
             "auxBrick": false
         },
         {
             "brickPosX": 90,
-            "brickPosY": 18,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 92,
-            "brickPosY": 20,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 92,
-            "brickPosY": 20,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 93,
-            "brickPosY": 18,
-            "brickPosZ": 3,
-            "rotation": 90.0,
-            "brickType": 2,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 68,
             "brickPosY": 20,
             "brickPosZ": 4,
             "rotation": 90.0,
             "brickType": 1,
-            "auxBrick": true
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 88,
+            "brickPosY": 18,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 86,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 84,
+            "brickPosY": 18,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 82,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 80,
+            "brickPosY": 18,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 78,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 76,
+            "brickPosY": 18,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 75,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
         },
         {
             "brickPosX": 72,
@@ -489,103 +577,15 @@
             "auxBrick": true
         },
         {
-            "brickPosX": 75,
-            "brickPosY": 20,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 2,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 76,
-            "brickPosY": 18,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 78,
+            "brickPosX": 68,
             "brickPosY": 20,
             "brickPosZ": 4,
             "rotation": 90.0,
             "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 80,
-            "brickPosY": 18,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 82,
-            "brickPosY": 20,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 84,
-            "brickPosY": 18,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 86,
-            "brickPosY": 20,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 88,
-            "brickPosY": 18,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 90,
-            "brickPosY": 20,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 92,
-            "brickPosY": 18,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 92,
-            "brickPosY": 18,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
+            "auxBrick": true
         },
         {
             "brickPosX": 93,
-            "brickPosY": 20,
-            "brickPosZ": 4,
-            "rotation": 90.0,
-            "brickType": 2,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 75,
             "brickPosY": 18,
             "brickPosZ": 5,
             "rotation": 90.0,
@@ -593,7 +593,7 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 76,
+            "brickPosX": 92,
             "brickPosY": 20,
             "brickPosZ": 5,
             "rotation": 90.0,
@@ -601,47 +601,7 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 78,
-            "brickPosY": 18,
-            "brickPosZ": 5,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 80,
-            "brickPosY": 20,
-            "brickPosZ": 5,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 82,
-            "brickPosY": 18,
-            "brickPosZ": 5,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 84,
-            "brickPosY": 20,
-            "brickPosZ": 5,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 86,
-            "brickPosY": 18,
-            "brickPosZ": 5,
-            "rotation": 90.0,
-            "brickType": 1,
-            "auxBrick": false
-        },
-        {
-            "brickPosX": 88,
+            "brickPosX": 92,
             "brickPosY": 20,
             "brickPosZ": 5,
             "rotation": 90.0,
@@ -657,7 +617,7 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 92,
+            "brickPosX": 88,
             "brickPosY": 20,
             "brickPosZ": 5,
             "rotation": 90.0,
@@ -665,7 +625,15 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 92,
+            "brickPosX": 86,
+            "brickPosY": 18,
+            "brickPosZ": 5,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 84,
             "brickPosY": 20,
             "brickPosZ": 5,
             "rotation": 90.0,
@@ -673,7 +641,39 @@
             "auxBrick": false
         },
         {
-            "brickPosX": 93,
+            "brickPosX": 82,
+            "brickPosY": 18,
+            "brickPosZ": 5,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 80,
+            "brickPosY": 20,
+            "brickPosZ": 5,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 78,
+            "brickPosY": 18,
+            "brickPosZ": 5,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 76,
+            "brickPosY": 20,
+            "brickPosZ": 5,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 75,
             "brickPosY": 18,
             "brickPosZ": 5,
             "rotation": 90.0,

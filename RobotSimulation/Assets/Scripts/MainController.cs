@@ -150,7 +150,7 @@ public class MainController : MonoBehaviour
         int timeMinutes = ((int)(overallTime) - (timeHours * 3600)) / 60;
         int timeSeconds = (((int)overallTime - (timeHours * 3600)) - (timeMinutes * 60));
 
-        totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
+       // totalBuildTimeLabel.text = "Total Build Time: " + timeHours.ToString() + ":" + timeMinutes.ToString() + ":" + timeSeconds.ToString();
     }
 
     void SetupUI()

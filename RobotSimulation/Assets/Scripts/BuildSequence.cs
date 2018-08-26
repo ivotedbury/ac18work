@@ -21,7 +21,7 @@ public class BuildSequence
     BrickPathFinder brickPathFinder = new BrickPathFinder();
     Brick closestHighestBrick;
 
-    bool simpleReorder = false;
+    bool simpleReorder = true;
 
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
@@ -663,6 +663,8 @@ public class BuildSequence
         int highestLayer = 0;
         bool closestHighestFound = false;
 
+        float zWeight = 1.5f;
+
         for (int i = 0; i < grid.gridSize.y; i++)
         {
             foreach (Brick brick in _inputTargetStructure)
@@ -710,7 +712,13 @@ public class BuildSequence
                         {
                             if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
                             {
-                                testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+                                Vector3 testVector = _inputTargetStructure[i].originCell.position - _inputSeed.position;
+                                float testVectorX = Mathf.Abs(testVector.x);
+                                float testVectorY = Mathf.Abs(testVector.y);
+                                float testVectorZ = Mathf.Abs(testVector.z);
+
+
+                                testDistance = testVectorX + testVectorY + (zWeight* testVectorZ);
 
                                 if (testDistance < currentClosestDistance)
                                 {
@@ -728,7 +736,13 @@ public class BuildSequence
                         {
                             if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
                             {
-                                testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+                                Vector3 testVector = _inputTargetStructure[i].originCell.position - _inputSeed.position;
+                                float testVectorX = Mathf.Abs(testVector.x);
+                                float testVectorY = Mathf.Abs(testVector.y);
+                                float testVectorZ = Mathf.Abs(testVector.z);
+
+
+                                testDistance = testVectorX + testVectorY + (zWeight * testVectorZ);
 
                                 if (testDistance > currentFurthestDistance)
                                 {
