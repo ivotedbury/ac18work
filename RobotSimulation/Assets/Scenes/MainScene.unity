@@ -1680,7 +1680,7 @@ MonoBehaviour:
   cellMarker: {fileID: 1008602878685338, guid: 5050dc78b14290f4c9d400621e65c37d, type: 2}
   lineRendererObject: {fileID: 434548581}
   lineRendererContainer: {fileID: 2072336310}
-  brickImportData: {fileID: 4900000, guid: 35c61ac0248b55f4aba5a5c14b359cca, type: 3}
+  brickImportData: {fileID: 4900000, guid: 368ff7b61ff4b2947866caa8991fa4e5, type: 3}
   gridLineMaterial: {fileID: 2100000, guid: 6c7a1118ff054d442baac72972c24028, type: 2}
   timeScaleSlider: {fileID: 620667921}
   timeScaleFactorLabel: {fileID: 592968306}

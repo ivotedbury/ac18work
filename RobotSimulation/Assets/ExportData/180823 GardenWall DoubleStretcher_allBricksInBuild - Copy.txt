@@ -184,7 +184,15 @@
             "brickType": 1,
             "auxBrick": false
         },
-         {
+        {
+            "brickPosX": 92,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
             "brickPosX": 93,
             "brickPosY": 18,
             "brickPosZ": 1,
@@ -208,7 +216,14 @@
             "brickType": 1,
             "auxBrick": false
         },
- 
+        {
+            "brickPosX": 92,
+            "brickPosY": 18,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
         {
             "brickPosX": 90,
             "brickPosY": 20,
@@ -345,7 +360,14 @@
             "brickType": 1,
             "auxBrick": false
         },
- 
+        {
+            "brickPosX": 92,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
         {
             "brickPosX": 90,
             "brickPosY": 18,
@@ -466,7 +488,14 @@
             "brickType": 1,
             "auxBrick": false
         },
- 
+        {
+            "brickPosX": 92,
+            "brickPosY": 18,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
         {
             "brickPosX": 90,
             "brickPosY": 20,
@@ -571,7 +600,15 @@
             "brickType": 1,
             "auxBrick": false
         },
-         {
+        {
+            "brickPosX": 92,
+            "brickPosY": 20,
+            "brickPosZ": 5,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
             "brickPosX": 90,
             "brickPosY": 18,
             "brickPosZ": 5,
