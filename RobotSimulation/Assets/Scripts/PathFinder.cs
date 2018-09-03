@@ -214,7 +214,7 @@ public class PathFinder
             directionChangeCost = 1000;
         }
 
-        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) + directionChangeCost; ////////////////////////////////////////////////////////////////////////////////
+        distance = (distX * horizontalCost) + (distY * verticalCost) + (distZ * horizontalCost) /*+ directionChangeCost*/; ////////////////////////////////////////////////////////////////////////////////
 
         return distance;
     }
