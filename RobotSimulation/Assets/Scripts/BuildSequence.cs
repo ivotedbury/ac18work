@@ -19,10 +19,12 @@ public class BuildSequence
     public List<Cell> fullDesiredPath = new List<Cell>();
 
     BrickPathFinder brickPathFinder = new BrickPathFinder();
+    Brick closestHighestBrick;
+
+    bool simpleReorder = false;
 
     public BuildSequence(Vector3Int _gridSize, Vector3Int _seedCell, TextAsset _brickDataImport)
     {
-
         grid = new Grid(_gridSize);
         CreateSeed(_seedCell);
 
@@ -42,14 +44,44 @@ public class BuildSequence
         forbiddenCells = FindForbiddenCells(completeStructure, availableCells);
     }
 
+    public void ReorderBricks()
+    {
+        if (simpleReorder)
+        {
+            completeStructure = ReorderBricks(completeStructure, seedCell, false);
+        }
+
+        else
+        {
+            completeStructure = ThoroughReorderBricks(completeStructure, seedCell, false);
+        }
+    }
+
+    public void ReorderFinalBricks()
+    {
+        if (simpleReorder)
+        {
+            finalStructureToBuild = ReorderBricks(completeStructure, seedCell, true);
+        }
+
+        else
+        {
+            // availableCells = FindAvailableCells(completeStructure);
+            // finalStructureToBuild = ThoroughReorderBricks(completeStructure, seedCell, true);
+            //finalStructureToBuild = OtherReorderBricks(completeStructure, seedCell, true);
+            finalStructureToBuild = AlternativeReorderBricks(completeStructure, seedCell);
+        }
+    }
+
     public void GenerateCompletePaths()
     {
-        //List<Brick> brickStructureCompletedPaths = new List<Brick>();
+        ReorderBricks();
 
         Brick brickToPlaceNext;
         Cell pathStartingCell = completeStructure[2].childCells[0];
 
-        brickToPlaceNext = completeStructure[completeStructure.Count - 1];
+        // brickToPlaceNext = completeStructure[completeStructure.Count - 1];
+        brickToPlaceNext = closestHighestBrick;
 
         desiredPath = brickPathFinder.CalculatePathForSequencing(grid, availableCells, forbiddenCells, pathStartingCell, brickToPlaceNext.originCell, 1);
     }
@@ -71,25 +103,46 @@ public class BuildSequence
         }
     }
 
+
+
     List<Brick> ConvertPathToBricks(List<Cell> _desiredPath)
     {
         List<Brick> _additionalBricks = new List<Brick>();
 
         int pathCounter = 2;
 
-        while (pathCounter < _desiredPath.Count - 3)
+        int pathCounterLimit = 3;
+
+        if (_desiredPath.Count % 2 == 1)
+        {
+            // pathCounterLimit = 4;
+        }
+
+        List<Cell> occupiedCells = new List<Cell>();
+
+        while (pathCounter < _desiredPath.Count - pathCounterLimit)
         {
             int requiredDirection = brickPathFinder.GetDirection(_desiredPath[pathCounter - 1], _desiredPath[pathCounter]);
+            bool cellIsAvailable = true; // test to see if the path is going through bricks already in the desired structure
+            for (int i = 0; i < availableCells.Count; i++)
+            {
+                if (availableCells[i].position == _desiredPath[pathCounter].position)
+                {
+                    cellIsAvailable = false;
+                }
+            }
 
-            _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2, true));
-
+            if (cellIsAvailable)
+            {
+                _additionalBricks.Add(new Brick(grid, _desiredPath[pathCounter], requiredDirection * 90, 2, true));
+            }
             pathCounter += 2;
         }
 
         List<Brick> _compactedAdditionalBricks = new List<Brick>();
 
         int additionalBricksCounter = 1;
-        while (additionalBricksCounter < _additionalBricks.Count - 1)
+        while (additionalBricksCounter < _additionalBricks.Count)
         {
             if (_additionalBricks[additionalBricksCounter - 1].brickType == 2 && _additionalBricks[additionalBricksCounter].brickType == 2)
             {
@@ -124,7 +177,8 @@ public class BuildSequence
                     if (additionalBricksCounter == _additionalBricks.Count - 2)
                     {
                         _compactedAdditionalBricks.Add(_additionalBricks[additionalBricksCounter + 1]);
-                        additionalBricksCounter++;
+                        break;
+                        // additionalBricksCounter++;
                     }
                     else
                     {
@@ -173,7 +227,11 @@ public class BuildSequence
 
         string importDataString = System.IO.File.ReadAllText(pathImportPath);
 
+        Debug.Log(importDataString);
+
         CellImportItem[] cellImportArray = JsonHelper.FromJson<CellImportItem>(importDataString);
+
+        Debug.Log("inport" + cellImportArray.Length);
 
         for (int i = 0; i < cellImportArray.Length; i++)
         {
@@ -328,7 +386,15 @@ public class BuildSequence
             _inputStructure.Add(ConvertToBrick(brickImportArray[i]));
         }
 
-        _inputStructure = ReorderBricks(_inputStructure, seedCell); //////////////////////////////////////////////////
+        //if (simpleReorder)
+        //{
+        //    _inputStructure = ReorderBricks(_inputStructure, seedCell);
+        //}
+
+        //else
+        //{
+        //    _inputStructure = ThoroughReorderBricks(_inputStructure, seedCell, false);
+        //}
 
         return _inputStructure;
     }
@@ -344,7 +410,244 @@ public class BuildSequence
         return convertedBrick;
     }
 
-    List<Brick> ReorderBricks(List<Brick> _inputTargetStructure, Cell _inputSeed)
+    List<Brick> OtherReorderBricks(List<Brick> _inputStructure, Cell _seedCell, bool _forFinal)
+    {
+        foreach (Cell cell in grid.cellsList)
+        {
+            cell.ResetCosts();
+        }
+
+        List<Brick> _bricksStillToOrder = new List<Brick>();
+        _bricksStillToOrder = _inputStructure;
+        List<Brick> _reorderedStructure = new List<Brick>();
+
+        //  List<Cell> _availableCells = new List<Cell>();
+
+        //  _availableCells.Add(_seedCell);
+        float bestCurrentDistance = 10000000;
+        float testDistance = 0;
+        Brick bestCurrentBrick = null;
+
+        for (int i = 0; i < _bricksStillToOrder.Count; i++)
+        {
+            testDistance = brickPathFinder.GetDistanceForOrdering(_seedCell, _bricksStillToOrder[i].originCell);
+
+            if (testDistance < bestCurrentDistance)
+            {
+                bestCurrentBrick = _bricksStillToOrder[i];
+                bestCurrentDistance = testDistance;
+            }
+        }
+
+        _reorderedStructure.Add(bestCurrentBrick);
+        _bricksStillToOrder.Remove(bestCurrentBrick);
+
+        Brick lastBrickPlaced = bestCurrentBrick;
+
+        for (int layerHeight = 1; layerHeight < grid.gridSize.y - 1; layerHeight++)
+        {
+            List<Brick> bricksInCurrentLayer = new List<Brick>();
+            List<Brick> reorderedBricksInCurrentLayer = new List<Brick>();
+
+            for (int i = 0; i < _bricksStillToOrder.Count; i++)
+            {
+                if (_bricksStillToOrder[i].originCell.position.y == layerHeight)
+                {
+                    bricksInCurrentLayer.Add(_bricksStillToOrder[i]);
+                }
+            }
+
+            while (bricksInCurrentLayer.Count > 0)
+            {
+                bestCurrentDistance = 10000000;
+                //bestCurrentBrick = null;
+
+                for (int j = 0; j < bricksInCurrentLayer.Count; j++)
+                {
+                    testDistance = brickPathFinder.GetDistanceForOrdering(lastBrickPlaced.originCell, bricksInCurrentLayer[j].originCell);
+
+                    if (testDistance < bestCurrentDistance)
+                    {
+                        bestCurrentBrick = bricksInCurrentLayer[j];
+                        bestCurrentDistance = testDistance;
+                    }
+                }
+
+                reorderedBricksInCurrentLayer.Add(bestCurrentBrick);
+                bricksInCurrentLayer.Remove(bestCurrentBrick);
+                lastBrickPlaced = bestCurrentBrick;
+            }
+
+            if (layerHeight > 1)
+            {
+                reorderedBricksInCurrentLayer.Reverse();
+            }
+
+            _reorderedStructure.AddRange(reorderedBricksInCurrentLayer);
+
+        }
+
+        return _reorderedStructure;
+    }
+
+    bool BrickIsReachable(Grid _inputGrid, Brick _startingBrick, Brick _testBrick)
+    {
+        bool _brickIsReachable = false;
+        List<Cell> _potentialNeighbours = new List<Cell>();
+
+        for (int x = -5; x <= 5; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int z = -5; z <= 5; z++)
+                {
+                    if (x == 0 && z == 0)
+                    {
+                        continue;
+                    }
+
+                    _potentialNeighbours.Add(_inputGrid.GetANeighbour(_startingBrick.originCell, new Vector3Int(z, y, z)));
+                }
+            }
+        }
+
+        if (_potentialNeighbours.Contains(_testBrick.originCell))
+        {
+            _brickIsReachable = true;
+        }
+        return _brickIsReachable;
+    }
+
+    List<Brick> AlternativeReorderBricks(List<Brick> _inputStructure, Cell _seedCell)
+    {
+        List<Brick> _bricksStillToOrder = new List<Brick>();
+        _bricksStillToOrder = _inputStructure;
+        List<Brick> _reorderedStructure = new List<Brick>();
+        List<Brick> bricksInCurrentLayer = new List<Brick>();
+        List<Brick> reorderedBricksInCurrentLayer = new List<Brick>();
+        bool thereAreBricksInThisLayer;
+        Cell currentStart = _seedCell;
+
+        while (_bricksStillToOrder.Count > 0)
+        {
+
+            for (int layerHeight = 1; layerHeight < grid.gridSize.y - 1; layerHeight++)
+            {
+                bricksInCurrentLayer.Clear();
+                reorderedBricksInCurrentLayer.Clear();
+
+                for (int i = 0; i < _bricksStillToOrder.Count; i++)
+                {
+                    if (_bricksStillToOrder[i].originCell.position.y == layerHeight)
+                    {
+                        bricksInCurrentLayer.Add(_bricksStillToOrder[i]);
+                    }
+                }
+
+                if (bricksInCurrentLayer.Count > 0)
+                {
+                    thereAreBricksInThisLayer = true;
+                }
+                else
+                {
+                    thereAreBricksInThisLayer = false;
+                }
+
+                while (bricksInCurrentLayer.Count > 0)
+                {
+                    float smallestDistance = 1000000000;
+                    Brick closestBrick = null;
+
+                    for (int i = 0; i < bricksInCurrentLayer.Count; i++)
+                    {
+                        float testDistance = brickPathFinder.GetDistanceForOrdering(currentStart, bricksInCurrentLayer[i].originCell);
+                        if (testDistance < smallestDistance)
+                        {
+                            smallestDistance = testDistance;
+                            closestBrick = bricksInCurrentLayer[i];
+                        }
+                    }
+
+                    bricksInCurrentLayer.Remove(closestBrick);
+                    reorderedBricksInCurrentLayer.Add(closestBrick);
+                    currentStart = closestBrick.originCell;
+                }
+
+                if (thereAreBricksInThisLayer)
+                {
+                    currentStart = reorderedBricksInCurrentLayer[0].originCell;
+                    for (int i = 0; i < reorderedBricksInCurrentLayer.Count; i++)
+                    {
+                        _bricksStillToOrder.Remove(reorderedBricksInCurrentLayer[i]);
+                    }
+                    if (layerHeight != 1)
+                    {
+                        reorderedBricksInCurrentLayer.Reverse();
+                    }
+                    _reorderedStructure.AddRange(reorderedBricksInCurrentLayer);
+                }
+            }
+        }
+
+        return _reorderedStructure;
+    }
+
+    List<Brick> ThoroughReorderBricks(List<Brick> _inputStructure, Cell _seedCell, bool _forFinal)
+    {
+        List<Brick> _bricksStillToOrder = new List<Brick>();
+        _bricksStillToOrder = _inputStructure;
+        List<Brick> _reorderedStructure = new List<Brick>();
+        List<Cell> _availableCells = new List<Cell>();
+
+        _availableCells.Add(_seedCell);
+
+        if (_forFinal)
+        {
+            for (int i = 0; i < _inputStructure.Count; i++)
+            {
+                for (int j = 0; j < _inputStructure[i].childCells.Count; j++)
+                {
+                    _availableCells.Add(_inputStructure[i].childCells[j]);
+                }
+            }
+        }
+
+        while (_bricksStillToOrder.Count > 0)
+        {
+            float bestCurrentCost = 100000000;
+            Brick bestCurrentBrick = null;
+
+            for (int j = 0; j < _bricksStillToOrder.Count; j++)
+            {
+                List<Cell> testPath = new List<Cell>();
+                testPath = brickPathFinder.CalculatePathForOrdering(grid, _availableCells, _seedCell, _bricksStillToOrder[j].originCell);
+
+                if (brickPathFinder.totalCostOfTrip < bestCurrentCost)
+                {
+                    bestCurrentCost = brickPathFinder.totalCostOfTrip;
+                    bestCurrentBrick = _bricksStillToOrder[j];
+                }
+            }
+
+            if (bestCurrentBrick != null)
+            {
+                _reorderedStructure.Add(bestCurrentBrick);
+                _bricksStillToOrder.Remove(bestCurrentBrick);
+
+                if (!_forFinal)
+                {
+                    foreach (Cell childCell in bestCurrentBrick.childCells)
+                    {
+                        _availableCells.Add(childCell);
+                    }
+                }
+            }
+        }
+
+        return _reorderedStructure;
+    }
+
+    List<Brick> ReorderBricks(List<Brick> _inputTargetStructure, Cell _inputSeed, bool _forFinal)
     {
         List<Brick> reorderedTargetStructure = new List<Brick>();
 
@@ -357,6 +660,20 @@ public class BuildSequence
         Brick bestCurrentBrick = null;
         bool betterBrickFound = false;
 
+        int highestLayer = 0;
+        bool closestHighestFound = false;
+
+        for (int i = 0; i < grid.gridSize.y; i++)
+        {
+            foreach (Brick brick in _inputTargetStructure)
+            {
+                if (brick.originCell.position.y >= highestLayer)
+                {
+                    highestLayer = brick.originCell.position.y;
+                }
+            }
+        }
+
         for (int currentSearchLayer = 1; currentSearchLayer < grid.gridSize.y; currentSearchLayer++)
         {
             for (int listCounter = 0; listCounter < listLength; listCounter++)
@@ -365,9 +682,10 @@ public class BuildSequence
                 currentFurthestDistance = 0;
                 betterBrickFound = false;
 
-                if (currentSearchLayer == 1)
-                {
 
+
+                if (!_forFinal)
+                {
                     for (int i = 0; i < _inputTargetStructure.Count; i++)
                     {
                         if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
@@ -386,24 +704,52 @@ public class BuildSequence
 
                 else
                 {
-                    for (int i = 0; i < _inputTargetStructure.Count; i++)
+                    if (currentSearchLayer == 1)
                     {
-                        if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
+                        for (int i = 0; i < _inputTargetStructure.Count; i++)
                         {
-                            testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
-
-                            if (testDistance > currentFurthestDistance)
+                            if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
                             {
-                                currentFurthestDistance = testDistance;
-                                bestCurrentBrick = _inputTargetStructure[i];
-                                betterBrickFound = true;
+                                testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+
+                                if (testDistance < currentClosestDistance)
+                                {
+                                    currentClosestDistance = testDistance;
+                                    bestCurrentBrick = _inputTargetStructure[i];
+                                    betterBrickFound = true;
+                                }
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        for (int i = 0; i < _inputTargetStructure.Count; i++)
+                        {
+                            if (_inputTargetStructure[i].originCell.position.y == currentSearchLayer)
+                            {
+                                testDistance = Mathf.Abs(Vector3.Distance(_inputTargetStructure[i].originCell.position, _inputSeed.position));
+
+                                if (testDistance > currentFurthestDistance)
+                                {
+                                    currentFurthestDistance = testDistance;
+                                    bestCurrentBrick = _inputTargetStructure[i];
+                                    betterBrickFound = true;
+                                }
                             }
                         }
                     }
                 }
 
+
                 if (betterBrickFound)
                 {
+                    if (!closestHighestFound && currentSearchLayer == highestLayer)
+                    {
+                        closestHighestBrick = bestCurrentBrick;
+                        closestHighestFound = true;
+                    }
+
                     reorderedTargetStructure.Add(bestCurrentBrick);
                     _inputTargetStructure.Remove(bestCurrentBrick);
                 }

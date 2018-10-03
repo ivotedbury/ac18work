@@ -220,14 +220,14 @@ namespace BrickManager
             Vector3d xDirection = new Vector3d(_brickX - _brickOrigins);
             Vector3d yDirection = new Vector3d(_brickY - _brickOrigins);
 
-            int xLength = (int)(2 * xDirection.Length / _gridDimX);
+            int xLength = (int)(xDirection.Length / (2 * _gridDimX));
             int yLength = (int)Math.Round(yDirection.Length / _gridDimX);
 
-            if (xLength == 2)
+            if (xLength == 1)
             {
                 thisAuxBrick = true;
             }
-            else if (xLength == 2)
+            else 
             {
                 thisAuxBrick = false;
             }

@@ -1,0 +1,540 @@
+{
+    "Items": [
+        {
+            "brickPosX": 24,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 24,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 28,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 28,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 32,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 32,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 32,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 36,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 40,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 40,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 44,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 52,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 56,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 60,
+            "brickPosY": 20,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 21,
+            "brickPosZ": 1,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 25,
+            "brickPosZ": 1,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 29,
+            "brickPosZ": 1,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 33,
+            "brickPosZ": 1,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 66,
+            "brickPosY": 34,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 70,
+            "brickPosY": 34,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 74,
+            "brickPosY": 34,
+            "brickPosZ": 1,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 75,
+            "brickPosY": 34,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 72,
+            "brickPosY": 34,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 68,
+            "brickPosY": 34,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 64,
+            "brickPosY": 34,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 31,
+            "brickPosZ": 2,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 27,
+            "brickPosZ": 2,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 23,
+            "brickPosZ": 2,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 62,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 58,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 54,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 51,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 44,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 40,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 40,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 36,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 32,
+            "brickPosY": 20,
+            "brickPosZ": 2,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 74,
+            "brickPosY": 34,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 70,
+            "brickPosY": 34,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 66,
+            "brickPosY": 34,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 33,
+            "brickPosZ": 3,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 29,
+            "brickPosZ": 3,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 25,
+            "brickPosZ": 3,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 21,
+            "brickPosZ": 3,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 60,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 56,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 52,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 44,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 40,
+            "brickPosY": 20,
+            "brickPosZ": 3,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        },
+        {
+            "brickPosX": 75,
+            "brickPosY": 34,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 72,
+            "brickPosY": 34,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 68,
+            "brickPosY": 34,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 64,
+            "brickPosY": 34,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 31,
+            "brickPosZ": 4,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 27,
+            "brickPosZ": 4,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 63,
+            "brickPosY": 23,
+            "brickPosZ": 4,
+            "rotation": 0.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 62,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 58,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 54,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 51,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 2,
+            "auxBrick": false
+        },
+        {
+            "brickPosX": 48,
+            "brickPosY": 20,
+            "brickPosZ": 4,
+            "rotation": 90.0,
+            "brickType": 1,
+            "auxBrick": true
+        }
+    ]
+}
