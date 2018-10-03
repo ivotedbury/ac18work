@@ -242,8 +242,7 @@ namespace BrickManager
             }
 
             Brick outputBrick = new Brick(brickPosition, rotationAngle, thisbrickType, thisAuxBrick);
-
-
+            
             return outputBrick;
         }
 
