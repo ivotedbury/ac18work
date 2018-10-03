@@ -60,7 +60,7 @@ public class RobotJoint
             distanceToMove = Mathf.Abs(targetPos - currentPos);
 
             startPos = currentPos;
-            startTime = overallTime;//Time.time
+            startTime = overallTime;
             elapsedTime = 0;
             timeForMove = Mathf.Abs(targetPos - startPos) / speed;
         }

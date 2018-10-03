@@ -53,7 +53,9 @@ public class Robot
     public Quaternion grip1Rot;
     public Quaternion grip2Rot;
 
-    public Robot()
+    int currentlyAttached;
+
+    public Robot(Vector3Int _startingCell, int _currentlyAttached, int _startingStance)
     {
         RobotJoint legARailJoint = new RobotJoint(100, legARailResetPos);
         RobotJoint legAVerticalJoint = new RobotJoint(100, legAVerticalResetPos);
@@ -74,5 +76,140 @@ public class Robot
         allJoints.Add(legCRailJoint);
         allJoints.Add(legCRotationJoint);
         allJoints.Add(legCGripJoint);
+
+        currentlyAttached = _currentlyAttached;
+
+        if (currentlyAttached == 0)
+        {
+            legAFootPos = new Vector3Int(0, 0, 0);
+        }
+        else
+        {
+            legBFootPos = new Vector3Int(0, 0, 0);
+        }
     }
+
+    public void UpdateRobot()
+    {
+       // CarryOutMoves();
+        UpdateReferenceTransforms();
+    }
+
+    void UpdateReferenceTransforms()
+    {
+        if (currentlyAttached == 0)
+        {
+            legAPos = legAFootPos;
+            legARot = Quaternion.Euler(0, (legARotationJoint.currentPos / 10), 0) * legAFootRot;
+
+            verticalToHorizontalAPos = legAPos + new Vector3(0, verticalOffset + (legAVerticalJoint.currentPos * 0.0001f), 0);
+            verticalToHorizontalARot = legARot;
+
+            mainBeamPos = verticalToHorizontalAPos + legARot * new Vector3(0, 0.06008f, (legARailJoint.currentPos * 0.0001f) - 0.5f);
+            mainBeamRot = legARot;
+
+            verticalToHorizontalBPos = mainBeamPos - legARot * (new Vector3(0, 0.06008f, legBRailJoint.currentPos * 0.0001f - 0.5f));
+            verticalToHorizontalBRot = legARot;
+
+            legBPos = verticalToHorizontalBPos - new Vector3(0, verticalOffset + (legBVerticalJoint.currentPos * 0.0001f), 0);
+            legBRot = legARot;
+
+            legBFootPos = legBPos;
+            legBFootRot = legARot;
+
+            legCPos = mainBeamPos + legARot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
+            legCRot = legARot;
+
+            legCFootPos = legCPos;
+            legCFootRot = legCRot * Quaternion.Euler(0, -legCRotationJoint.currentPos / 10, 0);
+
+            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip1Rot = legCFootRot;
+
+            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip2Rot = legCFootRot;
+        }
+
+        if (currentlyAttached == 1)
+        {
+            legBPos = legBFootPos;
+            legBRot = legBFootRot;
+
+            verticalToHorizontalBPos = legBPos + new Vector3(0, verticalOffset + (legBVerticalJoint.currentPos * 0.0001f), 0);
+            verticalToHorizontalBRot = legBRot;
+
+            mainBeamPos = verticalToHorizontalBPos + legBRot * new Vector3(0, 0.06008f, (legBRailJoint.currentPos * 0.0001f) - 0.5f);
+            mainBeamRot = legBRot;
+
+            verticalToHorizontalAPos = mainBeamPos - legBRot * (new Vector3(0, 0.06008f, (legARailJoint.currentPos * 0.0001f - 0.5f)));
+            verticalToHorizontalARot = legBRot;
+
+            legAPos = verticalToHorizontalAPos - new Vector3(0, verticalOffset + (legAVerticalJoint.currentPos * 0.0001f), 0);
+            legARot = legBRot;
+
+            legAFootPos = legAPos;
+            legAFootRot = legARot * Quaternion.Euler(0, -legARotationJoint.currentPos / 10, 0);
+
+            legCPos = mainBeamPos + legBRot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
+            legCRot = legBRot;
+
+            legCFootPos = legCPos;
+            legCFootRot = legCRot * Quaternion.Euler(0, -legCRotationJoint.currentPos / 10, 0);
+
+            grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip1Rot = legCFootRot;
+
+            grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
+            grip2Rot = legCFootRot;
+        }
+    }
+
+    private float RadianToDegree(float angle)
+    {
+        return (angle * (180 / Mathf.PI));
+    }
+
+    private float DegreeToRadian(float angle)
+    {
+        return (Mathf.PI * angle / 180);
+    }
+
+    //    void CarryOutMoves()
+    //    {
+    //        if (legARailJoint.JointNeedsToMove() ||
+    //legAVerticalJoint.JointNeedsToMove() ||
+    //legARotationJoint.JointNeedsToMove() ||
+    //legBRailJoint.JointNeedsToMove() ||
+    //legBVerticalJoint.JointNeedsToMove() ||
+    //legCRailJoint.JointNeedsToMove() ||
+    //legCGripJoint.JointNeedsToMove() ||
+    //legCRotationJoint.JointNeedsToMove())
+    //        {
+    //            moveInProgress = true;
+    //        }
+
+    //        else
+    //        {
+    //            moveInProgress = false;
+    //        }
+
+    //        if (!moveInProgress && stepInProgress)
+    //        {
+    //            MakeMove();
+
+    //        }
+
+    //        foreach (RobotJoint joint in allJoints)
+    //        {
+    //            if (_withInterpolation)
+    //            {
+    //                joint.LerpJointPosition();
+    //            }
+    //            else
+    //            {
+    //                joint.currentPos = joint.targetPos;
+    //            }
+    //        }
+    //    }
 }
+
