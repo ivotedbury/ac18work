@@ -62,7 +62,7 @@ public class RobotJoint
             startPos = currentPos;
             startTime = overallTime;//Time.time
             elapsedTime = 0;
-            timeForMove = Mathf.Abs(targetPos - startPos) / (speed * speedFactor);
+            timeForMove = Mathf.Abs(targetPos - startPos) / speed;
         }
     }
     void SetupJoint(float _speed, float _resetPos)
