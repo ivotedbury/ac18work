@@ -5,7 +5,7 @@ using UnityEngine;
 public class Robot
 {
     public bool simulateMovements = true;
-    public double totalProgramTime = 0;
+    public float totalProgramTime = 0;
 
     //joint names
     const char legARail = 'A';
@@ -1046,67 +1046,67 @@ public class Robot
         if (_legARailTarget != -1)
         {
             legARailJoint.targetPos = _legARailTarget;
-          //  legARailJointPosition.Add(_legARailTarget);
+            legARailJointPosition.Add(_legARailTarget);
         }
         else
         {
-          //  legARailJointPosition.Add(legARailJoint.currentPos);
+            legARailJointPosition.Add(legARailJoint.currentPos);
         }
         //legAVertical
         if (_legAVerticalTarget != -1)
         {
             legAVerticalJoint.targetPos = _legAVerticalTarget;
-          //  legAVerticalJointPosition.Add(_legAVerticalTarget);
+            legAVerticalJointPosition.Add(_legAVerticalTarget);
         }
         else
         {
-          //  legAVerticalJointPosition.Add(legAVerticalJoint.currentPos);
+            legAVerticalJointPosition.Add(legAVerticalJoint.currentPos);
         }
         //legARotation
         if (_legARotationTarget != -1)
         {
             legARotationJoint.targetPos = _legARotationTarget;
-          //  legARotationJointPosition.Add(_legARotationTarget);
+            legARotationJointPosition.Add(_legARotationTarget);
         }
         else
         {
-          //  legARotationJointPosition.Add(legARotationJoint.currentPos);
+            legARotationJointPosition.Add(legARotationJoint.currentPos);
         }
         //legBRail/
         if (_legBRailTarget != -1)
         {
             legBRailJoint.targetPos = _legBRailTarget;
-          //  legBRailJointPosition.Add(_legBRailTarget);
+            legBRailJointPosition.Add(_legBRailTarget);
         }
         else
         {
-          //  legBRailJointPosition.Add(legBRailJoint.currentPos);
+            legBRailJointPosition.Add(legBRailJoint.currentPos);
         }
         //legBVertical
         if (_legBVerticalTarget != -1)
         {
             legBVerticalJoint.targetPos = _legBVerticalTarget;
-           // legBVerticalJointPosition.Add(_legBVerticalTarget);
+            legBVerticalJointPosition.Add(_legBVerticalTarget);
         }
         else
         {
-          //  legBVerticalJointPosition.Add(legBVerticalJoint.currentPos);
+            legBVerticalJointPosition.Add(legBVerticalJoint.currentPos);
         }
         //legCRail
         if (_legCRailTarget != -1)
         {
             legCRailJoint.targetPos = _legCRailTarget;
-           // legCRailJointPosition.Add(_legCRailTarget);
+            legCRailJointPosition.Add(_legCRailTarget);
         }
         else
         {
-          //  legCRailJointPosition.Add(legCRailJoint.currentPos);
+            legCRailJointPosition.Add(legCRailJoint.currentPos);
         }
         //legCGrip
         if (_legCGripTarget != -1)
         {
             legCGripJoint.targetPos = _legCGripTarget;
-          //  legCGripJointPosition.Add(_legCGripTarget);
+            legCGripJointPosition.Add(_legCGripTarget);
         }
         else
         {
@@ -1116,11 +1116,11 @@ public class Robot
         if (_legCRotationTarget != -1)
         {
             legCRotationJoint.targetPos = _legCRotationTarget;
-         // legCRotationJointPosition.Add(_legCRotationTarget);
+            legCRotationJointPosition.Add(_legCRotationTarget);
         }
         else
         {
-          //  legCRotationJointPosition.Add(legCRotationJoint.currentPos);
+            legCRotationJointPosition.Add(legCRotationJoint.currentPos);
         }
 
         float timeForMoves = 0;
@@ -1151,17 +1151,17 @@ public class Robot
 
         timeForMoves = longestTimeForMove;
         Debug.Log("TIME FOR MOVES:" + timeForMoves);
-        totalProgramTime += timeForMoves; 
-       // moveTimeList.Add(timeForMoves); 
 
-     /* legARailJointDistToMove.Add(legARailJoint.distanceToMove); ///////////////////////////////////HERE
-       legAVerticalJointDistToMove.Add(legAVerticalJoint.distanceToMove);
-       legARotationJointDistToMove.Add(legARotationJoint.distanceToMove);
-       legBRailJointDistToMove.Add(legBRailJoint.distanceToMove);
+        moveTimeList.Add(timeForMoves);
+
+        legARailJointDistToMove.Add(legARailJoint.distanceToMove);
+        legAVerticalJointDistToMove.Add(legAVerticalJoint.distanceToMove);
+        legARotationJointDistToMove.Add(legARotationJoint.distanceToMove);
+        legBRailJointDistToMove.Add(legBRailJoint.distanceToMove);
         legBVerticalJointDistToMove.Add(legBVerticalJoint.distanceToMove);
         legCRailJointDistToMove.Add(legCRailJoint.distanceToMove);
-       legCGripJointDistToMove.Add(legCGripJoint.distanceToMove);
-        legCRotationJointDistToMove.Add(legCRotationJoint.distanceToMove);*/
+        legCGripJointDistToMove.Add(legCGripJoint.distanceToMove);
+        legCRotationJointDistToMove.Add(legCRotationJoint.distanceToMove);
     }
 
     //public float AddUpTimeForMoves()

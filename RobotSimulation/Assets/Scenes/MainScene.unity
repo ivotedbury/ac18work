@@ -1649,28 +1649,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1126478970}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4be2fbf82d218f429a03251086ba453, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraSensitivity: 90
-  climbSpeed: 10
-  normalMoveSpeed: 20
-  slowMoveFactor: 10
-  fastMoveFactor: 30
---- !u!114 &1126478978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1126478970}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86aae59bd9e5ff84abe7c635f3db7d09, type: 3}
+  m_Script: {fileID: 11500000, guid: 9fc462ee37ee39d4aa95ba6a13acbf98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   robotMeshes: {fileID: 389842929}
   robotMeshContainer: {fileID: 201384266}
-  tracker: {fileID: 770487020}
+  tracker: {fileID: 1261967728264864, guid: a759a28c1a2f7334586e8a08f94a9e58, type: 2}
   legMarker: {fileID: 1261967728264864, guid: a759a28c1a2f7334586e8a08f94a9e58, type: 2}
   legMarkerContainer: {fileID: 1100604610}
   fullBrickMesh: {fileID: 177960761}
@@ -1680,7 +1664,7 @@ MonoBehaviour:
   cellMarker: {fileID: 1008602878685338, guid: 5050dc78b14290f4c9d400621e65c37d, type: 2}
   lineRendererObject: {fileID: 434548581}
   lineRendererContainer: {fileID: 2072336310}
-  brickImportData: {fileID: 4900000, guid: aec2ad42dc6ab8e4dab3f039c762ebf5, type: 3}
+  brickImportData: {fileID: 4900000, guid: 7cfda4e4161fefa4980e5ad9dc04d55d, type: 3}
   gridLineMaterial: {fileID: 2100000, guid: 6c7a1118ff054d442baac72972c24028, type: 2}
   timeScaleSlider: {fileID: 620667921}
   timeScaleFactorLabel: {fileID: 592968306}
@@ -1688,6 +1672,22 @@ MonoBehaviour:
   tripTimeLabel: {fileID: 1757942177}
   startSimulation: {fileID: 1777959455}
   calculateBuildTime: {fileID: 70309413}
+--- !u!114 &1126478978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1126478970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e48b6dd0c08943d449eefa612eda1469, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraSensitivity: 90
+  climbSpeed: 10
+  normalMoveSpeed: 20
+  slowMoveFactor: 10
+  fastMoveFactor: 30
 --- !u!1 &1133042285
 GameObject:
   m_ObjectHideFlags: 0
