@@ -1,0 +1,29 @@
+fileFormatVersion: 2
+guid: e4efd44cae0bae7439480a2ebec33818
+timeCreated: 1517312968
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Galaxie Polaris
+  fontNames:
+  - Galaxie Polaris
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 194bdca19d4e099418af34ed5182fe90, type: 3}
+  - {fileID: 12800000, guid: 13408ad1bc0fba741b5392e72a1ac1c5, type: 3}
+  - {fileID: 12800000, guid: 24138873812c052449a883644e10e94a, type: 3}
+  - {fileID: 12800000, guid: 84d57d58ea221f445b1adfec796fbddb, type: 3}
+  - {fileID: 12800000, guid: 6a369059f429a4943a9b6a92f5f98c94, type: 3}
+  - {fileID: 12800000, guid: c772544b33aeef24cabdc99930a294ea, type: 3}
+  - {fileID: 12800000, guid: a556e90c59cd51d4baf18bd788f0eedd, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
