@@ -30,9 +30,8 @@ public class MainController : MonoBehaviour
     void Start()
     {
         allRobots.Add(new Robot(new Vector3Int(0, 0, 0), 0, 4));
-
-        CreateGridLines();
-
+        allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
+        allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform); CreateGridLines();
     }
 
     void Update()
@@ -60,41 +59,40 @@ public class MainController : MonoBehaviour
         legA.transform.position = robotToDisplay.legAPos;
         legA.transform.rotation = robotToDisplay.legARot;
 
-        GameObject legBFoot = meshToDisplay.gameObject.transform.GetChild(2).gameObject;
+        GameObject legAHip = meshToDisplay.gameObject.transform.GetChild(2).gameObject;
+        legAHip.transform.position = robotToDisplay.legAHipPos;
+        legAHip.transform.rotation = robotToDisplay.legAHipRot;
+
+        GameObject legBFoot = meshToDisplay.gameObject.transform.GetChild(3).gameObject;
         legBFoot.transform.position = robotToDisplay.legBFootPos;
         legBFoot.transform.rotation = robotToDisplay.legBFootRot;
 
-        GameObject legB = meshToDisplay.gameObject.transform.GetChild(3).gameObject;
+        GameObject legB = meshToDisplay.gameObject.transform.GetChild(4).gameObject;
         legB.transform.position = robotToDisplay.legBPos;
         legB.transform.rotation = robotToDisplay.legBRot;
 
-        GameObject mainBeam = meshToDisplay.gameObject.transform.GetChild(4).gameObject;
+        GameObject legBHip = meshToDisplay.gameObject.transform.GetChild(5).gameObject;
+        legBHip.transform.position = robotToDisplay.legBHipPos;
+        legBHip.transform.rotation = robotToDisplay.legBHipRot;
+
+        GameObject mainBeam = meshToDisplay.gameObject.transform.GetChild(6).gameObject;
         mainBeam.transform.position = robotToDisplay.mainBeamPos;
         mainBeam.transform.rotation = robotToDisplay.mainBeamRot;
 
-        GameObject legC = meshToDisplay.gameObject.transform.GetChild(5).gameObject;
-        legC.transform.position = robotToDisplay.legCPos;
-        legC.transform.rotation = robotToDisplay.legCRot;
+        GameObject legC = meshToDisplay.gameObject.transform.GetChild(7).gameObject;
+        legC.transform.position = robotToDisplay.legCShoulderPos;
+        legC.transform.rotation = robotToDisplay.legCShoulderRot;
 
-        GameObject legCFoot = meshToDisplay.gameObject.transform.GetChild(6).gameObject;
+        GameObject legCFoot = meshToDisplay.gameObject.transform.GetChild(8).gameObject;
         legCFoot.transform.position = robotToDisplay.legCFootPos;
         legCFoot.transform.rotation = robotToDisplay.legCFootRot;
 
-        GameObject verticalToHorizontalA = meshToDisplay.gameObject.transform.GetChild(7).gameObject;
-        verticalToHorizontalA.transform.position = robotToDisplay.verticalToHorizontalAPos;
-        verticalToHorizontalA.transform.rotation = robotToDisplay.verticalToHorizontalARot;
-
-        GameObject verticalToHorizontalB = meshToDisplay.gameObject.transform.GetChild(8).gameObject;
-        verticalToHorizontalB.transform.position = robotToDisplay.verticalToHorizontalBPos;
-        verticalToHorizontalB.transform.rotation = robotToDisplay.verticalToHorizontalBRot;
-
-        GameObject gripper = meshToDisplay.gameObject.transform.GetChild(9).gameObject;
-        GameObject grip1 = gripper.gameObject.transform.GetChild(0).gameObject;
-        GameObject grip2 = gripper.gameObject.transform.GetChild(1).gameObject;
-
+        GameObject grip1 = meshToDisplay.gameObject.transform.GetChild(9).gameObject;
         grip1.transform.position = robotToDisplay.grip1Pos;
         grip1.transform.rotation = robotToDisplay.grip1Rot;
 
+
+        GameObject grip2 = meshToDisplay.gameObject.transform.GetChild(10).gameObject;
         grip2.transform.position = robotToDisplay.grip2Pos;
         grip2.transform.rotation = robotToDisplay.grip2Rot;
 

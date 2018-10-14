@@ -67,7 +67,8 @@ public class RobotJoint
     }
     void SetupJoint(float _speed, float _resetPos)
     {
-        speed = _speed;
+              speed = _speed;
         resetPos = _resetPos;
+        currentPos = resetPos;
     }
 }
