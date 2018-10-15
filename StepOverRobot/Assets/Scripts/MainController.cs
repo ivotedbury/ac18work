@@ -29,7 +29,7 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        allRobots.Add(new Robot(new Vector3Int(0, 0, 0), 0, 4));
+        allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
         allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
         allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform); CreateGridLines();
     }

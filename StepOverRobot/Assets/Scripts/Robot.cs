@@ -5,15 +5,17 @@ using UnityEngine;
 public class Robot
 {
     float legARailResetPos = 0.28125f;
-    float legAVerticalResetPos = 0.18850f;
+    float legAVerticalResetPos = 0.18125f;
     float legARotationResetPos = 0;
     float legBRailResetPos = 0.50625f;
-    float legBVerticalResetPos = 0.18850f;
+    float legBVerticalResetPos = 0.18125f;
     float legBRotationResetPos = 0;
     float legCRailResetPos = 0.39375f;
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
 
+    float gridXZDim = 0.05625f;
+    float gridYDim = 0.0625f;
 
     List<RobotJoint> allJoints = new List<RobotJoint>();
 
@@ -81,14 +83,18 @@ public class Robot
 
         if (currentlyAttached == 0)
         {
-            legAFootPos = new Vector3Int(0, 0, 0);
+            legAFootPos = new Vector3(_startingCell.x * gridXZDim, _startingCell.y * gridYDim, _startingCell.z * gridXZDim);
             legAFootRot = Quaternion.Euler(0, 0, 0);
         }
         else
         {
-            legBFootPos = new Vector3Int(0, 0, 0);
-            legBFootRot = Quaternion.Euler(0, 0, 0);
+            legBFootPos = new Vector3(_startingCell.x * gridXZDim, _startingCell.y * gridYDim, _startingCell.z * gridXZDim);
+            legBFootRot = Quaternion.Euler(0, 180, 0);
         }
+
+        //legBVerticalJoint.currentPos = 0.1f;
+        //legAVerticalJoint.currentPos = 0.1f;
+
     }
 
     public void UpdateRobot()
@@ -103,22 +109,22 @@ public class Robot
             legAPos = legAFootPos;
             legARot = Quaternion.Euler(0, legARotationJoint.currentPos, 0) * legAFootRot;
 
-            legAHipPos = legAPos + new Vector3(0, (legAVerticalJoint.currentPos), 0);
+            legAHipPos = legAPos + new Vector3(0, (legAVerticalJoint.currentPos - legAVerticalResetPos), 0);
             legAHipRot = legARot;
 
-            mainBeamPos = legAHipPos + legARot * new Vector3(0, 0.06008f, (legARailJoint.currentPos * 0.0001f) - 0.5f);
+            mainBeamPos = legAHipPos + legARot * new Vector3(0, legAVerticalResetPos + 0.04f, (legARailJoint.currentPos - legCRailResetPos));
             mainBeamRot = legARot;
 
-            legBHipPos = mainBeamPos - legARot * (new Vector3(0, 0.06008f, legBRailJoint.currentPos * 0.0001f - 0.5f));
+            legBHipPos = mainBeamPos - legARot * (new Vector3(0, legBVerticalResetPos + 0.04f, legBRailJoint.currentPos - legCRailResetPos));
             legBHipRot = legARot * Quaternion.Euler(0,180,0);
 
-            legBPos = legBHipPos - new Vector3(0, (legBVerticalJoint.currentPos * 0.0001f), 0);
+            legBPos = legBHipPos - new Vector3(0, legBVerticalJoint.currentPos - legBVerticalResetPos, 0);
             legBRot = legARot * Quaternion.Euler(0, 180, 0); ;
 
             legBFootPos = legBPos;
             legBFootRot = legARot * Quaternion.Euler(0, legBRotationJoint.currentPos, 0) * Quaternion.Euler(0, 180, 0);
 
-            legCShoulderPos = mainBeamPos + legARot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
+            legCShoulderPos = mainBeamPos + legARot * (new Vector3(0, -0.04f, (legCRailJoint.currentPos - legCRailResetPos)));
             legCShoulderRot = legARot;
 
             legCFootPos = legCShoulderPos;
@@ -131,38 +137,38 @@ public class Robot
             grip2Rot = legCFootRot;
         }
 
-        //if (currentlyAttached == 1)
-        //{
-        //    legBPos = legBFootPos;
-        //    legBRot = legBFootRot;
+        if (currentlyAttached == 1)
+        {
+            legBPos = legBFootPos;
+            legBRot = Quaternion.Euler(0, legBRotationJoint.currentPos, 0) * legBFootRot;
 
-        //    verticalToHorizontalBPos = legBPos + new Vector3(0, verticalOffset + (legBVerticalJoint.currentPos * 0.0001f), 0);
-        //    verticalToHorizontalBRot = legBRot;
+            legBHipPos = legBPos + new Vector3(0, (legBVerticalJoint.currentPos - legBVerticalResetPos), 0);
+            legBHipRot = legBRot;
 
-        //    mainBeamPos = verticalToHorizontalBPos + legBRot * new Vector3(0, 0.06008f, (legBRailJoint.currentPos * 0.0001f) - 0.5f);
-        //    mainBeamRot = legBRot;
+            mainBeamPos = legBHipPos + legBRot * new Vector3(0, legBVerticalResetPos + 0.04f, (legCRailResetPos - legBRailJoint.currentPos));
+            mainBeamRot = legBRot;
 
-        //    verticalToHorizontalAPos = mainBeamPos - legBRot * (new Vector3(0, 0.06008f, (legARailJoint.currentPos * 0.0001f - 0.5f)));
-        //    verticalToHorizontalARot = legBRot;
+            legAHipPos = mainBeamPos - legBRot * (new Vector3(0, legAVerticalResetPos + 0.04f, legCRailResetPos - legARailJoint.currentPos));
+            legAHipRot = legARot * Quaternion.Euler(0, 180, 0);
 
-        //    legAPos = verticalToHorizontalAPos - new Vector3(0, verticalOffset + (legAVerticalJoint.currentPos * 0.0001f), 0);
-        //    legARot = legBRot;
+            legAPos = legAHipPos - new Vector3(0, legAVerticalJoint.currentPos - legAVerticalResetPos, 0);
+            legARot = legBRot * Quaternion.Euler(0, 180, 0); ;
 
-        //    legAFootPos = legAPos;
-        //    legAFootRot = legARot * Quaternion.Euler(0, -legARotationJoint.currentPos / 10, 0);
+            legAFootPos = legAPos;
+            legAFootRot = legBRot * Quaternion.Euler(0, legBRotationJoint.currentPos, 0) * Quaternion.Euler(0, 180, 0);
 
-        //    legCPos = mainBeamPos + legBRot * (new Vector3(0, -0.192f, -(legCRailJoint.currentPos * 0.0001f - 0.5f)));
-        //    legCRot = legBRot;
+            legCShoulderPos = mainBeamPos + legBRot * (new Vector3(0, -0.04f, (legCRailJoint.currentPos - legCRailResetPos)));
+            legCShoulderRot = legBRot;
 
-        //    legCFootPos = legCPos;
-        //    legCFootRot = legCRot * Quaternion.Euler(0, -legCRotationJoint.currentPos / 10, 0);
+            legCFootPos = legCShoulderPos;
+            legCFootRot = legCShoulderRot * Quaternion.Euler(0, -legCRotationJoint.currentPos / 10, 0);
 
-        //    grip1Pos = legCFootPos + (legCRot * new Vector3(0, 0, -(gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
-        //    grip1Rot = legCFootRot;
+            grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, -(legCGripJoint.currentPos) * 0.00001f));
+            grip1Rot = legCFootRot;
 
-        //    grip2Pos = legCFootPos + (legCRot * new Vector3(0, 0, (gripClosedPos - legCGripJoint.currentPos) * 0.00001f));
-        //    grip2Rot = legCFootRot;
-        //}
+            grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, (legCGripJoint.currentPos) * 0.00001f));
+            grip2Rot = legCFootRot;
+        }
     }
 
     private float RadianToDegree(float angle)
