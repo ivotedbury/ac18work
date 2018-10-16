@@ -17,18 +17,8 @@ public class RobotJoint
     float startPos;
     float startTime;
     float elapsedTime;
-   public float timeForMove;
+    public float timeForMove;
     public float distanceToMove;
-
-    //overall constants
-    const char legARail = 'A';
-    const char legAVertical = 'B';
-    const char legARotation = 'C';
-    const char legBRail = 'D';
-    const char legBVertical = 'E';
-    const char legCRail = 'F';
-    const char legCGrip = 'G';
-    const char legCRotation = 'H';
 
     //speeds
     float legARailSpeed = 350;
@@ -88,7 +78,7 @@ public class RobotJoint
     public float halfBrickLegAFactor;
     public float halfBrickLegBFactor;
 
-    float speedFactor = 7.142857f;
+    float speedFactor = 0.0001f;
     float overallTime = 0;
 
     public RobotJoint(char _thisJoint)

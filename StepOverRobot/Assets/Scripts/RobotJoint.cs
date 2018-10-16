@@ -19,6 +19,7 @@ public class RobotJoint
     public float distanceToMove;
 
     float overallTime = 0;
+    float speedFactor = 0.0001f;
 
     public RobotJoint(float _jointSpeed, float _jointResetPos)
     {
@@ -53,7 +54,7 @@ public class RobotJoint
         }
     }
 
-    public void SetLerpValues(int legCRailMoveType)
+    public void SetLerpValues()
     {
         if (targetPos != currentPos)
         {
@@ -62,7 +63,7 @@ public class RobotJoint
             startPos = currentPos;
             startTime = overallTime;
             elapsedTime = 0;
-            timeForMove = Mathf.Abs(targetPos - startPos) / speed;
+            timeForMove = Mathf.Abs(targetPos - startPos) / (speed * speedFactor);
         }
     }
     void SetupJoint(float _speed, float _resetPos)
