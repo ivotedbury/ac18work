@@ -29,7 +29,7 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 0, 4));
+        allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
         allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
         allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform); CreateGridLines();
     }
@@ -37,6 +37,7 @@ public class MainController : MonoBehaviour
     void Update()
     {
         DisplayAllMeshes();
+        DoManualCommands();
     }
 
     void DisplayAllMeshes()
@@ -45,6 +46,15 @@ public class MainController : MonoBehaviour
         {
             allRobots[i].UpdateRobot();
             DisplayRobot(allRobots[i], allRobotMeshes[i]);
+        }
+    }
+
+    void DoManualCommands()
+    {
+        if (Input.GetKeyDown("t"))
+        {
+            allRobots[0].TakeStep(4,0,0);
+            Debug.Log("T");
         }
     }
 

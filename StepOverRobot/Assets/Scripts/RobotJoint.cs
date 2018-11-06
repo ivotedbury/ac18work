@@ -24,6 +24,7 @@ public class RobotJoint
     public RobotJoint(float _jointSpeed, float _jointResetPos)
     {
         SetupJoint(_jointSpeed, _jointResetPos);
+        
     }
 
     public bool JointNeedsToMove()
@@ -71,5 +72,6 @@ public class RobotJoint
               speed = _speed;
         resetPos = _resetPos;
         currentPos = resetPos;
+        targetPos = currentPos;
     }
 }

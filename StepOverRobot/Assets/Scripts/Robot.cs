@@ -14,13 +14,29 @@ public class Robot
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
 
+    float legARailResetSpeed = 500;
+    float legAVerticalResetSpeed = 500;
+    float legARotationResetSpeed = 500;
+    float legBRailResetSpeed = 500;
+    float legBVerticalResetSpeed = 500;
+    float legBRotationResetSpeed = 500;
+    float legCRailResetSpeed = 500;
+    float legCRotationResetSpeed = 500;
+    float legCGripResetSpeed = 500;
+
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0625f;
 
     List<RobotJoint> allJoints = new List<RobotJoint>();
     RobotGesture robotGesture = new RobotGesture();
     List<float[]> jointTargetList = new List<float[]>();
-    bool moveInProgress = false;
+    bool gestureInProgress = false;
+    int gestureCounter;
+   bool moveInProgress;
+
+    //gesture types
+    int rotateLeg = 0;
+    int liftLeg = 1;
 
     RobotJoint legARailJoint;
     RobotJoint legAVerticalJoint;
@@ -61,17 +77,20 @@ public class Robot
     int currentlyAttached;
     int leadingLeg;
 
-    public Robot(Vector3Int _startingCell, int _currentlyAttached, int _leadingLeg, int _startingStance)
+    int legA = 0;
+    int legB = 1;
+
+    public Robot(Vector3Int _startingCell, int _currentlyAttached, int _startingStance)
     {
-        legARailJoint = new RobotJoint(100, legARailResetPos);
-        legAVerticalJoint = new RobotJoint(100, legAVerticalResetPos);
-        legARotationJoint = new RobotJoint(100, legARotationResetPos);
-        legBRailJoint = new RobotJoint(100, legBRailResetPos);
-        legBVerticalJoint = new RobotJoint(100, legBVerticalResetPos);
-        legBRotationJoint = new RobotJoint(100, legBRotationResetPos);
-        legCRailJoint = new RobotJoint(100, legCRailResetPos);
-        legCRotationJoint = new RobotJoint(100, legCRotationResetPos);
-        legCGripJoint = new RobotJoint(100, legCGripResetPos);
+        legARailJoint = new RobotJoint(legARailResetSpeed, legARailResetPos);
+        legAVerticalJoint = new RobotJoint(legAVerticalResetSpeed, legAVerticalResetPos);
+        legARotationJoint = new RobotJoint(legARotationResetSpeed, legARotationResetPos);
+        legBRailJoint = new RobotJoint(legBRailResetSpeed, legBRailResetPos);
+        legBVerticalJoint = new RobotJoint(legBVerticalResetSpeed, legBVerticalResetPos);
+        legBRotationJoint = new RobotJoint(legBRotationResetSpeed, legBRotationResetPos);
+        legCRailJoint = new RobotJoint(legCRailResetSpeed, legCRailResetPos);
+        legCRotationJoint = new RobotJoint(legCRotationResetSpeed, legCRotationResetPos);
+        legCGripJoint = new RobotJoint(legCGripResetSpeed, legCGripResetPos);
 
         allJoints.Add(legARailJoint);
         allJoints.Add(legAVerticalJoint);
@@ -84,7 +103,15 @@ public class Robot
         allJoints.Add(legCGripJoint);
 
         currentlyAttached = _currentlyAttached;
-        leadingLeg = _leadingLeg;
+
+        if (currentlyAttached == legA)
+        {
+            leadingLeg = legB;
+        }
+        else
+        {
+            leadingLeg = legA;
+        }
 
         if (currentlyAttached == 0)
         {
@@ -109,10 +136,48 @@ public class Robot
     public void Rotate()
     {
         jointTargetList.Clear();
-        jointTargetList.Add(robotGesture.GetGesture("rotateLeg", 1, 90));
-        RobotMove(jointTargetList[0]);
+        jointTargetList.Add(robotGesture.GetGesture(rotateLeg, 0, 0, 90));
     }
 
+    public void TakeStep(int _stepLength, int _stepHeight, int _stepTurnAngle)
+    {
+        jointTargetList.Clear();
+        jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 1, 0));
+        jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 0, 0));
+        gestureCounter = 0;
+        moveInProgress = true;
+    }
+
+    void MakeNextGesture()
+    {
+        RobotMove(jointTargetList[gestureCounter]);
+        gestureCounter++;
+
+        if (gestureCounter == jointTargetList.Count)
+        {
+            moveInProgress = false;
+        }
+    }
+
+    void CarryOutMoves()
+    {
+        gestureInProgress = false;
+
+        foreach (RobotJoint joint in allJoints)
+        {
+            if (joint.JointNeedsToMove())
+            {
+                gestureInProgress = true;
+            }
+         
+            joint.LerpJointPosition();
+        }
+
+        if (!gestureInProgress && moveInProgress)
+        {
+            MakeNextGesture();
+        }
+    }
 
     void RobotMove(float[] _jointTarget)
     {
@@ -176,26 +241,11 @@ public class Robot
         }
     }
 
-    void CarryOutMoves()
-    {
-        foreach (RobotJoint joint in allJoints)
-        {
-            if (joint.JointNeedsToMove())
-            {
-                moveInProgress = true;
-            }
-            else
-            {
-                moveInProgress = false;
-            }
 
-            joint.LerpJointPosition();
-        }
-    }
 
     void UpdateReferenceTransforms()
     {
-        if (currentlyAttached == 0)
+        if (currentlyAttached == legA)
         {
             legAPos = legAFootPos;
             legARot = Quaternion.Euler(0, legARotationJoint.currentPos, 0) * legAFootRot;
@@ -228,7 +278,7 @@ public class Robot
             grip2Rot = legCFootRot;
         }
 
-        if (currentlyAttached == 1)
+        if (currentlyAttached == legB)
         {
             legBPos = legBFootPos;
             legBRot = Quaternion.Euler(0, legBRotationJoint.currentPos, 0) * legBFootRot;
