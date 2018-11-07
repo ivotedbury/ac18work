@@ -19,7 +19,7 @@ public class RobotJoint
     public float distanceToMove;
 
     float overallTime = 0;
-    float speedFactor = 0.0001f;
+    float speedFactor = 1f;
 
     public RobotJoint(float _jointSpeed, float _jointResetPos)
     {

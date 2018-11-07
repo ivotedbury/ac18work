@@ -23,21 +23,43 @@ public class MainController : MonoBehaviour
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0625f;
 
+    int testStepSize = 4;
+
     Vector3Int gridSize = new Vector3Int(40, 40, 40);
 
     int numberOfRobots = 1;
 
     void Start()
     {
+        Time.timeScale = 3f;
+
         allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
+        allRobots.Add(new Robot(new Vector3Int(12, 0, 16), 0, 4));
+        allRobots.Add(new Robot(new Vector3Int(24, 0, 28), 0, 4));
+
         allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
-        allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform); CreateGridLines();
+        allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
+        allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
+
+        allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform);
+        allRobotMeshes[1].transform.SetParent(robotMeshContainer.transform);
+        allRobotMeshes[2].transform.SetParent(robotMeshContainer.transform);
+        CreateGridLines();
+
     }
 
     void Update()
     {
         DisplayAllMeshes();
         DoManualCommands();
+
+        for (int i = 0; i < allRobots.Count; i++)
+        {
+            if (!allRobots[i].moveInProgress)
+            {
+                allRobots[i].TakeStep(testStepSize, 0, 90);
+            }
+        }
     }
 
     void DisplayAllMeshes()
@@ -53,8 +75,16 @@ public class MainController : MonoBehaviour
     {
         if (Input.GetKeyDown("t"))
         {
-            allRobots[0].TakeStep(4,0,0);
+            allRobots[0].TakeStep(4, 0, 90);
             Debug.Log("T");
+        }
+        if (Input.GetKeyDown("e"))
+        {
+            testStepSize++;
+        }
+        if (Input.GetKeyDown("w"))
+        {
+            testStepSize--;
         }
     }
 
