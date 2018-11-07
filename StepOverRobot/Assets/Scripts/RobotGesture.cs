@@ -12,6 +12,9 @@ public class RobotGesture
     int liftLeg = 1;
     int setOverLeg = 2;
     int outstretchLeg = 3;
+    int stepDownLegs = 4;
+    int stepUpLegs = 5;
+    int goToStance = 6;
 
     float legARailResetPos = 0.28125f;
     float legAVerticalResetPos = 0.18125f;
@@ -31,13 +34,13 @@ public class RobotGesture
     int halfBrick = 2;
 
     float brickFactor;
-    float noBrickFactor = 0.5f / 0.5f;
-    float fullBrickFactor = 0.5f / 2.5f;
-    float halfBrickFactor = 0.5f / 1.5f;
+    float noBrickFactor = 0.5f / (0.5f + 6);
+    float fullBrickFactor = 0.5f / (2.5f + 6);
+    float halfBrickFactor = 0.5f / (1.5f + 6);
 
-    public float[] GetGesture(int _type, int _leg, int _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
+    public float[] GetGesture(int _type, int _leg, float _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
     {
-        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         //set the brick factor
         if (_brickCurrentlyCarried == noBrick)
@@ -76,12 +79,42 @@ public class RobotGesture
             if (_leg == legA)
             {
                 _output[1] = legAVerticalResetPos - (_legHeight * gridYDim);
-                _output[2] = 0;
             }
             else if (_leg == legB)
             {
                 _output[4] = legBVerticalResetPos - (_legHeight * gridYDim);
-               _output[5] = 0;
+            }
+        }
+
+        // step down legs type
+        if (_type == stepDownLegs)
+        {
+            if (_leg == legA)
+            {
+                _output[1] = legAVerticalResetPos + ((_legHeight + 1) * gridYDim);
+                _output[4] = legBVerticalResetPos + (_legHeight * gridYDim);
+
+            }
+            else if (_leg == legB)
+            {
+                _output[1] = legAVerticalResetPos + (_legHeight * gridYDim);
+                _output[4] = legBVerticalResetPos + ((_legHeight + 1) * gridYDim);
+            }
+        }
+
+        // step up legs type
+        if (_type == stepUpLegs)
+        {
+            if (_leg == legA)
+            {
+                _output[1] = legAVerticalResetPos - (_legHeight * gridYDim);
+                _output[4] = legBVerticalResetPos;
+
+            }
+            else if (_leg == legB)
+            {
+                _output[1] = legAVerticalResetPos;
+                _output[4] = legBVerticalResetPos - (_legHeight * gridYDim);
             }
         }
 
@@ -90,15 +123,24 @@ public class RobotGesture
         {
             if (_leg == legA)
             {
-                _output[0] = 7 * gridXZDim;
-                _output[3] = (7 + _legStance) * gridXZDim;
-                _output[6] = (7 + (_legStance * brickFactor)) * gridXZDim;
+                _output[0] = (7 + (_legStance * brickFactor)) * gridXZDim;
+                _output[3] = (7 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[6] = 7 * gridXZDim;
+
+                _output[9] = 1;
+                _output[10] = 1;
+                _output[11] = 1;
             }
+
             else if (_leg == legB)
             {
-                _output[0] = (7 + _legStance) * gridXZDim;
-                _output[3] = 7 * gridXZDim;
-                _output[6] = (7 + (_legStance * brickFactor)) * gridXZDim;
+                _output[0] = (7 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[3] = (7 + (_legStance * brickFactor)) * gridXZDim;
+                _output[6] = 7 * gridXZDim;
+
+                _output[9] = 1;
+                _output[10] = 1;
+                _output[11] = 1;
             }
         }
 
@@ -106,19 +148,29 @@ public class RobotGesture
         {
             if (_leg == legB)
             {
-                _output[0] = 7 * gridXZDim;
-                _output[3] = (7 - _legStance) * gridXZDim;
-                _output[6] = (7 - (_legStance * brickFactor)) * gridXZDim;
+                _output[0] = (7 - (_legStance * brickFactor)) * gridXZDim;
+                _output[3] = (7 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[6] = 7 * gridXZDim;
 
                 _output[2] = _rotationAngle;
+                _output[5] = 0;
+
+                _output[9] = brickFactor;
+                _output[10] = 1;
+                _output[11] = brickFactor;
             }
             else if (_leg == legA)
             {
-                _output[0] = (7 - _legStance) * gridXZDim;
-                _output[3] = 7 * gridXZDim;
-                _output[6] = (7 - (_legStance * brickFactor)) * gridXZDim;
+                _output[0] = (7 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[3] = (7 - (_legStance * brickFactor)) * gridXZDim;
+                _output[6] = 7 * gridXZDim;
 
+                _output[2] = 0;
                 _output[5] = _rotationAngle;
+
+                _output[9] = 1;
+                _output[10] = brickFactor;
+                _output[11] = brickFactor;
             }
         }
 

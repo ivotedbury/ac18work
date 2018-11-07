@@ -24,6 +24,8 @@ public class MainController : MonoBehaviour
     float gridYDim = 0.0625f;
 
     int testStepSize = 4;
+    int testTurnAngle = 0;
+    int testStepHeight = 0;
 
     Vector3Int gridSize = new Vector3Int(40, 40, 40);
 
@@ -31,19 +33,19 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 3f;
+        Time.timeScale = 1f;
 
         allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
-        allRobots.Add(new Robot(new Vector3Int(12, 0, 16), 0, 4));
-        allRobots.Add(new Robot(new Vector3Int(24, 0, 28), 0, 4));
+        //  allRobots.Add(new Robot(new Vector3Int(12, 0, 16), 0, 4));
+        //  allRobots.Add(new Robot(new Vector3Int(24, 0, 28), 0, 4));
 
         allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
-        allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
-        allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
+        //   allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
+        //  allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
 
         allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform);
-        allRobotMeshes[1].transform.SetParent(robotMeshContainer.transform);
-        allRobotMeshes[2].transform.SetParent(robotMeshContainer.transform);
+        //   allRobotMeshes[1].transform.SetParent(robotMeshContainer.transform);
+        //   allRobotMeshes[2].transform.SetParent(robotMeshContainer.transform);
         CreateGridLines();
 
     }
@@ -57,7 +59,7 @@ public class MainController : MonoBehaviour
         {
             if (!allRobots[i].moveInProgress)
             {
-                allRobots[i].TakeStep(testStepSize, 0, 90);
+                allRobots[i].TakeStep(testStepSize, testStepHeight, testTurnAngle);
             }
         }
     }
@@ -75,9 +77,22 @@ public class MainController : MonoBehaviour
     {
         if (Input.GetKeyDown("t"))
         {
-            allRobots[0].TakeStep(4, 0, 90);
+            allRobots[0].TakeStep(4, 0, 0);
             Debug.Log("T");
         }
+
+        if (Input.GetKeyDown("y"))
+        {
+            allRobots[0].TakeStep(4, +1, 0);
+            Debug.Log("Y");
+        }
+
+        if (Input.GetKeyDown("r"))
+        {
+            allRobots[0].TakeStep(4, -1, 0);
+            Debug.Log("R");
+        }
+
         if (Input.GetKeyDown("e"))
         {
             testStepSize++;
@@ -85,6 +100,36 @@ public class MainController : MonoBehaviour
         if (Input.GetKeyDown("w"))
         {
             testStepSize--;
+        }
+
+        if (Input.GetKeyDown("a"))
+        {
+            testStepHeight = -1;
+        }
+        if (Input.GetKeyDown("s"))
+        {
+            testStepHeight = 0;
+        }
+        if (Input.GetKeyDown("d"))
+        {
+            testStepHeight = 1;
+        }
+
+        if (Input.GetKeyDown("i"))
+        {
+            testTurnAngle = 0;
+        }
+        if (Input.GetKeyDown("j"))
+        {
+            testTurnAngle = -90;
+        }
+        if (Input.GetKeyDown("l"))
+        {
+            testTurnAngle = 90;
+        }
+        if (Input.GetKeyDown("k"))
+        {
+            testTurnAngle = 180;
         }
     }
 

@@ -6,7 +6,7 @@ public class RobotJoint
 {
 
     //general
-    float speed;
+   public float speed;
     public float resetPos;
     public float currentPos;
     public float targetPos;
