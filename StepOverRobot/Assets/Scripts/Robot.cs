@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Robot
 {
-    float legARailResetPos = 0.28125f;
+    float legARailResetPos = 0.225f; //0.28125f;
     float legAVerticalResetPos = 0.18125f;
     float legARotationResetPos = 0;
-    float legBRailResetPos = 0.50625f;
+    float legBRailResetPos = 0.45f; //0.50625f;
     float legBVerticalResetPos = 0.18125f;
     float legBRotationResetPos = 0;
-    float legCRailResetPos = 0.39375f;
+    float legCRailResetPos = 0.3375f; //0.39375f;
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
 
@@ -420,7 +420,7 @@ public class Robot
             legBHipRot = legBRot;
 
             mainBeamPos = legBHipPos + legBRot * new Vector3(0, legBVerticalResetPos + 0.04f, (legCRailResetPos - legBRailJoint.currentPos));
-            mainBeamRot = legBRot;
+            mainBeamRot = legBRot * Quaternion.Euler(0,180,0);
 
             legAHipPos = mainBeamPos - legBRot * (new Vector3(0, legAVerticalResetPos + 0.04f, legCRailResetPos - legARailJoint.currentPos));
             legAHipRot = legARot * Quaternion.Euler(0, 0, 0);

@@ -33,7 +33,7 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 2.5f;
 
         allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
         //  allRobots.Add(new Robot(new Vector3Int(12, 0, 16), 0, 4));

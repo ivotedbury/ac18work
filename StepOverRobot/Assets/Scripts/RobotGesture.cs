@@ -16,13 +16,13 @@ public class RobotGesture
     int stepUpLegs = 5;
     int goToStance = 6;
 
-    float legARailResetPos = 0.28125f;
+    float legARailResetPos = 0.225f; //0.28125f;
     float legAVerticalResetPos = 0.18125f;
     float legARotationResetPos = 0;
-    float legBRailResetPos = 0.50625f;
+    float legBRailResetPos = 0.45f; //0.50625f;
     float legBVerticalResetPos = 0.18125f;
     float legBRotationResetPos = 0;
-    float legCRailResetPos = 0.39375f;
+    float legCRailResetPos = 0.3375f; //0.39375f;
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
 
@@ -123,9 +123,9 @@ public class RobotGesture
         {
             if (_leg == legA)
             {
-                _output[0] = (7 + (_legStance * brickFactor)) * gridXZDim;
-                _output[3] = (7 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[6] = 7 * gridXZDim;
+                _output[0] = (6 + (_legStance * brickFactor)) * gridXZDim;
+                _output[3] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[6] = 6 * gridXZDim;
 
                 _output[9] = 1;
                 _output[10] = 1;
@@ -134,9 +134,9 @@ public class RobotGesture
 
             else if (_leg == legB)
             {
-                _output[0] = (7 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[3] = (7 + (_legStance * brickFactor)) * gridXZDim;
-                _output[6] = 7 * gridXZDim;
+                _output[0] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[3] = (6 + (_legStance * brickFactor)) * gridXZDim;
+                _output[6] = 6 * gridXZDim;
 
                 _output[9] = 1;
                 _output[10] = 1;
@@ -148,9 +148,9 @@ public class RobotGesture
         {
             if (_leg == legB)
             {
-                _output[0] = (7 - (_legStance * brickFactor)) * gridXZDim;
-                _output[3] = (7 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[6] = 7 * gridXZDim;
+                _output[0] = (6 - (_legStance * brickFactor)) * gridXZDim;
+                _output[3] = (6 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[6] = 6 * gridXZDim;
 
                 _output[2] = _rotationAngle;
                 _output[5] = 0;
@@ -161,9 +161,9 @@ public class RobotGesture
             }
             else if (_leg == legA)
             {
-                _output[0] = (7 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[3] = (7 - (_legStance * brickFactor)) * gridXZDim;
-                _output[6] = 7 * gridXZDim;
+                _output[0] = (6 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
+                _output[3] = (6 - (_legStance * brickFactor)) * gridXZDim;
+                _output[6] = 6 * gridXZDim;
 
                 _output[2] = 0;
                 _output[5] = _rotationAngle;
