@@ -7,14 +7,16 @@ public class RobotGesture
     int legA = 0;
     int legB = 1;
     int legC = 2;
-
+    
+    //gesture types
     int rotateLeg = 0;
     int liftLeg = 1;
     int setOverLeg = 2;
     int outstretchLeg = 3;
     int stepDownLegs = 4;
     int stepUpLegs = 5;
-    int goToStance = 6;
+    int outstretchGripper = 6;
+    int goToStance = 7;
 
     float legARailResetPos = 0.225f; //0.28125f;
     float legAVerticalResetPos = 0.18125f;
@@ -33,29 +35,71 @@ public class RobotGesture
     int fullBrick = 1;
     int halfBrick = 2;
 
+    // speed factor between body and leg
     float brickFactor;
     float noBrickFactor = 0.5f / (0.5f + 6);
     float fullBrickFactor = 0.5f / (2.5f + 6);
     float halfBrickFactor = 0.5f / (1.5f + 6);
 
-    public float[] GetGesture(int _type, int _leg, float _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
+    // speed factor between body and gripper
+    float brickFactorForBody;
+    float noBrickFactorForBody = 6 / 0.5f;
+    float fullBrickactorForBody = 6 / 2.5f;
+    float halfBrickFactorForBody = 6 / 1.5f;
+
+    void SetBrickFactor(int _brickType)
+    {
+        //set the brick factor
+        if (_brickType == noBrick)
+        {
+            brickFactor = noBrickFactor;
+            brickFactorForBody = noBrickFactorForBody;
+        }
+        else if (_brickType == fullBrick)
+        {
+            brickFactor = fullBrickFactor;
+            brickFactorForBody = fullBrickactorForBody;
+        }
+        else if (_brickType == halfBrick)
+        {
+            brickFactor = halfBrickFactor;
+            brickFactorForBody = halfBrickFactorForBody;
+        }
+    }
+
+    public float[] OutStretchGripper(int _legCurrentlyAttached, int _distanceInFront, int _distanceToSide, int _previousStepLength, int _brickCurrentlyCarried)
     {
         float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-        //set the brick factor
-        if (_brickCurrentlyCarried == noBrick)
-        {
-            brickFactor = noBrickFactor;
-        }
-        else if (_brickCurrentlyCarried == fullBrick)
-        {
-            brickFactor = fullBrickFactor;
-        }
-        else if (_brickCurrentlyCarried == halfBrick)
-        {
-            brickFactor = halfBrickFactor;
-        }
+        SetBrickFactor(_brickCurrentlyCarried);
 
+        float rotationAngle = RadianToDegree(Mathf.Atan(_distanceToSide / _distanceInFront));
+        float outstretchDistance = Mathf.Sqrt(Mathf.Pow(_distanceInFront, 2) + Mathf.Pow(_distanceToSide, 2));
+
+        Debug.Log(rotationAngle);
+        Debug.Log(outstretchDistance);
+        
+        float gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * outstretchDistance);
+
+        Debug.Log(gripperDisplacementFromEnd);
+
+
+        if (_legCurrentlyAttached == legA)
+        {
+            _output[0] = (gripperDisplacementFromEnd + outstretchDistance) * gridXZDim;
+            _output[3] = (gripperDisplacementFromEnd + outstretchDistance + _previousStepLength) * gridXZDim;
+            _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
+
+        }
+            return _output;
+    }
+
+        public float[] GetGesture(int _type, int _leg, float _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        SetBrickFactor(_brickCurrentlyCarried);
+       
         //rotate type
         if (_type == rotateLeg)
         {
@@ -144,6 +188,7 @@ public class RobotGesture
             }
         }
 
+        // outstretch leg type
         if (_type == outstretchLeg)
         {
             if (_leg == legB)
@@ -174,10 +219,17 @@ public class RobotGesture
             }
         }
 
-        // outstretch leg type
-
-
 
         return _output;
+    }
+
+    private float RadianToDegree(float angle)
+    {
+        return (angle * (180 / Mathf.PI));
+    }
+
+    private float DegreeToRadian(float angle)
+    {
+        return (Mathf.PI * angle / 180);
     }
 }

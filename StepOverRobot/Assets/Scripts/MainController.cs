@@ -5,9 +5,13 @@ using UnityEngine.UI;
 
 public class MainController : MonoBehaviour
 {
-
+    public GameObject cameraTracker;
     public GameObject robotMeshes;
     public GameObject robotMeshContainer;
+
+    public GameObject fullBrickMesh;
+    public GameObject halfBrickMesh;
+    //  public GameObject brickMeshContainer;
 
     public GameObject lineRendererObject;
     public GameObject lineRendererContainer;
@@ -19,6 +23,10 @@ public class MainController : MonoBehaviour
     List<LineRenderer> allLineRenderers = new List<LineRenderer>();
 
     List<Robot> allRobots = new List<Robot>();
+
+    Grid grid;
+    Brick fullBrick;
+    Brick halfBrick;
 
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0625f;
@@ -33,8 +41,18 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 2.5f;
+        Time.timeScale = 1.5f;
 
+        grid = new Grid(gridSize);
+
+        fullBrick = new Brick(grid, grid.cellsArray[3, 0, 3], 0, 1, false);
+        fullBrickMesh.transform.position = fullBrick.currentPosition;
+        fullBrickMesh.transform.rotation = fullBrick.currentRotation;
+
+        halfBrick = new Brick(grid, grid.cellsArray[6, 0, 3], 0, 2, false);
+        halfBrickMesh.transform.position = halfBrick.currentPosition;
+        halfBrickMesh.transform.rotation = halfBrick.currentRotation;
+                
         allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
         //  allRobots.Add(new Robot(new Vector3Int(12, 0, 16), 0, 4));
         //  allRobots.Add(new Robot(new Vector3Int(24, 0, 28), 0, 4));
@@ -46,6 +64,9 @@ public class MainController : MonoBehaviour
         allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform);
         //   allRobotMeshes[1].transform.SetParent(robotMeshContainer.transform);
         //   allRobotMeshes[2].transform.SetParent(robotMeshContainer.transform);
+
+        //allRobots[0].brickCurrentlyBeingCarried = fullBrick;
+
         CreateGridLines();
 
     }
@@ -55,13 +76,26 @@ public class MainController : MonoBehaviour
         DisplayAllMeshes();
         DoManualCommands();
 
-        for (int i = 0; i < allRobots.Count; i++)
-        {
-            if (!allRobots[i].moveInProgress)
-            {
-                allRobots[i].TakeStep(testStepSize, testStepHeight, testTurnAngle);
-            }
-        }
+        //for (int i = 0; i < allRobots.Count; i++)
+        //{
+        //    if (!allRobots[i].moveInProgress)
+        //    {
+        //        allRobots[i].TakeStep(testStepSize, testStepHeight, testTurnAngle);
+        //    }
+        //}
+
+        cameraTracker.transform.position = allRobots[0].averageRobotPos;
+
+        UpdateBricks();
+    }
+
+    void UpdateBricks()
+    {
+        fullBrickMesh.transform.position = fullBrick.currentPosition;
+        fullBrickMesh.transform.rotation = fullBrick.currentRotation;
+
+        halfBrickMesh.transform.position = halfBrick.currentPosition;
+        halfBrickMesh.transform.rotation = halfBrick.currentRotation;
     }
 
     void DisplayAllMeshes()
@@ -91,6 +125,12 @@ public class MainController : MonoBehaviour
         {
             allRobots[0].TakeStep(4, -1, 0);
             Debug.Log("R");
+        }
+
+        if (Input.GetKeyDown("n"))
+        {
+            allRobots[0].HandleBrick(0, 4, 0, 1, 0, fullBrick, true);
+            Debug.Log("PICKUP");
         }
 
         if (Input.GetKeyDown("e"))
