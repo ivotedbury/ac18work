@@ -41,11 +41,11 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 1.5f;
+        Time.timeScale = 0.5f;
 
         grid = new Grid(gridSize);
 
-        fullBrick = new Brick(grid, grid.cellsArray[3, 0, 3], 0, 1, false);
+        fullBrick = new Brick(grid, grid.cellsArray[3, 0, 3], 90, 1, false);
         fullBrickMesh.transform.position = fullBrick.currentPosition;
         fullBrickMesh.transform.rotation = fullBrick.currentRotation;
 
@@ -66,6 +66,8 @@ public class MainController : MonoBehaviour
         //   allRobotMeshes[2].transform.SetParent(robotMeshContainer.transform);
 
         //allRobots[0].brickCurrentlyBeingCarried = fullBrick;
+
+        allRobots[0].brickCurrentlyBeingCarried = fullBrick;
 
         CreateGridLines();
 

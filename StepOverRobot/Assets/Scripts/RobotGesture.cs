@@ -7,7 +7,7 @@ public class RobotGesture
     int legA = 0;
     int legB = 1;
     int legC = 2;
-    
+
     //gesture types
     int rotateLeg = 0;
     int liftLeg = 1;
@@ -19,10 +19,10 @@ public class RobotGesture
     int goToStance = 7;
 
     float legARailResetPos = 0.225f; //0.28125f;
-    float legAVerticalResetPos = 0.18125f;
+    float legAVerticalResetPos = 0.2125f;
     float legARotationResetPos = 0;
     float legBRailResetPos = 0.45f; //0.50625f;
-    float legBVerticalResetPos = 0.18125f;
+    float legBVerticalResetPos = 0.2125f;
     float legBRotationResetPos = 0;
     float legCRailResetPos = 0.3375f; //0.39375f;
     float legCRotationResetPos = 0;
@@ -78,7 +78,7 @@ public class RobotGesture
 
         Debug.Log(rotationAngle);
         Debug.Log(outstretchDistance);
-        
+
         float gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * outstretchDistance);
 
         Debug.Log(gripperDisplacementFromEnd);
@@ -91,15 +91,39 @@ public class RobotGesture
             _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
 
         }
-            return _output;
+
+        return _output;
     }
 
-        public float[] GetGesture(int _type, int _leg, float _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
+    public float[] RotateGripper(float _angleToRotate)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        _output[7] = _angleToRotate;
+
+        Debug.Log(_angleToRotate);
+
+        return _output;
+    }
+
+    public float[] LowerLegsToPlace(int _relativeBrickHeight, int _legCurrentlyAttached)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1 ) * gridYDim) - 0.02625f - 0.005f; //
+        _output[4] = legAVerticalResetPos + ((_relativeBrickHeight - 2) * gridYDim) - 0.02625f - 0.005f; //
+
+
+
+        return _output;
+    }
+
+    public float[] GetGesture(int _type, int _leg, float _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
     {
         float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         SetBrickFactor(_brickCurrentlyCarried);
-       
+
         //rotate type
         if (_type == rotateLeg)
         {

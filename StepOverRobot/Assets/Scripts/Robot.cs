@@ -5,10 +5,10 @@ using UnityEngine;
 public class Robot
 {
     float legARailResetPos = 0.225f; //0.28125f;
-    float legAVerticalResetPos = 0.18125f;
+    float legAVerticalResetPos = 0.2125f;
     float legARotationResetPos = 0;
     float legBRailResetPos = 0.45f; //0.50625f;
-    float legBVerticalResetPos = 0.18125f;
+    float legBVerticalResetPos = 0.2125f;
     float legBRotationResetPos = 0;
     float legCRailResetPos = 0.3375f; //0.39375f;
     float legCRotationResetPos = 0;
@@ -187,7 +187,9 @@ public class Robot
         }
 
         brickCurrentlyBeingCarried = _brickToMove;
-      
+
+
+
         //set over attached leg
         jointTargetList.Add(robotGesture.GetGesture(setOverLeg, currentlyAttached, 0, previousStepLength, 0, brickCurrentlyCarried));
 
@@ -209,13 +211,16 @@ public class Robot
         }
 
         // outstretch the gripper and rotate
-       jointTargetList.Add(robotGesture.OutStretchGripper(currentlyAttached, _distanceInFront, _distanceToSide, previousStepLength, brickCurrentlyCarried));
+        jointTargetList.Add(robotGesture.OutStretchGripper(currentlyAttached, _distanceInFront, _distanceToSide, previousStepLength, brickCurrentlyCarried));
 
-
-
+        float brickfinalRotation = brickCurrentlyBeingCarried.rotation.eulerAngles.y;
+        float currentRotation = brickCurrentlyBeingCarried.currentRotation.eulerAngles.y;
+        float angleToRotate = currentRotation - brickfinalRotation;
         // rotate the brick
+        jointTargetList.Add(robotGesture.RotateGripper(angleToRotate));
 
         // place brick
+        jointTargetList.Add(robotGesture.LowerLegsToPlace(_relativeBrickHeight, currentlyAttached));
 
         gestureCounter = 0;
         moveInProgress = true;
@@ -466,10 +471,10 @@ public class Robot
             legAHipPos = legAPos + new Vector3(0, (legAVerticalJoint.currentPos - legAVerticalResetPos), 0);
             legAHipRot = legARot;
 
-            mainBeamPos = legAHipPos + legARot * new Vector3(0, legAVerticalResetPos + 0.04f, (legARailJoint.currentPos - legCRailResetPos));
+            mainBeamPos = legAHipPos + legARot * new Vector3(0, legAVerticalResetPos /*+ 0.045f*/, (legARailJoint.currentPos - legCRailResetPos));
             mainBeamRot = legARot;
 
-            legBHipPos = mainBeamPos - legARot * (new Vector3(0, legBVerticalResetPos + 0.04f, legBRailJoint.currentPos - legCRailResetPos));
+            legBHipPos = mainBeamPos - legARot * (new Vector3(0, legBVerticalResetPos /*+ 0.045f*/, legBRailJoint.currentPos - legCRailResetPos));
             legBHipRot = legARot * Quaternion.Euler(0, 180, 0);
 
             legBPos = legBHipPos - new Vector3(0, legBVerticalJoint.currentPos - legBVerticalResetPos, 0);
@@ -478,11 +483,11 @@ public class Robot
             legBFootPos = legBPos;
             legBFootRot = legARot * Quaternion.Euler(0, legBRotationJoint.currentPos, 0) * Quaternion.Euler(0, 180, 0);
 
-            legCShoulderPos = mainBeamPos + legARot * (new Vector3(0, -0.04f, (legCRailJoint.currentPos - legCRailResetPos)));
+            legCShoulderPos = mainBeamPos + legARot * (new Vector3(0, -0.04125f, (legCRailJoint.currentPos - legCRailResetPos)));
             legCShoulderRot = legARot;
 
             legCFootPos = legCShoulderPos;
-            legCFootRot = legCShoulderRot * Quaternion.Euler(0, -legCRotationJoint.currentPos / 10, 0);
+            legCFootRot = legCShoulderRot * Quaternion.Euler(0, -legCRotationJoint.currentPos, 0);
 
             grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, -(legCGripJoint.currentPos) * 0.00001f));
             grip1Rot = legCFootRot;
@@ -499,10 +504,10 @@ public class Robot
             legBHipPos = legBPos + new Vector3(0, (legBVerticalJoint.currentPos - legBVerticalResetPos), 0);
             legBHipRot = legBRot;
 
-            mainBeamPos = legBHipPos + legBRot * new Vector3(0, legBVerticalResetPos + 0.04f, (legCRailResetPos - legBRailJoint.currentPos));
+            mainBeamPos = legBHipPos + legBRot * new Vector3(0, legBVerticalResetPos /*+ 0.045f*/, (legCRailResetPos - legBRailJoint.currentPos));
             mainBeamRot = legBRot * Quaternion.Euler(0, 180, 0);
 
-            legAHipPos = mainBeamPos - legBRot * (new Vector3(0, legAVerticalResetPos + 0.04f, legCRailResetPos - legARailJoint.currentPos));
+            legAHipPos = mainBeamPos - legBRot * (new Vector3(0, legAVerticalResetPos /*+ 0.045f*/, legCRailResetPos - legARailJoint.currentPos));
             legAHipRot = legARot * Quaternion.Euler(0, 0, 0);
 
             legAPos = legAHipPos - new Vector3(0, legAVerticalJoint.currentPos - legAVerticalResetPos, 0);
@@ -511,11 +516,11 @@ public class Robot
             legAFootPos = legAPos;
             legAFootRot = legBRot * Quaternion.Euler(0, legARotationJoint.currentPos, 0) * Quaternion.Euler(0, 180, 0);
 
-            legCShoulderPos = mainBeamPos - legBRot * (new Vector3(0, +0.04f, (legCRailJoint.currentPos - legCRailResetPos)));
+            legCShoulderPos = mainBeamPos - legBRot * (new Vector3(0, +0.04125f, (legCRailJoint.currentPos - legCRailResetPos)));
             legCShoulderRot = legBRot;
 
             legCFootPos = legCShoulderPos;
-            legCFootRot = legCShoulderRot * Quaternion.Euler(0, (legCRotationJoint.currentPos / 10) + 180, 0);
+            legCFootRot = legCShoulderRot * Quaternion.Euler(0, (legCRotationJoint.currentPos) + 180, 0);
 
             grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, -(legCGripJoint.currentPos) * 0.00001f));
             grip1Rot = legCFootRot;

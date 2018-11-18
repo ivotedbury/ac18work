@@ -6,7 +6,7 @@ public class RobotJoint
 {
 
     //general
-   public float speed;
+    public float speed;
     public float resetPos;
     public float currentPos;
     public float targetPos;
@@ -24,7 +24,7 @@ public class RobotJoint
     public RobotJoint(float _jointSpeed, float _jointResetPos)
     {
         SetupJoint(_jointSpeed, _jointResetPos);
-        
+
     }
 
     public bool JointNeedsToMove()
@@ -69,7 +69,7 @@ public class RobotJoint
     }
     void SetupJoint(float _speed, float _resetPos)
     {
-              speed = _speed;
+        speed = _speed;
         resetPos = _resetPos;
         currentPos = resetPos;
         targetPos = currentPos;
