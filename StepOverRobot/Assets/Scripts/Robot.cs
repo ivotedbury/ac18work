@@ -569,43 +569,6 @@ public class Robot
     {
         return (Mathf.PI * angle / 180);
     }
-
-    //    void CarryOutMoves()
-    //    {
-    //        if (legARailJoint.JointNeedsToMove() ||
-    //legAVerticalJoint.JointNeedsToMove() ||
-    //legARotationJoint.JointNeedsToMove() ||
-    //legBRailJoint.JointNeedsToMove() ||
-    //legBVerticalJoint.JointNeedsToMove() ||
-    //legCRailJoint.JointNeedsToMove() ||
-    //legCGripJoint.JointNeedsToMove() ||
-    //legCRotationJoint.JointNeedsToMove())
-    //        {
-    //            moveInProgress = true;
-    //        }
-
-    //        else
-    //        {
-    //            moveInProgress = false;
-    //        }
-
-    //        if (!moveInProgress && stepInProgress)
-    //        {
-    //            MakeMove();
-
-    //        }
-
-    //        foreach (RobotJoint joint in allJoints)
-    //        {
-    //            if (_withInterpolation)
-    //            {
-    //                joint.LerpJointPosition();
-    //            }
-    //            else
-    //            {
-    //                joint.currentPos = joint.targetPos;
-    //            }
-    //        }
-    //    }
+      
 }
 
