@@ -24,11 +24,12 @@ public class RobotJoint
     public RobotJoint(float _jointSpeed, float _jointResetPos)
     {
         SetupJoint(_jointSpeed, _jointResetPos);
-
     }
 
     public bool JointNeedsToMove()
     {
+        // if the joint needs to move, return true
+
         overallTime += Time.deltaTime;
 
         bool jointNeedsToMove;
@@ -47,6 +48,8 @@ public class RobotJoint
 
     public void LerpJointPosition()
     {
+        // interpolate between the current and target joint positions
+
         if (currentPos != targetPos)
         {
             float progress = elapsedTime / timeForMove;
@@ -57,6 +60,8 @@ public class RobotJoint
 
     public void SetLerpValues()
     {
+        // if a move is required, find the amount of time it should take. 
+
         if (targetPos != currentPos)
         {
             distanceToMove = Mathf.Abs(targetPos - currentPos);
@@ -67,6 +72,7 @@ public class RobotJoint
             timeForMove = Mathf.Abs(targetPos - startPos) / (speed * speedFactor);
         }
     }
+
     void SetupJoint(float _speed, float _resetPos)
     {
         speed = _speed;

@@ -4,16 +4,21 @@ using UnityEngine;
 
 public class Robot
 {
-    float legARailResetPos = 0.225f; //0.28125f;
+    // reset positions
+    float legARailResetPos = 0.225f;
     float legAVerticalResetPos = 0.2125f;
     float legARotationResetPos = 0;
-    float legBRailResetPos = 0.45f; //0.50625f;
+    float legBRailResetPos = 0.45f;
     float legBVerticalResetPos = 0.2125f;
     float legBRotationResetPos = 0;
-    float legCRailResetPos = 0.3375f; //0.39375f;
+    float legCRailResetPos = 0.3375f;
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
+    float nozzleVerticalResetPos = 0;
+    float nozzleRotationResetPos = 0;
+    float nozzleMortarResetPos = 0;
 
+    // speeds
     float railBasicSpeed = 0.5f;
     float legARailResetSpeed = 0.25f;
     float legAVerticalResetSpeed = 0.25f;
@@ -24,31 +29,55 @@ public class Robot
     float legCRailResetSpeed = 0.25f;
     float legCRotationResetSpeed = 90;
     float legCGripResetSpeed = 0.25f;
+    float nozzleVerticalResetSpeed = 0.25f;
+    float nozzleRotationResetSpeed = 90f;
+    float nozzleMortarResetSpeed = 0.1f;
 
+    //grid dimensions
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0725f;
 
+    // nozzle values
+    Vector3 nozzleOffsetVector = new Vector3(0, 0, 0.39250f);
+    float nozzleExtendedDistance = 0.12350f; //nozzle extended vertical distance;
+
+    // general for robot
     List<RobotJoint> allJoints = new List<RobotJoint>();
     RobotGesture robotGesture = new RobotGesture();
     List<float[]> jointTargetList = new List<float[]>();
+
     bool gestureInProgress = false;
     bool stepInProgress = false;
     int gestureCounter;
-    public bool moveInProgress;
+    public bool moveInProgress; // checked to see when the next step can be taken
 
-    bool steppingDown;
+    // leg states
+    int currentlyAttached; // leg currently attached
+    int leadingLeg; // leg that needs to be lifted next to take a step
+
+    bool steppingDown; // short 'memory' of whether the robot has recently stepped up or down
     bool steppingUp;
 
-    RobotJoint legARailJoint;
-    RobotJoint legAVerticalJoint;
-    RobotJoint legARotationJoint;
-    RobotJoint legBRailJoint;
-    RobotJoint legBVerticalJoint;
-    RobotJoint legBRotationJoint;
-    RobotJoint legCRailJoint;
-    RobotJoint legCRotationJoint;
-    RobotJoint legCGripJoint;
+    int previousStepLength; // short 'memory' of how spaced out its legs are from the previous step
 
+    // list of joints - the number corresponds to the index in the output of each 'gesture' requested
+    RobotJoint legARailJoint; // 0
+    RobotJoint legAVerticalJoint; // 1
+    RobotJoint legARotationJoint; // 2
+    RobotJoint legBRailJoint; // 3
+    RobotJoint legBVerticalJoint; // 4
+    RobotJoint legBRotationJoint; // 5
+    RobotJoint legCRailJoint; // 6
+    RobotJoint legCRotationJoint; // 7
+    RobotJoint legCGripJoint; // 8
+    RobotJoint nozzleVerticalJoint; // 9
+    RobotJoint nozzleRotationJoint; // 10
+    RobotJoint nozzleMortarJoint; // 11
+                                  //legARailSpeed 12
+                                  //legBRailSpeed 13
+                                  //legCRailSpeed 14
+
+    // position used for camera target
     public Vector3 averageRobotPos;
 
     //positions for display meshes
@@ -63,6 +92,7 @@ public class Robot
     public Vector3 legCFootPos;
     public Vector3 grip1Pos;
     public Vector3 grip2Pos;
+    public Vector3 nozzlePos;
 
     //rotations for display meshes
     public Quaternion legAFootRot;
@@ -76,36 +106,23 @@ public class Robot
     public Quaternion legCFootRot;
     public Quaternion grip1Rot;
     public Quaternion grip2Rot;
+    public Quaternion nozzleRot;
 
-    // leg states
-    int currentlyAttached;
-    int leadingLeg;
-    // leg types
-    int legA = 0;
-    int legB = 1;
-
-    //leg heights
+    //leg heights - to be calibrated
     float liftNormal = 0.88f;
     float liftHigher = 1.25f;
     float baseHeight = 0;
 
-    //gesture types
-    int rotateLeg = 0;
-    int liftLeg = 1;
-    int setOverLeg = 2;
-    int outstretchLeg = 3;
-    int stepDownLegs = 4;
-    int stepUpLegs = 5;
-    int outstretchGripper = 6;
-    int goToStance = 7;
+    // leg types
+    int legA = 0;
+    int legB = 1;
 
     //brick type being carried
     int brickCurrentlyCarried;
+
     int noBrick = 0;
     int fullBrick = 1;
     int halfBrick = 2;
-
-    int previousStepLength;
 
     public Brick brickCurrentlyBeingCarried = null;
 
@@ -120,6 +137,9 @@ public class Robot
         legCRailJoint = new RobotJoint(railBasicSpeed, legCRailResetPos);
         legCRotationJoint = new RobotJoint(legCRotationResetSpeed, legCRotationResetPos);
         legCGripJoint = new RobotJoint(legCGripResetSpeed, legCGripResetPos);
+        nozzleVerticalJoint = new RobotJoint(nozzleVerticalResetSpeed, nozzleVerticalResetPos);
+        nozzleRotationJoint = new RobotJoint(nozzleRotationResetSpeed, nozzleRotationResetPos);
+        nozzleMortarJoint = new RobotJoint(nozzleMortarResetSpeed, nozzleMortarResetPos);
 
         allJoints.Add(legARailJoint);
         allJoints.Add(legAVerticalJoint);
@@ -130,33 +150,35 @@ public class Robot
         allJoints.Add(legCRailJoint);
         allJoints.Add(legCRotationJoint);
         allJoints.Add(legCGripJoint);
+        allJoints.Add(nozzleVerticalJoint);
+        allJoints.Add(nozzleRotationJoint);
+        allJoints.Add(nozzleMortarJoint);
 
-        currentlyAttached = _currentlyAttached;
-        brickCurrentlyCarried = noBrick;
+        // set the short 'memory' of previous steps
         steppingDown = false;
         steppingUp = false;
+        previousStepLength = _startingStance;
+
+        brickCurrentlyCarried = noBrick; // set the brick
+
+
+        currentlyAttached = _currentlyAttached; // set the leg currently attached and 'spawn' the robot according to that position and rotation
 
         if (currentlyAttached == legA)
         {
             leadingLeg = legB;
-        }
-        else
-        {
-            leadingLeg = legA;
-        }
 
-        if (currentlyAttached == 0)
-        {
             legAFootPos = new Vector3(_startingCell.x * gridXZDim, _startingCell.y * gridYDim, _startingCell.z * gridXZDim);
             legAFootRot = Quaternion.Euler(0, 0, 0);
         }
         else
         {
+            leadingLeg = legA;
+
             legBFootPos = new Vector3(_startingCell.x * gridXZDim, _startingCell.y * gridYDim, _startingCell.z * gridXZDim);
             legBFootRot = Quaternion.Euler(0, 180, 0);
         }
 
-        previousStepLength = _startingStance;
     }
 
     public void UpdateRobot()
@@ -164,15 +186,11 @@ public class Robot
         UpdateReferenceTransforms();
         CarryOutMoves();
 
+        // update the average position for the camera target 
         averageRobotPos = new Vector3((legAHipPos.x + legBHipPos.x + mainBeamPos.x) / 3, mainBeamPos.y, (legAHipPos.z + legBHipPos.z + mainBeamPos.z) / 3);
     }
 
-    public void Rotate()
-    {
-        jointTargetList.Clear();
-        jointTargetList.Add(robotGesture.GetGesture(rotateLeg, 0, 0, 4, 90, brickCurrentlyCarried));
-    }
-
+    // handle can be picking or placing - may be easier to separate these out
     public void HandleBrick(int _relativeBrickHeight, int _distanceInFront, int _distanceToSide, int _brickType, int _gripRotation, Brick _brickToMove, bool _pickupMode)
     {
         jointTargetList.Clear();
@@ -188,27 +206,30 @@ public class Robot
 
         brickCurrentlyBeingCarried = _brickToMove;
 
-
+        /////////////////////////////////////////////////////////////////////////////
 
         //set over attached leg
-        jointTargetList.Add(robotGesture.GetGesture(setOverLeg, currentlyAttached, 0, previousStepLength, 0, brickCurrentlyCarried));
+        jointTargetList.Add(robotGesture.SetOverLeg(currentlyAttached, previousStepLength, brickCurrentlyCarried));
 
         if (_relativeBrickHeight == 0)
         {
             //lift leading leg
             if (!steppingDown && !steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, liftNormal, previousStepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftNormal));
             }
             else if (steppingDown)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, liftHigher, previousStepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftHigher));
             }
             else if (steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(stepUpLegs, leadingLeg, liftNormal, previousStepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.StepUpLegs(leadingLeg, liftNormal));
             }
         }
+
+        // testNozzle - this is a placeholder
+        jointTargetList.Add(robotGesture.ExtendNozzle(nozzleExtendedDistance, 90));
 
         // outstretch the gripper and rotate
         jointTargetList.Add(robotGesture.OutStretchGripper(currentlyAttached, _distanceInFront, _distanceToSide, previousStepLength, brickCurrentlyCarried));
@@ -225,6 +246,10 @@ public class Robot
         gestureCounter = 0;
         moveInProgress = true;
         stepInProgress = true;
+
+        // open the gripper
+        // lift the gripper
+        // etc.
     }
 
     public void TakeStep(int _stepLength, int _stepHeight, int _stepTurnAngle)
@@ -236,27 +261,27 @@ public class Robot
         if (_stepHeight == 0)
         {
             //set over attached leg
-            jointTargetList.Add(robotGesture.GetGesture(setOverLeg, currentlyAttached, 0, previousStepLength, 0, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.SetOverLeg(currentlyAttached, previousStepLength, brickCurrentlyCarried));
 
             //lift leading leg
             if (!steppingDown && !steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, liftNormal, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftNormal));
             }
             else if (steppingDown)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, liftHigher, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftHigher));
             }
             else if (steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(stepUpLegs, leadingLeg, liftNormal, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.StepUpLegs(leadingLeg, liftNormal));
             }
 
             //outstretch over leg
-            jointTargetList.Add(robotGesture.GetGesture(outstretchLeg, leadingLeg, 0.88f, _stepLength, _stepTurnAngle, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.OutStretchLeg(leadingLeg, _stepLength, _stepTurnAngle, brickCurrentlyCarried));
 
             //lower leading leg
-            jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 0, _stepLength, 0, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, 0));
 
             steppingDown = false;
             steppingUp = false;
@@ -265,27 +290,27 @@ public class Robot
         if (_stepHeight == -1)
         {
             //set over attached leg
-            jointTargetList.Add(robotGesture.GetGesture(setOverLeg, currentlyAttached, 0, previousStepLength, 0, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.SetOverLeg(currentlyAttached, previousStepLength, brickCurrentlyCarried));
 
             //lift leading leg
             if (!steppingDown && !steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 0.88f, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftNormal));
             }
             else if (steppingDown)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 1.25f, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftHigher));
             }
             else if (steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(stepUpLegs, leadingLeg, 0.88f, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.StepUpLegs(leadingLeg, liftNormal));
             }
 
             //outstretch over leg
-            jointTargetList.Add(robotGesture.GetGesture(outstretchLeg, leadingLeg, 1, _stepLength, _stepTurnAngle, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.OutStretchLeg(leadingLeg, _stepLength, _stepTurnAngle, brickCurrentlyCarried));
 
             //lower leading leg
-            jointTargetList.Add(robotGesture.GetGesture(stepDownLegs, leadingLeg, -1, _stepLength, 0, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.StepDownLegs(leadingLeg, -1));
 
             steppingDown = true;
             steppingUp = false;
@@ -294,27 +319,27 @@ public class Robot
         if (_stepHeight == 1)
         {
             //set over attached leg
-            jointTargetList.Add(robotGesture.GetGesture(setOverLeg, currentlyAttached, 0, previousStepLength, 0, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.SetOverLeg(currentlyAttached, previousStepLength, brickCurrentlyCarried));
 
             //lift leading leg
             if (!steppingDown && !steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 1.25f, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftHigher));
             }
             else if (steppingDown)
             {
-                jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 1.25f, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftHigher));
             }
             else if (steppingUp)
             {
-                jointTargetList.Add(robotGesture.GetGesture(stepUpLegs, leadingLeg, 1.25f, _stepLength, 0, brickCurrentlyCarried));
+                jointTargetList.Add(robotGesture.StepUpLegs(leadingLeg, liftHigher));
             }
 
             //outstretch over leg
-            jointTargetList.Add(robotGesture.GetGesture(outstretchLeg, leadingLeg, 1, _stepLength, _stepTurnAngle, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.OutStretchLeg(leadingLeg, _stepLength, _stepTurnAngle, brickCurrentlyCarried));
 
             //lower leading leg
-            jointTargetList.Add(robotGesture.GetGesture(liftLeg, leadingLeg, 1, _stepLength, 0, brickCurrentlyCarried));
+            jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, 1));
 
             steppingUp = true;
             steppingDown = false;
@@ -330,7 +355,7 @@ public class Robot
     {
         gestureInProgress = false;
 
-        foreach (RobotJoint joint in allJoints)
+        foreach (RobotJoint joint in allJoints) // check to see if any joints need to move
         {
             if (joint.JointNeedsToMove())
             {
@@ -345,7 +370,7 @@ public class Robot
             MakeNextGesture();
         }
 
-        if (!gestureInProgress && !moveInProgress && stepInProgress)
+        if (!gestureInProgress && !moveInProgress && stepInProgress) // if the move is a step and it has been completed, the leading legs and currently attached are switched.
         {
             SwitchLeadingLeg();
             SwitchCurrentlyAttached();
@@ -354,7 +379,7 @@ public class Robot
 
     }
 
-    void MakeNextGesture()
+    void MakeNextGesture() // if the previous gesure is complete, begin the next gesture
     {
         if (gestureCounter == jointTargetList.Count)
         {
@@ -366,10 +391,9 @@ public class Robot
             RobotMove(jointTargetList[gestureCounter]);
             gestureCounter++;
         }
-
     }
 
-    void RobotMove(float[] _jointTarget)
+    void RobotMove(float[] _jointTarget) // if each of the joint target positions have been changed, update them.
     {
         //legARail
         if (_jointTarget[0] != -1)
@@ -425,22 +449,39 @@ public class Robot
             legCGripJoint.targetPos = _jointTarget[8];
         }
 
-        //legARailSpeed
+        //nozzleVertical
         if (_jointTarget[9] != -1)
         {
-            legARailJoint.speed = _jointTarget[9] * railBasicSpeed;
+            nozzleVerticalJoint.targetPos = _jointTarget[9];
+        }
+
+        //nozzleRotation
+        if (_jointTarget[10] != -1)
+        {
+            nozzleRotationJoint.targetPos = _jointTarget[10];
+        }
+        //nozzleMortar
+        if (_jointTarget[11] != -1)
+        {
+            nozzleMortarJoint.targetPos = _jointTarget[11];
+        }
+
+        //legARailSpeed
+        if (_jointTarget[12] != -1)
+        {
+            legARailJoint.speed = _jointTarget[12] * railBasicSpeed;
         }
 
         //legBRailSpeed
-        if (_jointTarget[10] != -1)
+        if (_jointTarget[13] != -1)
         {
-            legBRailJoint.speed = _jointTarget[10] * railBasicSpeed;
+            legBRailJoint.speed = _jointTarget[13] * railBasicSpeed;
         }
 
         //legCRailSpeed
-        if (_jointTarget[11] != -1)
+        if (_jointTarget[14] != -1)
         {
-            legCRailJoint.speed = _jointTarget[11] * railBasicSpeed;
+            legCRailJoint.speed = _jointTarget[14] * railBasicSpeed;
         }
 
         foreach (RobotJoint joint in allJoints)
@@ -461,7 +502,7 @@ public class Robot
         }
     }
 
-    void UpdateReferenceTransforms()
+    void UpdateReferenceTransforms() // this builds a kinematic rig depending on which leg is attached. When the attached leg changes (e.g. when a step is complete), the kinematic rig is inverted. 
     {
         if (currentlyAttached == legA)
         {
@@ -471,10 +512,10 @@ public class Robot
             legAHipPos = legAPos + new Vector3(0, (legAVerticalJoint.currentPos - legAVerticalResetPos), 0);
             legAHipRot = legARot;
 
-            mainBeamPos = legAHipPos + legARot * new Vector3(0, legAVerticalResetPos /*+ 0.045f*/, (legARailJoint.currentPos - legCRailResetPos));
+            mainBeamPos = legAHipPos + legARot * new Vector3(0, legAVerticalResetPos, (legARailJoint.currentPos - legCRailResetPos));
             mainBeamRot = legARot;
 
-            legBHipPos = mainBeamPos - legARot * (new Vector3(0, legBVerticalResetPos /*+ 0.045f*/, legBRailJoint.currentPos - legCRailResetPos));
+            legBHipPos = mainBeamPos - legARot * (new Vector3(0, legBVerticalResetPos, legBRailJoint.currentPos - legCRailResetPos));
             legBHipRot = legARot * Quaternion.Euler(0, 180, 0);
 
             legBPos = legBHipPos - new Vector3(0, legBVerticalJoint.currentPos - legBVerticalResetPos, 0);
@@ -494,6 +535,9 @@ public class Robot
 
             grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, (legCGripJoint.currentPos) * 0.00001f));
             grip2Rot = legCFootRot;
+
+            nozzlePos = mainBeamPos + (mainBeamRot * nozzleOffsetVector) + new Vector3(0, 0.12350f - nozzleVerticalJoint.currentPos, 0);
+            nozzleRot = mainBeamRot * Quaternion.Euler(0, nozzleRotationJoint.currentPos, 0);
         }
 
         if (currentlyAttached == legB)
@@ -504,10 +548,10 @@ public class Robot
             legBHipPos = legBPos + new Vector3(0, (legBVerticalJoint.currentPos - legBVerticalResetPos), 0);
             legBHipRot = legBRot;
 
-            mainBeamPos = legBHipPos + legBRot * new Vector3(0, legBVerticalResetPos /*+ 0.045f*/, (legCRailResetPos - legBRailJoint.currentPos));
+            mainBeamPos = legBHipPos + legBRot * new Vector3(0, legBVerticalResetPos, (legCRailResetPos - legBRailJoint.currentPos));
             mainBeamRot = legBRot * Quaternion.Euler(0, 180, 0);
 
-            legAHipPos = mainBeamPos - legBRot * (new Vector3(0, legAVerticalResetPos /*+ 0.045f*/, legCRailResetPos - legARailJoint.currentPos));
+            legAHipPos = mainBeamPos - legBRot * (new Vector3(0, legAVerticalResetPos, legCRailResetPos - legARailJoint.currentPos));
             legAHipRot = legARot * Quaternion.Euler(0, 0, 0);
 
             legAPos = legAHipPos - new Vector3(0, legAVerticalJoint.currentPos - legAVerticalResetPos, 0);
@@ -527,9 +571,12 @@ public class Robot
 
             grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, (legCGripJoint.currentPos) * 0.00001f));
             grip2Rot = legCFootRot;
+
+            nozzlePos = mainBeamPos + (mainBeamRot * nozzleOffsetVector) + new Vector3(0, 0.12350f - nozzleVerticalJoint.currentPos, 0);
+            nozzleRot = mainBeamRot * Quaternion.Euler(0, nozzleRotationJoint.currentPos, 0);
         }
 
-        if (brickCurrentlyBeingCarried != null)
+        if (brickCurrentlyBeingCarried != null) // this updates current transform of a brick being carried
         {
             brickCurrentlyBeingCarried.currentPosition = legCFootPos + new Vector3(0, -(gridYDim - 0.01f), 0);
             brickCurrentlyBeingCarried.currentRotation = legCFootRot;
@@ -569,6 +616,6 @@ public class Robot
     {
         return (Mathf.PI * angle / 180);
     }
-      
+
 }
 

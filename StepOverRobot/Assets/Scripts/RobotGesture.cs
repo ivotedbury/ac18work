@@ -4,20 +4,7 @@ using UnityEngine;
 
 public class RobotGesture
 {
-    int legA = 0;
-    int legB = 1;
-    int legC = 2;
-
-    //gesture types
-    int rotateLeg = 0;
-    int liftLeg = 1;
-    int setOverLeg = 2;
-    int outstretchLeg = 3;
-    int stepDownLegs = 4;
-    int stepUpLegs = 5;
-    int outstretchGripper = 6;
-    int goToStance = 7;
-
+    //reset positions
     float legARailResetPos = 0.225f; //0.28125f;
     float legAVerticalResetPos = 0.2125f;
     float legARotationResetPos = 0;
@@ -28,9 +15,15 @@ public class RobotGesture
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
 
+    // grid dimensions
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0725f;
 
+    // leg types
+    int legA = 0;
+    int legB = 1;
+
+    //brick type being carried
     int noBrick = 0;
     int fullBrick = 1;
     int halfBrick = 2;
@@ -49,7 +42,7 @@ public class RobotGesture
 
     void SetBrickFactor(int _brickType)
     {
-        //set the brick factor
+        //set the brick factor to change the relative speeds between elements depending on which brick is being carried
         if (_brickType == noBrick)
         {
             brickFactor = noBrickFactor;
@@ -67,22 +60,18 @@ public class RobotGesture
         }
     }
 
+    // here are all the gestures - return a list of joint positions for each set of inputs
+
     public float[] OutStretchGripper(int _legCurrentlyAttached, int _distanceInFront, int _distanceToSide, int _previousStepLength, int _brickCurrentlyCarried)
     {
-        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         SetBrickFactor(_brickCurrentlyCarried);
 
         float rotationAngle = RadianToDegree(Mathf.Atan(_distanceToSide / _distanceInFront));
         float outstretchDistance = Mathf.Sqrt(Mathf.Pow(_distanceInFront, 2) + Mathf.Pow(_distanceToSide, 2));
 
-        Debug.Log(rotationAngle);
-        Debug.Log(outstretchDistance);
-
         float gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * outstretchDistance);
-
-        Debug.Log(gripperDisplacementFromEnd);
-
 
         if (_legCurrentlyAttached == legA)
         {
@@ -95,157 +84,167 @@ public class RobotGesture
         return _output;
     }
 
+    public float[] ExtendNozzle(float _distance, float _rotation)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        _output[9] = _distance;
+        _output[10] = _rotation;
+
+        return _output;
+    }
+
+    public float[] RetractNozzle()
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        _output[9] = 0;
+        _output[10] = 0;
+
+        return _output;
+    }
+
     public float[] RotateGripper(float _angleToRotate)
     {
-        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         _output[7] = _angleToRotate;
-
-        Debug.Log(_angleToRotate);
 
         return _output;
     }
 
     public float[] LowerLegsToPlace(int _relativeBrickHeight, int _legCurrentlyAttached)
     {
-        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-        _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1 ) * gridYDim) - 0.02625f - 0.005f; //
+        _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1) * gridYDim) - 0.02625f - 0.005f; //
         _output[4] = legAVerticalResetPos + ((_relativeBrickHeight - 2) * gridYDim) - 0.02625f - 0.005f; //
-
-
 
         return _output;
     }
 
-    public float[] GetGesture(int _type, int _leg, float _legHeight, int _legStance, float _rotationAngle, int _brickCurrentlyCarried)
+    public float[] SetOverLeg(int _leg, int _legStance, int _brickCurrentlyCarried)
     {
-        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         SetBrickFactor(_brickCurrentlyCarried);
 
-        //rotate type
-        if (_type == rotateLeg)
+        if (_leg == legA)
         {
-            if (_leg == legA)
-            {
-                _output[2] = _rotationAngle;
-            }
-            else if (_leg == legB)
-            {
-                _output[5] = _rotationAngle;
-            }
-            else
-            {
-                _output[7] = _rotationAngle;
-            }
+            _output[0] = (6 + (_legStance * brickFactor)) * gridXZDim;
+            _output[3] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
+            _output[6] = 6 * gridXZDim;
+
+            _output[12] = 1;
+            _output[13] = 1;
+            _output[14] = 1;
         }
 
-        // lift leg type
-        if (_type == liftLeg)
+        else if (_leg == legB)
         {
-            if (_leg == legA)
-            {
-                _output[1] = legAVerticalResetPos - (_legHeight * gridYDim);
-            }
-            else if (_leg == legB)
-            {
-                _output[4] = legBVerticalResetPos - (_legHeight * gridYDim);
-            }
+            _output[0] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
+            _output[3] = (6 + (_legStance * brickFactor)) * gridXZDim;
+            _output[6] = 6 * gridXZDim;
+
+            _output[12] = 1;
+            _output[13] = 1;
+            _output[14] = 1;
         }
-
-        // step down legs type
-        if (_type == stepDownLegs)
-        {
-            if (_leg == legA)
-            {
-                _output[1] = legAVerticalResetPos + ((_legHeight + 1) * gridYDim);
-                _output[4] = legBVerticalResetPos + (_legHeight * gridYDim);
-
-            }
-            else if (_leg == legB)
-            {
-                _output[1] = legAVerticalResetPos + (_legHeight * gridYDim);
-                _output[4] = legBVerticalResetPos + ((_legHeight + 1) * gridYDim);
-            }
-        }
-
-        // step up legs type
-        if (_type == stepUpLegs)
-        {
-            if (_leg == legA)
-            {
-                _output[1] = legAVerticalResetPos - (_legHeight * gridYDim);
-                _output[4] = legBVerticalResetPos;
-
-            }
-            else if (_leg == legB)
-            {
-                _output[1] = legAVerticalResetPos;
-                _output[4] = legBVerticalResetPos - (_legHeight * gridYDim);
-            }
-        }
-
-        // set over leg type
-        if (_type == setOverLeg)
-        {
-            if (_leg == legA)
-            {
-                _output[0] = (6 + (_legStance * brickFactor)) * gridXZDim;
-                _output[3] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[6] = 6 * gridXZDim;
-
-                _output[9] = 1;
-                _output[10] = 1;
-                _output[11] = 1;
-            }
-
-            else if (_leg == legB)
-            {
-                _output[0] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[3] = (6 + (_legStance * brickFactor)) * gridXZDim;
-                _output[6] = 6 * gridXZDim;
-
-                _output[9] = 1;
-                _output[10] = 1;
-                _output[11] = 1;
-            }
-        }
-
-        // outstretch leg type
-        if (_type == outstretchLeg)
-        {
-            if (_leg == legB)
-            {
-                _output[0] = (6 - (_legStance * brickFactor)) * gridXZDim;
-                _output[3] = (6 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[6] = 6 * gridXZDim;
-
-                _output[2] = _rotationAngle;
-                _output[5] = 0;
-
-                _output[9] = brickFactor;
-                _output[10] = 1;
-                _output[11] = brickFactor;
-            }
-            else if (_leg == legA)
-            {
-                _output[0] = (6 - (_legStance + (_legStance * brickFactor))) * gridXZDim;
-                _output[3] = (6 - (_legStance * brickFactor)) * gridXZDim;
-                _output[6] = 6 * gridXZDim;
-
-                _output[2] = 0;
-                _output[5] = _rotationAngle;
-
-                _output[9] = 1;
-                _output[10] = brickFactor;
-                _output[11] = brickFactor;
-            }
-        }
-
 
         return _output;
     }
+
+    public float[] LiftLeg(int _leg, float _legHeight)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_leg == legA)
+        {
+            _output[1] = legAVerticalResetPos - (_legHeight * gridYDim);
+        }
+        else if (_leg == legB)
+        {
+            _output[4] = legBVerticalResetPos - (_legHeight * gridYDim);
+        }
+
+        return _output;
+    }
+
+    public float[] OutStretchLeg(int _leg, int _legStretch, float _rotationAngle, int _brickCurrentlyCarried)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        SetBrickFactor(_brickCurrentlyCarried);
+
+        if (_leg == legB)
+        {
+            _output[0] = (6 - (_legStretch * brickFactor)) * gridXZDim;
+            _output[3] = (6 - (_legStretch + (_legStretch * brickFactor))) * gridXZDim;
+            _output[6] = 6 * gridXZDim;
+
+            _output[2] = _rotationAngle;
+            _output[5] = 0;
+
+            _output[12] = brickFactor;
+            _output[13] = 1;
+            _output[14] = brickFactor;
+        }
+        else if (_leg == legA)
+        {
+            _output[0] = (6 - (_legStretch + (_legStretch * brickFactor))) * gridXZDim;
+            _output[3] = (6 - (_legStretch * brickFactor)) * gridXZDim;
+            _output[6] = 6 * gridXZDim;
+
+            _output[2] = 0;
+            _output[5] = _rotationAngle;
+
+            _output[12] = 1;
+            _output[13] = brickFactor;
+            _output[14] = brickFactor;
+        }
+
+        return _output;
+    }
+
+    public float[] StepDownLegs(int _leg, float _legHeight)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_leg == legA)
+        {
+            _output[1] = legAVerticalResetPos + ((_legHeight + 1) * gridYDim);
+            _output[4] = legBVerticalResetPos + (_legHeight * gridYDim);
+
+        }
+        else if (_leg == legB)
+        {
+            _output[1] = legAVerticalResetPos + (_legHeight * gridYDim);
+            _output[4] = legBVerticalResetPos + ((_legHeight + 1) * gridYDim);
+        }
+
+        return _output;
+    }
+
+    public float[] StepUpLegs(int _leg, float _legHeight)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_leg == legA)
+        {
+            _output[1] = legAVerticalResetPos - (_legHeight * gridYDim);
+            _output[4] = legBVerticalResetPos;
+
+        }
+        else if (_leg == legB)
+        {
+            _output[1] = legAVerticalResetPos;
+            _output[4] = legBVerticalResetPos - (_legHeight * gridYDim);
+        }
+
+        return _output;
+    }
+
+    // extra functions
 
     private float RadianToDegree(float angle)
     {
