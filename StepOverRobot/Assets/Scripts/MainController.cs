@@ -47,7 +47,7 @@ public class MainController : MonoBehaviour
         grid = new Grid(gridSize);
 
         //fullbrick for testing
-        fullBrick = new Brick(grid, grid.cellsArray[3, 0, 3], 90, 1, false);
+        fullBrick = new Brick(grid, grid.cellsArray[3, 0, 3], 0, 1, false);
         fullBrickMesh.transform.position = fullBrick.currentPosition;
         fullBrickMesh.transform.rotation = fullBrick.currentRotation;
 
@@ -57,7 +57,7 @@ public class MainController : MonoBehaviour
         halfBrickMesh.transform.rotation = halfBrick.currentRotation;
 
         allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
-        allRobots[0].brickCurrentlyBeingCarried = fullBrick;
+        // allRobots[0].brickCurrentlyBeingCarried = fullBrick;
 
         allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));
         allRobotMeshes[0].transform.SetParent(robotMeshContainer.transform);
@@ -107,7 +107,7 @@ public class MainController : MonoBehaviour
     {
         if (Input.GetKeyDown("t"))
         {
-            allRobots[0].TakeStep(4, 0, 90);
+            allRobots[0].TakeStep(4, 0, 0);
             Debug.Log("T");
         }
 
@@ -125,15 +125,28 @@ public class MainController : MonoBehaviour
 
         if (Input.GetKeyDown("n"))
         {
-            allRobots[0].PlaceBrick(0, 4, 0, 1, 0, fullBrick);
+            allRobots[0].PlaceBrick(0, 3, 0, 1, 0, fullBrick);
             Debug.Log("Place");
         }
 
         if (Input.GetKeyDown("m"))
         {
-            allRobots[0].PlaceBrick(0, 4, -2, 1, 0, fullBrick);
+            allRobots[0].PlaceBrick(-1, 3, -2, 1, 0, fullBrick);
             Debug.Log("Place");
         }
+
+        if (Input.GetKeyDown(","))
+        {
+            allRobots[0].PickupBrick(0, 3, 2, 1, 0, fullBrick);
+            Debug.Log("Pickup");
+        }
+
+        if (Input.GetKeyDown("."))
+        {
+            allRobots[0].PickupBrick(0, 3, 0, 1, 0, fullBrick);
+            Debug.Log("Pickup");
+        }
+
 
         if (Input.GetKeyDown("e"))
         {

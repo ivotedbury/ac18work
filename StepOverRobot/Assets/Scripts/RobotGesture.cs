@@ -64,28 +64,75 @@ public class RobotGesture
 
     // here are all the gestures - return a list of joint positions for each set of inputs
 
-    public float[] OutStretchGripper(int _legCurrentlyAttached, int _distanceInFront, int _distanceToSide, int _previousStepLength, int _brickCurrentlyCarried)
+    public float[] OutStretchGripper(int _legCurrentlyAttached, float _outStretchDistance, float _rotationAngle, int _previousStepLength, int _brickCurrentlyCarried)
     {
         float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         SetBrickFactor(_brickCurrentlyCarried);
 
-        float rotationAngle = RadianToDegree(Mathf.Atan2(_distanceToSide, _distanceInFront));
-        float outstretchDistance = Mathf.Sqrt(Mathf.Pow(_distanceInFront, 2) + Mathf.Pow(_distanceToSide, 2));
-
-        float gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * outstretchDistance);
+        float gripperDisplacementFromEnd;
 
         if (_legCurrentlyAttached == legA)
         {
-            _output[0] = (gripperDisplacementFromEnd + outstretchDistance) * gridXZDim;
-            _output[3] = (gripperDisplacementFromEnd + outstretchDistance + _previousStepLength) * gridXZDim;
+            gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * _outStretchDistance);
+
+            _output[0] = (gripperDisplacementFromEnd + _outStretchDistance) * gridXZDim;
+            _output[3] = (gripperDisplacementFromEnd + _outStretchDistance + _previousStepLength) * gridXZDim;
             _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
 
-            _output[2] = rotationAngle;
-            Debug.Log(rotationAngle);
+            _output[2] = _rotationAngle;
+            _output[5] = 0;
+        }
+
+        else if (_legCurrentlyAttached == legB)
+        {
+            gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * _outStretchDistance);
+
+            _output[3] = (gripperDisplacementFromEnd + _outStretchDistance) * gridXZDim;
+            _output[0] = (gripperDisplacementFromEnd + _outStretchDistance + _previousStepLength) * gridXZDim;
+            _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
+
+            _output[2] = 0;
+            _output[5] = _rotationAngle;
         }
 
         return _output;
+    }
+
+    public float[] ResetOverLeg(int _legCurrentlyAttached, int _previousStepLength, float _outStretchDistance, float _rotationAngle, int _brickCurrentlyCarried)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        SetBrickFactor(_brickCurrentlyCarried);
+
+        float gripperDisplacementFromEnd;
+
+        if (_legCurrentlyAttached == legA)
+        {
+            gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * _outStretchDistance);
+
+            _output[0] = (gripperDisplacementFromEnd + _outStretchDistance) * gridXZDim;
+            _output[3] = (gripperDisplacementFromEnd + _outStretchDistance + _previousStepLength) * gridXZDim;
+            _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
+
+            _output[2] = _rotationAngle;
+            _output[5] = 0;
+        }
+
+        else if (_legCurrentlyAttached == legB)
+        {
+            gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * _outStretchDistance);
+
+            _output[3] = (gripperDisplacementFromEnd + _outStretchDistance) * gridXZDim;
+            _output[0] = (gripperDisplacementFromEnd + _outStretchDistance + _previousStepLength) * gridXZDim;
+            _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
+
+            _output[2] = 0;
+            _output[5] = _rotationAngle;
+        }
+
+        return _output;
+
     }
 
     public float[] OpenGrip()
@@ -141,8 +188,32 @@ public class RobotGesture
 
         if (_legCurrentlyAttached == legA)
         {
-            _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1) * gridYDim) - 0.02675f; //
-            _output[4] = legBVerticalResetPos + ((_relativeBrickHeight - 1.88f) * gridYDim) - 0.02675f; //
+            _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1) * gridYDim) - 0.02675f;
+
+            if (_relativeBrickHeight == 0)
+            {
+                _output[4] = legBVerticalResetPos + ((_relativeBrickHeight - 1.88f) * gridYDim) - 0.02675f;
+            }
+
+            else
+            {
+                _output[4] = 0.034f;
+            }
+        }
+
+        else if (_legCurrentlyAttached == legB)
+        {
+            if (_relativeBrickHeight == 0)
+            {
+                _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1.88f) * gridYDim) - 0.02675f;
+            }
+
+            else
+            {
+                _output[1] = 0.034f;
+            }
+
+            _output[4] = legBVerticalResetPos + ((_relativeBrickHeight - 1) * gridYDim) - 0.02675f; //
         }
 
         return _output;
@@ -154,8 +225,14 @@ public class RobotGesture
 
         if (_legCurrentlyAttached == legA)
         {
-            _output[1] = legAVerticalResetPos; //
-            _output[4] = legBVerticalResetPos - (0.88f * gridYDim); //
+            _output[1] = legAVerticalResetPos;
+            _output[4] = legBVerticalResetPos - (0.88f * gridYDim);
+        }
+
+        if (_legCurrentlyAttached == legB)
+        {
+            _output[1] = legAVerticalResetPos - (0.88f * gridYDim);
+            _output[4] = legBVerticalResetPos;
         }
 
         return _output;
@@ -173,6 +250,9 @@ public class RobotGesture
             _output[3] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
             _output[6] = 6 * gridXZDim;
 
+            _output[2] = 0;
+            _output[7] = 0;
+
             _output[12] = 1;
             _output[13] = 1;
             _output[14] = 1;
@@ -183,6 +263,9 @@ public class RobotGesture
             _output[0] = (6 + (_legStance + (_legStance * brickFactor))) * gridXZDim;
             _output[3] = (6 + (_legStance * brickFactor)) * gridXZDim;
             _output[6] = 6 * gridXZDim;
+
+            _output[5] = 0;
+            _output[7] = 0;
 
             _output[12] = 1;
             _output[13] = 1;
