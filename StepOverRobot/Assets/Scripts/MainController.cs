@@ -29,7 +29,7 @@ public class MainController : MonoBehaviour
 
     // grid dimensions
     float gridXZDim = 0.05625f;
-    float gridYDim = 0.0625f;
+    float gridYDim = 0.0725f;
 
     // step variables for testing - if stepping continuously, these will be the inputs
     int testStepSize = 4;
@@ -42,7 +42,7 @@ public class MainController : MonoBehaviour
 
     void Start()
     {
-        Time.timeScale = 1f;
+        Time.timeScale = 0.25f;
 
         grid = new Grid(gridSize);
 
@@ -125,8 +125,14 @@ public class MainController : MonoBehaviour
 
         if (Input.GetKeyDown("n"))
         {
-            allRobots[0].HandleBrick(0, 4, 0, 1, 0, fullBrick, true);
-            Debug.Log("PICKUP");
+            allRobots[0].PlaceBrick(0, 4, 0, 1, 0, fullBrick);
+            Debug.Log("Place");
+        }
+
+        if (Input.GetKeyDown("m"))
+        {
+            allRobots[0].PlaceBrick(0, 4, -2, 1, 0, fullBrick);
+            Debug.Log("Place");
         }
 
         if (Input.GetKeyDown("e"))

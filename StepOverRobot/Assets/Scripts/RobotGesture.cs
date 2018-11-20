@@ -15,6 +15,8 @@ public class RobotGesture
     float legCRotationResetPos = 0;
     float legCGripResetPos = 0;
 
+    float gripOpenDistance = 0.0125f;
+
     // grid dimensions
     float gridXZDim = 0.05625f;
     float gridYDim = 0.0725f;
@@ -68,7 +70,7 @@ public class RobotGesture
 
         SetBrickFactor(_brickCurrentlyCarried);
 
-        float rotationAngle = RadianToDegree(Mathf.Atan(_distanceToSide / _distanceInFront));
+        float rotationAngle = RadianToDegree(Mathf.Atan2(_distanceToSide, _distanceInFront));
         float outstretchDistance = Mathf.Sqrt(Mathf.Pow(_distanceInFront, 2) + Mathf.Pow(_distanceToSide, 2));
 
         float gripperDisplacementFromEnd = 6 - ((1 + brickFactor) * outstretchDistance);
@@ -79,7 +81,27 @@ public class RobotGesture
             _output[3] = (gripperDisplacementFromEnd + outstretchDistance + _previousStepLength) * gridXZDim;
             _output[6] = (12 - gripperDisplacementFromEnd) * gridXZDim;
 
+            _output[2] = rotationAngle;
+            Debug.Log(rotationAngle);
         }
+
+        return _output;
+    }
+
+    public float[] OpenGrip()
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        _output[8] = gripOpenDistance;
+
+        return _output;
+    }
+
+    public float[] CloseGrip()
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        _output[8] = legCGripResetPos;
 
         return _output;
     }
@@ -117,8 +139,24 @@ public class RobotGesture
     {
         float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-        _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1) * gridYDim) - 0.02625f - 0.005f; //
-        _output[4] = legAVerticalResetPos + ((_relativeBrickHeight - 2) * gridYDim) - 0.02625f - 0.005f; //
+        if (_legCurrentlyAttached == legA)
+        {
+            _output[1] = legAVerticalResetPos + ((_relativeBrickHeight - 1) * gridYDim) - 0.02675f; //
+            _output[4] = legBVerticalResetPos + ((_relativeBrickHeight - 1.88f) * gridYDim) - 0.02675f; //
+        }
+
+        return _output;
+    }
+
+    public float[] LiftLegsAfterPlace(int _relativeBrickHeight, int _legCurrentlyAttached)
+    {
+        float[] _output = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+        if (_legCurrentlyAttached == legA)
+        {
+            _output[1] = legAVerticalResetPos; //
+            _output[4] = legBVerticalResetPos - (0.88f * gridYDim); //
+        }
 
         return _output;
     }

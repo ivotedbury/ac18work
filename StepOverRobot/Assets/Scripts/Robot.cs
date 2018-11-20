@@ -22,12 +22,12 @@ public class Robot
     float railBasicSpeed = 0.5f;
     float legARailResetSpeed = 0.25f;
     float legAVerticalResetSpeed = 0.25f;
-    float legARotationResetSpeed = 90;
+    float legARotationResetSpeed = 180;
     float legBRailResetSpeed = 0.25f;
     float legBVerticalResetSpeed = 0.25f;
-    float legBRotationResetSpeed = 90;
+    float legBRotationResetSpeed = 180;
     float legCRailResetSpeed = 0.25f;
-    float legCRotationResetSpeed = 90;
+    float legCRotationResetSpeed = 180;
     float legCGripResetSpeed = 0.25f;
     float nozzleVerticalResetSpeed = 0.25f;
     float nozzleRotationResetSpeed = 90f;
@@ -190,30 +190,20 @@ public class Robot
         averageRobotPos = new Vector3((legAHipPos.x + legBHipPos.x + mainBeamPos.x) / 3, mainBeamPos.y, (legAHipPos.z + legBHipPos.z + mainBeamPos.z) / 3);
     }
 
-    // handle can be picking or placing - may be easier to separate these out
-    public void HandleBrick(int _relativeBrickHeight, int _distanceInFront, int _distanceToSide, int _brickType, int _gripRotation, Brick _brickToMove, bool _pickupMode)
+    public void PlaceBrick(int _relativeBrickHeight, int _distanceInFront, int _distanceToSide, int _brickType, int _gripRotation, Brick _brickToMove)
     {
         jointTargetList.Clear();
 
         SetBrickTypeCurrentlyBeingCarried();
 
-        int brickTypeToBeCarriedAfterHandle = 0;
-
-        if (_pickupMode == true)
-        {
-            brickTypeToBeCarriedAfterHandle = _brickToMove.brickType;
-        }
-
         brickCurrentlyBeingCarried = _brickToMove;
 
-        /////////////////////////////////////////////////////////////////////////////
-
-        //set over attached leg
+        //set over attached leg (target list 0)
         jointTargetList.Add(robotGesture.SetOverLeg(currentlyAttached, previousStepLength, brickCurrentlyCarried));
 
+        //lift leading leg (target list 1)
         if (_relativeBrickHeight == 0)
         {
-            //lift leading leg
             if (!steppingDown && !steppingUp)
             {
                 jointTargetList.Add(robotGesture.LiftLeg(leadingLeg, liftNormal));
@@ -228,20 +218,27 @@ public class Robot
             }
         }
 
-        // testNozzle - this is a placeholder
-        jointTargetList.Add(robotGesture.ExtendNozzle(nozzleExtendedDistance, 90));
-
-        // outstretch the gripper and rotate
+        // outstretch the gripper and rotate (target list 2)
         jointTargetList.Add(robotGesture.OutStretchGripper(currentlyAttached, _distanceInFront, _distanceToSide, previousStepLength, brickCurrentlyCarried));
 
         float brickfinalRotation = brickCurrentlyBeingCarried.rotation.eulerAngles.y;
         float currentRotation = brickCurrentlyBeingCarried.currentRotation.eulerAngles.y;
         float angleToRotate = currentRotation - brickfinalRotation;
-        // rotate the brick
+
+        // rotate the brick (target list 3)
         jointTargetList.Add(robotGesture.RotateGripper(angleToRotate));
 
-        // place brick
+        // place brick (target list 4)
         jointTargetList.Add(robotGesture.LowerLegsToPlace(_relativeBrickHeight, currentlyAttached));
+
+        // open gripper (target list 5)
+        jointTargetList.Add(robotGesture.OpenGrip());
+
+        // set over attached leg with same gripper position
+        jointTargetList.Add(robotGesture.SetOverLeg(currentlyAttached, previousStepLength, brickCurrentlyCarried));
+
+        // lift the gripper
+        jointTargetList.Add(robotGesture.LiftLegsAfterPlace(_relativeBrickHeight, currentlyAttached));
 
         gestureCounter = 0;
         moveInProgress = true;
@@ -530,10 +527,10 @@ public class Robot
             legCFootPos = legCShoulderPos;
             legCFootRot = legCShoulderRot * Quaternion.Euler(0, -legCRotationJoint.currentPos, 0);
 
-            grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, -(legCGripJoint.currentPos) * 0.00001f));
+            grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(legCGripJoint.currentPos, 0, 0));
             grip1Rot = legCFootRot;
 
-            grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, (legCGripJoint.currentPos) * 0.00001f));
+            grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(-legCGripJoint.currentPos, 0, 0));
             grip2Rot = legCFootRot;
 
             nozzlePos = mainBeamPos + (mainBeamRot * nozzleOffsetVector) + new Vector3(0, 0.12350f - nozzleVerticalJoint.currentPos, 0);
@@ -566,10 +563,10 @@ public class Robot
             legCFootPos = legCShoulderPos;
             legCFootRot = legCShoulderRot * Quaternion.Euler(0, (legCRotationJoint.currentPos) + 180, 0);
 
-            grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, -(legCGripJoint.currentPos) * 0.00001f));
+            grip1Pos = legCFootPos + (legCShoulderRot * new Vector3(legCGripJoint.currentPos, 0, 0));
             grip1Rot = legCFootRot;
 
-            grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(0, 0, (legCGripJoint.currentPos) * 0.00001f));
+            grip2Pos = legCFootPos + (legCShoulderRot * new Vector3(-legCGripJoint.currentPos, 0, 0));
             grip2Rot = legCFootRot;
 
             nozzlePos = mainBeamPos + (mainBeamRot * nozzleOffsetVector) + new Vector3(0, 0.12350f - nozzleVerticalJoint.currentPos, 0);
