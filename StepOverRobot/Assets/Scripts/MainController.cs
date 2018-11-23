@@ -56,7 +56,7 @@ public class MainController : MonoBehaviour
         halfBrickMesh.transform.position = halfBrick.currentPosition;
         halfBrickMesh.transform.rotation = halfBrick.currentRotation;
 
-        allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4));
+        allRobots.Add(new Robot(new Vector3Int(0, 0, 4), 0, 4, 0));
         // allRobots[0].brickCurrentlyBeingCarried = fullBrick;
 
         allRobotMeshes.Add(Instantiate(robotMeshes, robotMeshes.transform));

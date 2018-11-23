@@ -131,7 +131,10 @@ public class Robot
     public Brick brickCurrentlyBeingCarried = null;
     Brick brickToBePickedUp = null;
 
-    public Robot(Vector3Int _startingCell, int _currentlyAttached, int _startingStance)
+    int currentDirection;
+    bool normalDirection;
+
+    public Robot(Vector3Int _startingCell, int _currentlyAttached, int _startingStance, int _startingDirection)
     {
         legARailJoint = new RobotJoint(railBasicSpeed, legARailResetPos);
         legAVerticalJoint = new RobotJoint(legAVerticalResetSpeed, legAVerticalResetPos);
@@ -174,16 +177,18 @@ public class Robot
             leadingLeg = legB;
 
             legAFootPos = new Vector3(_startingCell.x * gridXZDim, _startingCell.y * gridYDim, _startingCell.z * gridXZDim);
-            legAFootRot = Quaternion.Euler(0, 0, 0);
+            legAFootRot = Quaternion.Euler(0, _startingDirection, 0);
         }
         else
         {
             leadingLeg = legA;
 
             legBFootPos = new Vector3(_startingCell.x * gridXZDim, _startingCell.y * gridYDim, _startingCell.z * gridXZDim);
-            legBFootRot = Quaternion.Euler(0, 180, 0);
+            legBFootRot = Quaternion.Euler(0, _startingDirection, 0);
         }
 
+        currentDirection = _startingDirection;
+        normalDirection = true;
     }
 
     public void UpdateRobot()
@@ -330,6 +335,12 @@ public class Robot
         jointTargetList.Clear();
 
         SetBrickTypeCurrentlyBeingCarried();
+
+        ///////////////////////////////// direction change would go here
+        //if (!normalDirection)
+        //{
+
+        //}
 
         if (_stepHeight == 0)
         {
