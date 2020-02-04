@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Product {
+public class Product : MonoBehaviour {
 
     public int ProductId;
     public string ProductName;
