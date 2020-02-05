@@ -6,7 +6,7 @@ public class StockManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		foreach ()
+
 	}
 	
 	// Update is called once per frame

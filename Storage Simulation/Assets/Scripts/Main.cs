@@ -4,32 +4,27 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
+    public Structure structure;
+    public Settings settings;
 
-    Structure structure = new Structure(Constants.MAIN_STRUCTURE_DIMS);
-
+    void Start()
+    {
+        LoadSettings();
+    }
     // Update is called once per frame
     void Update()
     {
-        //if (Time.time > 2)
-        //{
-        //    Debug.Log("Line");
 
-        //    int i = 0;
+    }
 
-        //    for (int x = 0; x < 10; x++)
-        //    {
-        //        for (int y = 0; y < 10; y++)
-        //        {
-        //            for (int z = 0; z < 10; z++)
-        //            {
-        //                toteGrid[x, y, z].transform.position = new Vector3(i * xFactor, 0, 0);
-        //                Debug.Log(i);
-        //                i++;
+    void LoadSettings()
+    {
+        string _settingsImportString = System.IO.File.ReadAllText("Assets/Settings/" + "settingsImport.txt");
 
-        //            }
-        //        }
-        //    }
-        //}
+        settings = JsonUtility.FromJson<Settings>(_settingsImportString);
+
+        print(settings.testItem);
+
     }
 }
 
