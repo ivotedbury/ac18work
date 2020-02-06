@@ -9,6 +9,7 @@ public class Node : MonoBehaviour
     {
         this.transform.position = new Vector3(_nodePos.x * Constants.GRID_DIMS.x, _nodePos.y * Constants.GRID_DIMS.y, _nodePos.z * Constants.GRID_DIMS.z);
     }
+
     void Start()
     {
 
@@ -19,4 +20,20 @@ public class Node : MonoBehaviour
     {
 
     }
+
+    void OnMouseOver()
+    {
+        GetComponent<Renderer>().material.color = Constants.NODE_SELECTED;
+    }
+
+    void OnMouseExit()
+    {
+        GetComponent<Renderer>().material.color = Constants.NODE_NORMAL;
+            }
+
+    private void OnMouseDown()
+    {
+       
+    }
+
 }

@@ -13,7 +13,8 @@ void Start()
         {
             for (int z = 0; z < Constants.MAIN_STRUCTURE_DIMS.z; z++)
             {
-                nodesArray[x, z] = Instantiate (node, new Vector3 (x * Constants.GRID_DIMS.x, 0 , z * Constants.GRID_DIMS.z), node.transform.rotation);
+                nodesArray[x, z] = Instantiate (node, new Vector3 (x * Constants.GRID_DIMS.x, 0 , z * Constants.GRID_DIMS.z), node.transform.rotation, this.transform);
+                nodesArray[x, z].name = "node (" + x.ToString() + ", " + z.ToString() + ")";
             }
 
         }

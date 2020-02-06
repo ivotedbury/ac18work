@@ -30,10 +30,18 @@ public class Camera : MonoBehaviour
     private float rotationX;
     private float rotationY;
 
+
     void Start()
     {
         Screen.lockCursor = false;
 
+        rotationY = -transform.rotation.eulerAngles.x;
+        rotationX = transform.rotation.eulerAngles.y;
+        rotationY = Mathf.Clamp(rotationY, -90, 90);
+
+
+        transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
+        transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
 
     }
 

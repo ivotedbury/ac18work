@@ -13,4 +13,14 @@ public class Tote : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    void OnMouseOver()
+    {
+        GetComponent<Renderer>().material.color = Constants.TOTE_SELECTED;
+    }
+
+    void OnMouseExit()
+    {
+        GetComponent<Renderer>().material.color = Constants.TOTE_NORMAL;
+    }
 }
