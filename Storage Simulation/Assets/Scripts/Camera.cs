@@ -21,7 +21,7 @@ public class Camera : MonoBehaviour
                         End:    Toggle cursor locking to screen (you can also press Ctrl+P to toggle play mode on and off).
 	*/
 
-    public float cameraSensitivity = 90;
+    public float cameraSensitivity = 40;
     public float climbSpeed = 10;
     public float normalMoveSpeed = 20;
     public float slowMoveFactor = 10;
@@ -30,6 +30,7 @@ public class Camera : MonoBehaviour
     private float rotationX;
     private float rotationY;
 
+    private static float heightLimit = 0.1f;
 
     void Start()
     {
@@ -75,7 +76,14 @@ public class Camera : MonoBehaviour
 
 
         if (Input.GetKey(KeyCode.Q)) { transform.position += transform.up * climbSpeed * Time.deltaTime; }
-        if (Input.GetKey(KeyCode.E)) { transform.position -= transform.up * climbSpeed * Time.deltaTime; }
+        if (Input.GetKey(KeyCode.E))
+        {
+            if (transform.position.y >= heightLimit)
+            {
+                transform.position -= transform.up * climbSpeed * Time.deltaTime;
+            }
+
+        }
 
         if (Input.GetKeyDown(KeyCode.End))
         {

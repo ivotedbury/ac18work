@@ -6,20 +6,18 @@ public class Main : MonoBehaviour
 {
     public Structure structure;
     public Settings settings;
+    public ToteManager toteManager;
+    public RobotManager robotManager;
 
-    public Robot robot;
 
-    List<Robot> allRobots = new List<Robot>();
 
     void Start()
     {
         LoadSettings();
 
-        for (int i = 0; i < 5; i++)
-        {
-            allRobots.Add(Instantiate(robot, structure.nodesArray[i,0].transform.position, Quaternion.identity));
-            allRobots[i].currentNode = structure.nodesArray[i, 0];
-        }
+        toteManager.LoadTotes(structure);
+        robotManager.InitialiseRobots(structure);
+
     }
 
     void Update()
@@ -33,7 +31,7 @@ public class Main : MonoBehaviour
 
         settings = JsonUtility.FromJson<Settings>(_settingsImportString);
 
-        print(settings.testItem);
+       // print(settings.testItem);
 
     }
 

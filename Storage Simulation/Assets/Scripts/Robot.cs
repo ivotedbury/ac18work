@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Robot : MonoBehaviour {
 
-private int direction = Constants.POSITIVE_X;
+    public int direction;
 
     public Node currentNode;
     public Node targetNode;
