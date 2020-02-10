@@ -9,6 +9,8 @@ public class Robot : MonoBehaviour {
     public Node currentNode;
     public Node targetNode;
 
+    public Pathfinder pathfinder;
+
     public GameObject chassis;
     public GameObject lWheel;
     public GameObject rWheel;
@@ -21,6 +23,7 @@ public class Robot : MonoBehaviour {
     private float platformPosition = 0f;
     private bool isMoving = false;
 
+  
   
     void Update()
     {

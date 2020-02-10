@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
+    public Vector3Int gridPos;
 
     public Node(Vector3Int _nodePos)
     {
-        this.transform.position = new Vector3(_nodePos.x * Constants.GRID_DIMS.x, _nodePos.y * Constants.GRID_DIMS.y, _nodePos.z * Constants.GRID_DIMS.z);
+        gridPos = _nodePos;
+        this.transform.position = new Vector3(gridPos.x * Constants.GRID_DIMS.x, gridPos.y * Constants.GRID_DIMS.y, gridPos.z * Constants.GRID_DIMS.z);
     }
 
     void Start()
