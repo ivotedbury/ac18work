@@ -2,14 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Robot : MonoBehaviour {
+public class Robot : MonoBehaviour
+{
 
     public int direction;
 
-    public Node currentNode;
-    public Node targetNode;
+    public NodeRep currentNode;
+    public NodeRep targetNode;
+    public NodeRep[,,] nodeRepArray = new NodeRep[Constants.MAIN_STRUCTURE_DIMS.x, Constants.MAIN_STRUCTURE_DIMS.y, Constants.MAIN_STRUCTURE_DIMS.z];
+
+
 
     public Pathfinder pathfinder;
+    public RobotTask currentTask;
+
+    public Queue<RobotTask> taskQueue = new Queue<RobotTask>();
+    public int currentState = Constants.idle;
 
     public GameObject chassis;
     public GameObject lWheel;
@@ -23,18 +31,54 @@ public class Robot : MonoBehaviour {
     private float platformPosition = 0f;
     private bool isMoving = false;
 
-  
-  
+
+
     void Update()
     {
-        this.transform.position = currentNode.transform.position;
-
         chassis.transform.position = this.transform.position + (this.transform.rotation * Constants.CHASSIS_TRANSFORM);
         lWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.L_WHEEL_TRANSFORM);
         rWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.R_WHEEL_TRANSFORM);
         platform.transform.position = this.transform.position + (this.transform.rotation * Constants.PLATFORM_TRANSFORM) + (platformPosition * Constants.RAISED_PLATFORM_HEIGHT);
+
+        if (currentState == Constants.idle)
+        {
+            if (taskQueue.Count > 0)
+            {
+                currentTask = taskQueue.Dequeue();
+                CarryOutTask(currentTask);
+                currentState = Constants.busy;
+            }
+            else
+            {
+                currentState = Constants.idle;
+            }
+        }
     }
 
+    void CarryOutTask(RobotTask _task)
+    {
+        if (_task.inProgress())
+        {
+            targetNode = _task.waypoints.Peek();
+            transform.position = new Vector3(targetNode.pos.x * Constants.GRID_DIMS.x, targetNode.pos.y * Constants.GRID_DIMS.y, targetNode.pos.z * Constants.GRID_DIMS.z);
+            currentNode = _task.waypoints.Dequeue();
+        }
+
+    }
+
+    public void InitialiseRobot()
+    {
+        for (int x = 0; x < Constants.MAIN_STRUCTURE_DIMS.x; x++)
+        {
+            for (int y = 0; y < Constants.MAIN_STRUCTURE_DIMS.y; y++)
+            {
+                for (int z = 0; z < Constants.MAIN_STRUCTURE_DIMS.z; z++)
+                {
+                    nodeRepArray[x, y, z] = new NodeRep(new Vector3Int(x, y, z));
+                }
+            }
+        }
+    }
 }
 
 

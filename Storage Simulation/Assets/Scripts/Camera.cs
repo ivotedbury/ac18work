@@ -21,11 +21,11 @@ public class Camera : MonoBehaviour
                         End:    Toggle cursor locking to screen (you can also press Ctrl+P to toggle play mode on and off).
 	*/
 
-    public float cameraSensitivity = 40;
+    public float cameraSensitivity = 80;
     public float climbSpeed = 10;
     public float normalMoveSpeed = 20;
     public float slowMoveFactor = 10;
-    public float fastMoveFactor = 30;
+    public float fastMoveFactor = 15;
 
     private float rotationX;
     private float rotationY;
@@ -57,6 +57,15 @@ public class Camera : MonoBehaviour
             transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
             transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
         }
+
+        transform.position += transform.forward * (normalMoveSpeed * fastMoveFactor * Input.GetAxis("Mouse ScrollWheel")) * Time.deltaTime;
+        
+        if (Input.GetMouseButton(2))
+        {
+            transform.position -= transform.right * normalMoveSpeed  * Input.GetAxis("Mouse X") * Time.deltaTime;
+            transform.position -= transform.up * normalMoveSpeed * Input.GetAxis("Mouse Y") * Time.deltaTime;
+        }
+
 
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {

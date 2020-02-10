@@ -10,13 +10,14 @@ public class Main : MonoBehaviour
     public RobotManager robotManager;
 
 
-
     void Start()
     {
         LoadSettings();
 
         toteManager.LoadTotes(structure);
         robotManager.InitialiseRobots(structure);
+
+        Time.timeScale = 0.1f;
 
     }
 

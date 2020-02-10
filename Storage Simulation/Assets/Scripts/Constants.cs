@@ -26,6 +26,13 @@ public class Constants : MonoBehaviour
 
     public static int NUMBER_OF_ROBOTS = ROBOT_STARTING_POSITION.Length;
 
+    // ROBOT STATES
+
+    public static int idle = 0;
+    public static int busy = 1;
+
+    public static int WAIT = 0;
+    public static int GO_TO = 1;
 
     public static float ROBOT_LINEAR_SPEED = 0.5f;
     public static float ROBOT_ANGULAR_SPEED = 1000f;
