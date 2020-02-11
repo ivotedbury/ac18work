@@ -17,8 +17,9 @@ void Start()
                 {
                     nodesArray[x, y, z] = Instantiate(node, new Vector3(x * Constants.GRID_DIMS.x, y * Constants.GRID_DIMS.y, z * Constants.GRID_DIMS.z), node.transform.rotation, this.transform);
                     nodesArray[x, y, z].name = "node (" + x.ToString() + ", " + y.ToString() + ", " + z.ToString() + ")";
+                    nodesArray[x, y, z].gridPos = new Vector3Int(x, y, z);
+                    
                 }
-
             }
         }
     }

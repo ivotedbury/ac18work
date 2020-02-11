@@ -5,15 +5,15 @@ using UnityEngine;
 public class RobotTask
 {
 
-    public Queue<NodeRep> waypoints = new Queue<NodeRep>();
+    public Queue<Node> waypoints = new Queue<Node>();
    
 
-    public RobotTask(Pathfinder _pathfinder, NodeRep[,,] _nodeRepArray, int _actionType, NodeRep _current, NodeRep _target)
+    public RobotTask(Pathfinder _pathfinder, Node[,,] _nodeArray, int _actionType, Node _current, Node _target)
     {
         if (_actionType == Constants.GO_TO)
         {
-            List<NodeRep> waypointsNodes = new List<NodeRep>();
-            waypointsNodes = _pathfinder.FindPath(_nodeRepArray, _current, _target);
+            List<Node> waypointsNodes = new List<Node>();
+            waypointsNodes = _pathfinder.FindPath(_nodeArray, _current, _target);
             Debug.Log(waypointsNodes.Count);
 
             for (int i = 0; i < waypointsNodes.Count; i++)

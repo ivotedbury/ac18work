@@ -9,46 +9,46 @@ using System.Text;
 public class Pathfinder
 {
 
-    public List<NodeRep> FindNeighbours(NodeRep[,,] _nodeRepArray, NodeRep _input)
+    public List<Node> FindNeighbours(Node[,,] _nodeArray, Node _input)
     {
-        List<NodeRep> _neighbours = new List<NodeRep>();
+        List<Node> _neighbours = new List<Node>();
 
-        if (_input.pos.x < Constants.MAIN_STRUCTURE_DIMS.x - 1) // positive X
+        if (_input.gridPos.x < Constants.MAIN_STRUCTURE_DIMS.x - 1) // positive X
         {
-            _neighbours.Add(_nodeRepArray[_input.pos.x + 1, _input.pos.y, _input.pos.z]);
-       }
-        if (_input.pos.z < Constants.MAIN_STRUCTURE_DIMS.z - 1) // positive Z
-        {
-            _neighbours.Add(_nodeRepArray[_input.pos.x, _input.pos.y, _input.pos.z + 1]);
+            _neighbours.Add(_nodeArray[_input.gridPos.x + 1, _input.gridPos.y, _input.gridPos.z]);
         }
-        if (_input.pos.x > 0) // negative X
+        if (_input.gridPos.z < Constants.MAIN_STRUCTURE_DIMS.z - 1) // positive Z
         {
-            _neighbours.Add(_nodeRepArray[_input.pos.x - 1, _input.pos.y, _input.pos.z]);
+            _neighbours.Add(_nodeArray[_input.gridPos.x, _input.gridPos.y, _input.gridPos.z + 1]);
         }
-        if (_input.pos.z > 0) // negative Z
+        if (_input.gridPos.x > 0) // negative X
         {
-            _neighbours.Add(_nodeRepArray[_input.pos.x, _input.pos.y, _input.pos.z - 1]);
+            _neighbours.Add(_nodeArray[_input.gridPos.x - 1, _input.gridPos.y, _input.gridPos.z]);
+        }
+        if (_input.gridPos.z > 0) // negative Z
+        {
+            _neighbours.Add(_nodeArray[_input.gridPos.x, _input.gridPos.y, _input.gridPos.z - 1]);
         }
 
         return _neighbours;
     }
 
-    private int ManhattanDistance(NodeRep _start, NodeRep _end)
+    private int ManhattanDistance(Node _start, Node _end)
     {
-        int distance = Mathf.Abs(_end.pos.x - _start.pos.x) + Mathf.Abs(_end.pos.y - _start.pos.y) + Mathf.Abs(_end.pos.z - _start.pos.z);
+        int distance = Mathf.Abs(_end.gridPos.x - _start.gridPos.x) + Mathf.Abs(_end.gridPos.y - _start.gridPos.y) + Mathf.Abs(_end.gridPos.z - _start.gridPos.z);
         return distance;
     }
 
-    public List<NodeRep> FindPath(NodeRep[,,] _nodeRepArray, NodeRep _start, NodeRep _end)
+    public List<Node> FindPath(Node[,,] _nodeRepArray, Node _start, Node _end)
     {
 
-        List<NodeRep> path = new List<NodeRep>();
+        List<Node> path = new List<Node>();
         bool pathSuccess = false;
 
         _start.parent = _start;
 
-        List<NodeRep> openSet = new List<NodeRep>();
-        HashSet<NodeRep> closedSet = new HashSet<NodeRep>();
+        List<Node> openSet = new List<Node>();
+        HashSet<Node> closedSet = new HashSet<Node>();
         openSet.Add(_start);
 
         _start.gCost = 0;
@@ -56,7 +56,7 @@ public class Pathfinder
 
         while (openSet.Count > 0)
         {
-            NodeRep current = openSet[0];
+            Node current = openSet[0];
             openSet.Remove(openSet[0]);
             closedSet.Add(current);
 
@@ -66,7 +66,7 @@ public class Pathfinder
                 break;
             }
 
-            foreach (NodeRep neighbour in FindNeighbours(_nodeRepArray, current))
+            foreach (Node neighbour in FindNeighbours(_nodeRepArray, current))
             {
 
                 if ((!neighbour.walkable) || closedSet.Contains(neighbour))
@@ -85,8 +85,6 @@ public class Pathfinder
                     {
                         openSet.Add(neighbour);
                     }
-                    //else
-                    //    openSet.UpdateItem(neighbour);
                 }
             }
         }
@@ -103,10 +101,10 @@ public class Pathfinder
 
     }
 
-    List<NodeRep> RetracePath(NodeRep _startPath, NodeRep _endPath)
+    List<Node> RetracePath(Node _startPath, Node _endPath)
     {
-        List<NodeRep> _path = new List<NodeRep>();
-        NodeRep _current = _endPath;
+        List<Node> _path = new List<Node>();
+        Node _current = _endPath;
 
         while (_current != _startPath)
         {
@@ -119,9 +117,9 @@ public class Pathfinder
         return _path;
     }
 
-    public NodeRep FindLowestFCost(List<NodeRep> _inputList)
+    public Node FindLowestFCost(List<Node> _inputList)
     {
-        NodeRep lowestFCost = null;
+        Node lowestFCost = null;
 
         float currentLowestFCost = Mathf.Infinity;
 

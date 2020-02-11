@@ -6,18 +6,24 @@ public class Node : MonoBehaviour
 {
     public Vector3Int gridPos;
 
-    public Node(Vector3Int _nodePos)
+    public Node parent;
+
+    public float gCost;
+    public float hCost;
+    public bool walkable;
+
+    public float fCost()
     {
-        gridPos = _nodePos;
-        this.transform.position = new Vector3(gridPos.x * Constants.GRID_DIMS.x, gridPos.y * Constants.GRID_DIMS.y, gridPos.z * Constants.GRID_DIMS.z);
+        return gCost + hCost;
     }
 
     void Start()
     {
-
+        gCost = 0;
+        hCost = 0;
+        walkable = true;
     }
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -31,11 +37,11 @@ public class Node : MonoBehaviour
     void OnMouseExit()
     {
         GetComponent<Renderer>().material.color = Constants.NODE_NORMAL;
-            }
+    }
 
     private void OnMouseDown()
     {
-       
+
     }
 
 }

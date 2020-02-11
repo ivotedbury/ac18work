@@ -17,7 +17,7 @@ public class Main : MonoBehaviour
         toteManager.LoadTotes(structure);
         robotManager.InitialiseRobots(structure);
 
-        Time.timeScale = 0.1f;
+      //  Time.timeScale = 0.1f;
 
     }
 

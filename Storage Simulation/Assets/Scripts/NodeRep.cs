@@ -6,7 +6,7 @@ using UnityEngine;
 public class NodeRep
 {
     public Vector3Int pos;
-    public NodeRep parent;
+    public Node parent;
 
     public float gCost;
     public float hCost;

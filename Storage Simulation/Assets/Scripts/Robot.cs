@@ -7,11 +7,10 @@ public class Robot : MonoBehaviour
 
     public int direction;
 
-    public NodeRep currentNode;
-    public NodeRep targetNode;
-    public NodeRep[,,] nodeRepArray = new NodeRep[Constants.MAIN_STRUCTURE_DIMS.x, Constants.MAIN_STRUCTURE_DIMS.y, Constants.MAIN_STRUCTURE_DIMS.z];
-
-
+    public Node currentNode;
+    public Node targetNode;
+    public Structure structure;
+    public RobotState robotState;
 
     public Pathfinder pathfinder;
     public RobotTask currentTask;
@@ -31,28 +30,47 @@ public class Robot : MonoBehaviour
     private float platformPosition = 0f;
     private bool isMoving = false;
 
+    public bool taskComplete = true;
 
+    public RobotAction currentAction;
 
     void Update()
     {
-        chassis.transform.position = this.transform.position + (this.transform.rotation * Constants.CHASSIS_TRANSFORM);
-        lWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.L_WHEEL_TRANSFORM);
-        rWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.R_WHEEL_TRANSFORM);
-        platform.transform.position = this.transform.position + (this.transform.rotation * Constants.PLATFORM_TRANSFORM) + (platformPosition * Constants.RAISED_PLATFORM_HEIGHT);
-
-        if (currentState == Constants.idle)
+        if (!currentAction.actionComplete)
         {
-            if (taskQueue.Count > 0)
-            {
-                currentTask = taskQueue.Dequeue();
-                CarryOutTask(currentTask);
-                currentState = Constants.busy;
-            }
-            else
-            {
-                currentState = Constants.idle;
-            }
+            currentAction.UpdateRobotState(Time.deltaTime);
+            robotState = currentAction.currentState;
         }
+
+        transform.position = robotState.position;
+        transform.rotation = robotState.orientation;
+        platformPosition = robotState.platformPosition;
+        UpdateTransforms();
+
+
+        //if (taskComplete)
+        //{
+        //    //   ProcessNextTask();
+        //}
+
+        //if (currentState == Constants.idle)
+        //{
+        //    if (taskQueue.Count > 0)
+        //    {
+        //        currentTask = taskQueue.Dequeue();
+        //        CarryOutTask(currentTask);
+        //        currentState = Constants.busy;
+        //    }
+        //    else
+        //    {
+        //        currentState = Constants.idle;
+        //    }
+        //}
+    }
+
+   public void AssignTask(string _type, Node _destination)
+    {
+        
     }
 
     void CarryOutTask(RobotTask _task)
@@ -60,25 +78,25 @@ public class Robot : MonoBehaviour
         if (_task.inProgress())
         {
             targetNode = _task.waypoints.Peek();
-            transform.position = new Vector3(targetNode.pos.x * Constants.GRID_DIMS.x, targetNode.pos.y * Constants.GRID_DIMS.y, targetNode.pos.z * Constants.GRID_DIMS.z);
-            currentNode = _task.waypoints.Dequeue();
+            transform.position = new Vector3(targetNode.gridPos.x * Constants.GRID_DIMS.x, targetNode.gridPos.y * Constants.GRID_DIMS.y, targetNode.gridPos.z * Constants.GRID_DIMS.z);
+            // currentNode = _task.waypoints.Dequeue();
         }
 
     }
 
-    public void InitialiseRobot()
+    void UpdateTransforms()
     {
-        for (int x = 0; x < Constants.MAIN_STRUCTURE_DIMS.x; x++)
-        {
-            for (int y = 0; y < Constants.MAIN_STRUCTURE_DIMS.y; y++)
-            {
-                for (int z = 0; z < Constants.MAIN_STRUCTURE_DIMS.z; z++)
-                {
-                    nodeRepArray[x, y, z] = new NodeRep(new Vector3Int(x, y, z));
-                }
-            }
-        }
+        chassis.transform.position = this.transform.position + (this.transform.rotation * Constants.CHASSIS_TRANSFORM);
+        lWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.L_WHEEL_TRANSFORM);
+        rWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.R_WHEEL_TRANSFORM);
+        platform.transform.position = this.transform.position + (this.transform.rotation * Constants.PLATFORM_TRANSFORM) + (platformPosition * Constants.RAISED_PLATFORM_HEIGHT);
     }
+
+    public void InitialiseRobot(Structure _structure)
+    {
+        structure = _structure;
+    }
+
 }
 
 
@@ -92,11 +110,14 @@ public struct RobotState
 
     public Vector3 position;
     public Quaternion orientation;
+    public float platformPosition;
 
-    public RobotState(Vector3 _position, Quaternion _orientation)
+
+    public RobotState(Vector3 _position, Quaternion _orientation, float _platformPosition)
     {
         position = _position;
         orientation = _orientation;
+        platformPosition = _platformPosition;
     }
 }
 
