@@ -41,6 +41,9 @@ public class Pathfinder
 
     public List<Node> FindPath(Node[,,] _nodeRepArray, Node _start, Node _end)
     {
+        Debug.Log("Pathfinding started");
+        Debug.Log(_start.gridPos);
+        Debug.Log(_end.gridPos);
 
         List<Node> path = new List<Node>();
         bool pathSuccess = false;
@@ -92,14 +95,36 @@ public class Pathfinder
         if (pathSuccess)
         {
             path = RetracePath(_start, _end);
+          //  path = SimplifyPath(path);
+
             Debug.Log("Path Found!");
             Debug.Log(path.Count);
         }
+        
         return path;
-
-        //requestManager.FinishedProcessingPath(path, pathSuccess);
-
     }
+
+    //List<Node> SimplifyPath(List<Node> _inputPath)
+    //{
+    //    List<Node> outputpath = new List<Node>();
+
+    //    outputpath = _inputPath;
+
+    //    Quaternion currentDirection;
+    //    Quaternion newDirection;
+
+    //    currentDirection = Quaternion.LookRotation(_inputPath[1].transform.position - _inputPath[0].transform.position);
+
+    //    for (int i = 0; i < _inputPath.Count - 1; i++)
+    //    {
+    //        newDirection = Quaternion.LookRotation(_inputPath[i + 1].transform.position - _inputPath[i].transform.position);
+    //        if (newDirection != currentDirection)
+    //        {
+    //            outputpath.Add(_inputPath[i]);
+    //        }
+    //    }
+    //    return outputpath;
+    //}
 
     List<Node> RetracePath(Node _startPath, Node _endPath)
     {
@@ -111,7 +136,7 @@ public class Pathfinder
             _path.Add(_current);
             _current = _current.parent;
         }
-        // _path.Add(_startPath);
+        _path.Add(_startPath);
 
         _path.Reverse();
         return _path;

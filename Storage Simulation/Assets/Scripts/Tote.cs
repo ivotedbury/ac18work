@@ -13,6 +13,7 @@ public class Tote : MonoBehaviour
     public int number;
 
 
+
     public void PopulateItems(int _productId, int _quantity)
     {
         for (int i = 0; i < _quantity; i++)

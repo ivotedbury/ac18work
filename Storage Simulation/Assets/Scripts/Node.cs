@@ -17,11 +17,16 @@ public class Node : MonoBehaviour
         return gCost + hCost;
     }
 
-    void Start()
+    public void SetupNode()
     {
         gCost = 0;
         hCost = 0;
         walkable = true;
+    }
+
+    void Start()
+    {
+   
     }
 
     void Update()

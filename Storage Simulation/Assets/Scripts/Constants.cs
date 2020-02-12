@@ -32,10 +32,12 @@ public class Constants : MonoBehaviour
     public static int busy = 1;
 
     public static int WAIT = 0;
-    public static int GO_TO = 1;
+    public static int GOTO = 1;
+    public static int PICKUP = 2;
+    public static int DROPOFF = 3;
 
-    public static float ROBOT_LINEAR_SPEED = 0.5f;
-    public static float ROBOT_ANGULAR_SPEED = 1000f;
+    public static float ROBOT_LINEAR_SPEED = 3f;
+    public static float ROBOT_ANGULAR_SPEED = 500;
     public static float ROBOT_LIFT_SPEED = 0.1f;
 
     public static int DOWN = 0; // platform positions
@@ -47,6 +49,8 @@ public class Constants : MonoBehaviour
     public static Vector3 PLATFORM_TRANSFORM = new Vector3(0, 0.085f, 0);
     public static Vector3 RAISED_PLATFORM_HEIGHT = new Vector3(0, 0.03f, 0);
 
+    public static float COLLISION_DISTANCE = 0.48f;
+
 
     // GRID 
     public static Vector3 GRID_DIMS = new Vector3(0.5f, 0.5f, 0.7f);
@@ -57,6 +61,7 @@ public class Constants : MonoBehaviour
     public static int POSITIVE_Z = 1;
     public static int NEGATIVE_X = 2;
     public static int NEGATIVE_Z = 3;
+
 
     // MAIN STRUCTURE
     public static Vector3Int MAIN_STRUCTURE_DIMS = new Vector3Int(10, 1, 10);
@@ -90,6 +95,7 @@ public class Constants : MonoBehaviour
     public static float PRODUCT_SPACING = 0.09f;
     public static float TOTE_OFFSET_X = -1.5f * PRODUCT_SPACING;
     public static float TOTE_OFFSET_Z = -2.5f * PRODUCT_SPACING;
+    public static Vector3 TOTE_RAISE = new Vector3(0, 0.75f, 0);
 
     public static float TOTE_OFFSET_HEIGHT = 0.14f;
     public static Vector3[] PRODUCT_TOTE_STACKING = new Vector3[12] {
@@ -153,8 +159,4 @@ public class Constants : MonoBehaviour
     public static int PRODUCT_ID_VIOLET = 10;
     public static int PRODUCT_ID_VIOLET_RED = 11;
 
-    void Awake()
-    {
-
-    }
 }

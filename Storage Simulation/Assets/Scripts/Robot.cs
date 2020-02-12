@@ -22,6 +22,7 @@ public class Robot : MonoBehaviour
     public GameObject lWheel;
     public GameObject rWheel;
     public GameObject platform;
+    public int robotID;
 
     Tote passengerTote;
 
@@ -31,20 +32,18 @@ public class Robot : MonoBehaviour
     private bool isMoving = false;
 
     public bool taskComplete = true;
-
-    public RobotAction currentAction;
+    public bool proceed = true;
+    // public RobotAction currentAction;
 
     void Update()
     {
-        if (!currentAction.actionComplete)
-        {
-            currentAction.UpdateRobotState(Time.deltaTime);
-            robotState = currentAction.currentState;
-        }
+            BroadcastMessage("CheckCollisions", transform.position);
 
-        transform.position = robotState.position;
-        transform.rotation = robotState.orientation;
-        platformPosition = robotState.platformPosition;
+            if (!currentTask.taskComplete && proceed)
+            {
+                robotState = currentTask.UpdateTaskState(Time.deltaTime);
+            }
+      
         UpdateTransforms();
 
 
@@ -68,9 +67,42 @@ public class Robot : MonoBehaviour
         //}
     }
 
-   public void AssignTask(string _type, Node _destination)
+    void UpdateTransforms()
     {
-        
+        transform.position = robotState.position;
+        transform.rotation = robotState.orientation;
+        platformPosition = robotState.platformPosition;
+        UpdateComponents();
+    }
+
+    void CheckCollisions(Vector3 _position)
+    {
+        if (this.transform.position != _position && Vector3.Distance(transform.position, _position) < Constants.COLLISION_DISTANCE)
+        {
+            proceed = false;
+        }
+        else
+        {
+            proceed = true;
+        }
+    }
+
+    public void AssignTask(int _type, Node _destination)
+    {
+        Node _startingNode;
+
+        if (taskQueue.Count > 0)
+        {
+            _startingNode = taskQueue.Peek().destination;
+        }
+        else
+        {
+            _startingNode = currentNode;
+        }
+
+        currentTask = new RobotTask(pathfinder, structure.nodesArray, new RobotState(transform.position, transform.rotation, platformPosition), _type, _startingNode, _destination);
+
+        Debug.Log("Task assigned to " + robotID);
     }
 
     void CarryOutTask(RobotTask _task)
@@ -84,7 +116,7 @@ public class Robot : MonoBehaviour
 
     }
 
-    void UpdateTransforms()
+    void UpdateComponents()
     {
         chassis.transform.position = this.transform.position + (this.transform.rotation * Constants.CHASSIS_TRANSFORM);
         lWheel.transform.position = this.transform.position + (this.transform.rotation * Constants.L_WHEEL_TRANSFORM);
@@ -92,9 +124,12 @@ public class Robot : MonoBehaviour
         platform.transform.position = this.transform.position + (this.transform.rotation * Constants.PLATFORM_TRANSFORM) + (platformPosition * Constants.RAISED_PLATFORM_HEIGHT);
     }
 
-    public void InitialiseRobot(Structure _structure)
+    public void InitialiseRobot(Structure _structure, Node _node, int _robotID)
     {
         structure = _structure;
+        robotState = new RobotState(transform.position, transform.rotation, platformPosition);
+        currentNode = _node;
+        robotID = _robotID;
     }
 
 }
