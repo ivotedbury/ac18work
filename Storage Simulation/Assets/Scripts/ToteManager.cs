@@ -68,9 +68,6 @@ public class ToteManager : MonoBehaviour
         for (int i = 0; i < allTotes.Count; i++)
         {
             totesState.allTotes.Add(allTotes[i]);
-            //totesState.allTotes[i].number = allTotes[i].number;
-            //totesState.allTotes[i].position = allTotes[i].transform.position;
-            //totesState.allTotes[i].rotation = allTotes[i].transform.rotation;
         }
 
         Debug.Log(totesState.allTotes.Count);
