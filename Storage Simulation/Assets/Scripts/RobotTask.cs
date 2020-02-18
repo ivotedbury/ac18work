@@ -58,7 +58,7 @@ public class RobotTask
 
     }
 
-    public RobotState UpdateTaskState(float _deltaTime)
+    public RobotState UpdateTaskState(float _deltaTime, bool _proceed)
     {
 
         if (actionsInTask.Count > 0)
@@ -71,7 +71,7 @@ public class RobotTask
                 currentAction = actionsInTask.Peek();
             }
 
-            currentAction.UpdateRobotState(Time.deltaTime);
+            currentAction.UpdateRobotState(Time.deltaTime, _proceed);
             stateUpdate = currentAction.currentState;
         }
 

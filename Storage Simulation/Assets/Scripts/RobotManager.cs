@@ -23,6 +23,7 @@ public class RobotManager : MonoBehaviour
             Node startingNode = structure.nodesArray[Constants.ROBOT_STARTING_POSITION[i].x, Constants.ROBOT_STARTING_POSITION[i].y, Constants.ROBOT_STARTING_POSITION[i].z];
             Robot newRobot = Instantiate(robotReference, startingNode.transform.position, Quaternion.identity, transform);
             newRobot.InitialiseRobot(structure, startingNode, i);
+            newRobot.name = "Robot " + i.ToString();
             //  newRobot.currentNode = newRobot.structure.nodesArray[startingNode.gridPos.x, startingNode.gridPos.y, startingNode.gridPos.z];
             newRobot.direction = Constants.ROBOT_STARTING_DIRECTION[i];
             newRobot.pathfinder = new Pathfinder();
@@ -33,28 +34,24 @@ public class RobotManager : MonoBehaviour
         }
     }
 
-    //void Update()
-    //{
-    //    for (int i = 0; i < allRobots.Count; i++)
-    //    {
-    //        for (int j = 0; j < allRobots.Count; j++)
-    //        {
-    //            if (i == j)
-    //            {
-    //                continue;
-    //            }
-    //            if (Vector3.Distance(allRobots[i].transform.position, allRobots[j].transform.position) < Constants.COLLISION_DISTANCE)
-    //            {
-    //                allRobots[i].proceed = false;
-    //                Debug.Log("Collision detected between " + allRobots[i].robotID + " and " + allRobots[j].robotID);
-    //            }
-    //            else
-    //            {
-    //                allRobots[i].proceed = true;
-    //            }
-    //        }
-    //    }
-    //}
+    void Update()
+    {
+        for (int i = 0; i < allRobots.Count; i++)
+        {
+            for (int j = 0; j < allRobots.Count; j++)
+            {
+                if (i == j)
+                {
+                    continue;
+                }
 
+                if (allRobots[i].CheckCollisions(allRobots[j]))
+                {
+                    break;
+                }
+            }
+            allRobots[i].UpdateRobot();
+        }
+    }
 }
 

@@ -49,18 +49,18 @@ public class Constants : MonoBehaviour
     public static Vector3 PLATFORM_TRANSFORM = new Vector3(0, 0.085f, 0);
     public static Vector3 RAISED_PLATFORM_HEIGHT = new Vector3(0, 0.03f, 0);
 
-    public static float COLLISION_DISTANCE = 0.48f;
-
+    public static float COLLISION_DISTANCE = 0.7f;
+    public static float COLLISION_PERPENDICULAR_DISTANCE = 0.2f;
 
     // GRID 
     public static Vector3 GRID_DIMS = new Vector3(0.5f, 0.5f, 0.7f);
 
     // DIRECTIONS
 
-    public static int POSITIVE_X = 0;
-    public static int POSITIVE_Z = 1;
-    public static int NEGATIVE_X = 2;
-    public static int NEGATIVE_Z = 3;
+    public static int POSITIVE_Z = 0; // North
+    public static int POSITIVE_X = 1; // East
+    public static int NEGATIVE_Z = 2; // South
+    public static int NEGATIVE_X = 3; // West
 
 
     // MAIN STRUCTURE

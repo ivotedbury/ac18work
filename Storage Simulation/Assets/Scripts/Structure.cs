@@ -7,6 +7,7 @@ public class Structure : MonoBehaviour
 
     public Node[,,] nodesArray = new Node[Constants.MAIN_STRUCTURE_DIMS.x, Constants.MAIN_STRUCTURE_DIMS.y, Constants.MAIN_STRUCTURE_DIMS.z];
     public Node node;
+    public int structureId;
 
     void Start()
     {

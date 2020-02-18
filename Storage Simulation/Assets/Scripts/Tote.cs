@@ -11,8 +11,12 @@ public class Tote : MonoBehaviour
     public Properties properties;
 
     public int number;
+    public Vector3Int gridPos;
 
+    void Update()
+    {
 
+    }
 
     public void PopulateItems(int _productId, int _quantity)
     {
@@ -25,6 +29,8 @@ public class Tote : MonoBehaviour
             toteProducts.Add(newProduct);
         }
     }
+
+
 
     Vector3 GetProductPosition(int _productNumber)
     {
@@ -58,7 +64,19 @@ public class Tote : MonoBehaviour
 
     private void OnMouseDown()
     {
-        PopulateProperties();
+        //  PopulateProperties();
+
+        //if (Input.GetKey("l"))
+        //{
+        Debug.Log("Destroy");
+        foreach (Product product in toteProducts)
+        {
+           // toteProducts.Remove(product);
+            Destroy(product.gameObject);
+        }
+        
+        Destroy(gameObject);
+        //}
     }
 
     void OnMouseExit()

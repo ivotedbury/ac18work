@@ -12,6 +12,13 @@ public class Node : MonoBehaviour
     public float hCost;
     public bool walkable;
 
+    public bool flowPosZ; // North
+    public bool flowPosX; // East
+    public bool flowNegZ; // South
+    public bool flowNegX; // West
+
+
+
     public float fCost()
     {
         return gCost + hCost;
@@ -22,11 +29,31 @@ public class Node : MonoBehaviour
         gCost = 0;
         hCost = 0;
         walkable = true;
+
+        if (gridPos.x == 0)
+        {
+            flowPosZ = true;
+        }
+
+        else
+        {
+            flowNegZ = true;
+        }
+        
+        if (gridPos.z == Constants.MAIN_STRUCTURE_DIMS.z - 1)
+        {
+            flowPosX = true;
+        }
+
+        if (gridPos.z == 0)
+        {
+            flowNegX = true;
+        }
     }
 
     void Start()
     {
-   
+
     }
 
     void Update()

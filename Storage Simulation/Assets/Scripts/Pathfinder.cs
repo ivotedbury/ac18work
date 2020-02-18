@@ -13,19 +13,19 @@ public class Pathfinder
     {
         List<Node> _neighbours = new List<Node>();
 
-        if (_input.gridPos.x < Constants.MAIN_STRUCTURE_DIMS.x - 1) // positive X
+        if (_input.gridPos.x < Constants.MAIN_STRUCTURE_DIMS.x - 1 && _input.flowPosX) // positive X
         {
             _neighbours.Add(_nodeArray[_input.gridPos.x + 1, _input.gridPos.y, _input.gridPos.z]);
         }
-        if (_input.gridPos.z < Constants.MAIN_STRUCTURE_DIMS.z - 1) // positive Z
+        if (_input.gridPos.z < Constants.MAIN_STRUCTURE_DIMS.z - 1 && _input.flowPosZ) // positive Z
         {
             _neighbours.Add(_nodeArray[_input.gridPos.x, _input.gridPos.y, _input.gridPos.z + 1]);
         }
-        if (_input.gridPos.x > 0) // negative X
+        if (_input.gridPos.x > 0 && _input.flowNegX) // negative X
         {
             _neighbours.Add(_nodeArray[_input.gridPos.x - 1, _input.gridPos.y, _input.gridPos.z]);
         }
-        if (_input.gridPos.z > 0) // negative Z
+        if (_input.gridPos.z > 0 && _input.flowNegZ) // negative Z
         {
             _neighbours.Add(_nodeArray[_input.gridPos.x, _input.gridPos.y, _input.gridPos.z - 1]);
         }

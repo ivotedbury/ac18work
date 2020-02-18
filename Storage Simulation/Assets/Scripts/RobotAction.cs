@@ -52,14 +52,18 @@ public class RobotAction
         actionComplete = false;
     }
 
-    public void UpdateRobotState(float deltaTime)
+    public void UpdateRobotState(float deltaTime, bool proceed)
     {
         if (timeSinceStart >= actionDuration)
         {
             actionComplete = true;
         }
 
-        timeSinceStart += deltaTime;
+        if (proceed)
+        {
+            timeSinceStart += deltaTime;
+        }
+
         currentState.position = Vector3.Lerp(startState.position, endState.position, timeSinceStart / actionDuration);
         currentState.orientation = Quaternion.Lerp(startState.orientation, endState.orientation, timeSinceStart / actionDuration);
         currentState.platformPosition = Mathf.Lerp(startState.platformPosition, endState.platformPosition, timeSinceStart / actionDuration);
