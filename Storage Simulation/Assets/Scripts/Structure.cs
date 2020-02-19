@@ -11,6 +11,13 @@ public class Structure : MonoBehaviour
 
     void Start()
     {
+        List<int> internalCorridors = new List<int>();
+
+        for (int c = 0; c < Constants.MAIN_STRUCTURE_DIMS.x; c += Constants.SLOT_DEPTH + Constants.AISLE_WIDTH)
+        {
+            internalCorridors.Add(c);
+        }
+
         for (int x = 0; x < Constants.MAIN_STRUCTURE_DIMS.x; x++)
         {
             for (int y = 0; y < Constants.MAIN_STRUCTURE_DIMS.y; y++)
@@ -21,6 +28,16 @@ public class Structure : MonoBehaviour
                     nodesArray[x, y, z].name = "node (" + x.ToString() + ", " + y.ToString() + ", " + z.ToString() + ")";
                     nodesArray[x, y, z].gridPos = new Vector3Int(x, y, z);
                     nodesArray[x, y, z].SetupNode();
+
+                    if (x == 0
+|| x == Constants.MAIN_STRUCTURE_DIMS.x - 1
+|| z == 0
+|| z == Constants.MAIN_STRUCTURE_DIMS.z - 1
+|| internalCorridors.Contains(x))
+
+                    {
+                        nodesArray[x, y, z].corridor = true;
+                    }
 
                 }
             }

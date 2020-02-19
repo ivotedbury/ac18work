@@ -22,7 +22,7 @@ public class Tote : MonoBehaviour
     {
         for (int i = 0; i < _quantity; i++)
         {
-            Product newProduct = Instantiate(referenceProduct, this.transform.position + GetProductPosition(i), Quaternion.identity, transform);
+            Product newProduct = Instantiate(referenceProduct, this.transform.position + this.transform.rotation * GetProductPosition(i), Quaternion.identity, transform);
             newProduct.productId = _productId;
             newProduct.SetColour();
             newProduct.name = "ProductID: " + _productId.ToString();
@@ -64,19 +64,19 @@ public class Tote : MonoBehaviour
 
     private void OnMouseDown()
     {
-        //  PopulateProperties();
+        PopulateProperties();
 
-        //if (Input.GetKey("l"))
+        ////if (Input.GetKey("l"))
+        ////{
+        //Debug.Log("Destroy");
+        //foreach (Product product in toteProducts)
         //{
-        Debug.Log("Destroy");
-        foreach (Product product in toteProducts)
-        {
-           // toteProducts.Remove(product);
-            Destroy(product.gameObject);
-        }
-        
-        Destroy(gameObject);
+        //   // toteProducts.Remove(product);
+        //    Destroy(product.gameObject);
         //}
+        
+        //Destroy(gameObject);
+        ////}
     }
 
     void OnMouseExit()

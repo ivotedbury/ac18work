@@ -53,7 +53,7 @@ public class Constants : MonoBehaviour
     public static float COLLISION_PERPENDICULAR_DISTANCE = 0.2f;
 
     // GRID 
-    public static Vector3 GRID_DIMS = new Vector3(0.5f, 0.5f, 0.7f);
+    public static Vector3 GRID_DIMS = new Vector3(0.7f, 0.5f, 0.5f);
 
     // DIRECTIONS
 
@@ -64,8 +64,12 @@ public class Constants : MonoBehaviour
 
 
     // MAIN STRUCTURE
-    public static Vector3Int MAIN_STRUCTURE_DIMS = new Vector3Int(10, 1, 10);
+    public static Vector3Int MAIN_STRUCTURE_DIMS = new Vector3Int(10, 5, 12);
     public static Vector2Int MAIN_STRUCTURE_BASE_DIMS = new Vector2Int(MAIN_STRUCTURE_DIMS.x, MAIN_STRUCTURE_DIMS.z);
+
+
+    public static int AISLE_WIDTH = 1;
+    public static int SLOT_DEPTH = 2;
 
     // COLOURS
 
@@ -88,6 +92,15 @@ public class Constants : MonoBehaviour
     public static Color COLOUR_VIOLET = new Color(100f / 255, 060f / 255f, 145f / 255f, 1f);
     public static Color COLOUR_VIOLET_RED = new Color(224f / 255, 070f / 255f, 170f / 255f, 1f);
 
+    // FLOW LINES
+
+    public static Vector3 FLOW_LINE_OFFSET = new Vector3(0, 0.02f, 0);
+    public static float FLOW_LINE_LENGTH = 0.2f;
+    public static float FLOW_LINE_WIDTH = 0.02f;
+    public static Color FLOW_LINE_COLOUR_POSZ = Color.cyan;
+    public static Color FLOW_LINE_COLOUR_POSX = Color.magenta;
+    public static Color FLOW_LINE_COLOUR_NEGZ = Color.yellow;
+    public static Color FLOW_LINE_COLOUR_NEGX = Color.green;
 
 
     // INSIDE TOTES
@@ -95,7 +108,7 @@ public class Constants : MonoBehaviour
     public static float PRODUCT_SPACING = 0.09f;
     public static float TOTE_OFFSET_X = -1.5f * PRODUCT_SPACING;
     public static float TOTE_OFFSET_Z = -2.5f * PRODUCT_SPACING;
-    public static Vector3 TOTE_RAISE = new Vector3(0, 0.75f, 0);
+    public static Vector3 TOTE_RAISE = new Vector3(0, 0f, 0);
 
     public static float TOTE_OFFSET_HEIGHT = 0.14f;
     public static Vector3[] PRODUCT_TOTE_STACKING = new Vector3[12] {

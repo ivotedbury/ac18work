@@ -19,9 +19,9 @@ public class ToteManager : MonoBehaviour
     {
         structure = _structure;
 
-        LoadSavedTotes();
+      //  LoadSavedTotes();
 
-        //CreateNewTotes();  
+      CreateNewTotes();
     }
 
     private void CreateNewTotes()
@@ -33,8 +33,11 @@ public class ToteManager : MonoBehaviour
             {
                 for (int z = 0; z < Constants.MAIN_STRUCTURE_DIMS.z; z++)
                 {
-                    AddTote(structure.nodesArray[x, y, z], toteNumber, Random.Range(0, 11), Random.Range(1, 71));
-                    toteNumber++;
+                    if (!structure.nodesArray[x, y, z].corridor)
+                    {
+                        AddTote(structure.nodesArray[x, y, z], toteNumber, Random.Range(0, 11), Random.Range(1, 71));
+                        toteNumber++;
+                                            }
                 }
             }
         }
@@ -42,7 +45,7 @@ public class ToteManager : MonoBehaviour
 
     private void AddTote(Node _node, int _toteNumber, int _productId, int _quantity)
     {
-        Tote newTote = Instantiate(referenceTote, _node.transform.position + Constants.TOTE_RAISE, Quaternion.identity, this.transform);
+        Tote newTote = Instantiate(referenceTote, _node.transform.position + Constants.TOTE_RAISE, Quaternion.identity * Quaternion.Euler(0,90,0), this.transform);
         int newToteNumber = _toteNumber;
         newTote.PopulateItems(_productId, _quantity);
         newTote.gridPos = _node.gridPos;
@@ -65,18 +68,10 @@ public class ToteManager : MonoBehaviour
             SaveTotes();
         }
 
-        //if (Input.GetButtonDown("0"))
-        //{
-        //     ray = Camera.main.ScreenPointToRay(Input.MousePosition);
-        //    Raycasthit hit;
-        //    //this if checks, a detection of hit in an GameObject with the mouse on screen
-        //    if (Physics.Raycast(ray, hit))
-        //    {
-        //        //GameObject.Find("Nameofyourobject") search your gameobject on the hierarchy with the desired name and allows you to use it
-        //        Destroy(GameObject.Find(hit.name));
-        //    }
-        //}
+
+
     }
+
 
     public void LoadSavedTotes()
     {
@@ -84,7 +79,7 @@ public class ToteManager : MonoBehaviour
 
         ToteCollection totesState = new ToteCollection();
 
-        string _settingsImportString = System.IO.File.ReadAllText("Assets/Data/ToteData/" + "toteDataImport_200218_ExampleB.txt");
+        string _settingsImportString = System.IO.File.ReadAllText("Assets/Data/ToteData/" + "toteDataImport_200218_ExampleB.totecol");
 
         totesState = JsonUtility.FromJson<ToteCollection>(_settingsImportString);
         List<ToteDataItem> toteDataItemsToLoad = new List<ToteDataItem>();
@@ -105,7 +100,7 @@ public class ToteManager : MonoBehaviour
 
     void SaveTotes()
     {
-        string toteDataToExportPath = "Assets/Data/ToteData/" + "toteDataImport_200218_ExampleB.txt";
+        string toteDataToExportPath = "Assets/Data/ToteData/" + "toteDataImport_200218_ExampleB.totecol";
 
         ToteCollection totesState = new ToteCollection();
 
@@ -130,3 +125,23 @@ public class ToteManager : MonoBehaviour
     }
 
 }
+
+
+//if (Input.GetMouseButtonDown(0))
+//{
+//    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+//    RaycastHit hit;
+//    //this if checks, a detection of hit in an GameObject with the mouse on screen
+//    if (Physics.Raycast(ray, out hit, 10000))
+//    {
+//        //GameObject.Find("Nameofyourobject") search your gameobject on the hierarchy with the desired name and allows you to use it
+//        Tote hitTote;
+
+//       if (hit.transform.gameObject.GetComponent<Tote> != null)
+//        {
+
+//        }
+
+//        Destroy(hit.transform.gameObject);
+//    }
+//}

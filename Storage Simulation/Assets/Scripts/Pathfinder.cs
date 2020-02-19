@@ -72,7 +72,7 @@ public class Pathfinder
             foreach (Node neighbour in FindNeighbours(_nodeRepArray, current))
             {
 
-                if ((!neighbour.walkable) || closedSet.Contains(neighbour))
+                if ((neighbour.occupied) || closedSet.Contains(neighbour))
                 {
                     continue;
                 }
