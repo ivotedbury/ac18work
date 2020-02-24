@@ -3,23 +3,11 @@ using System.Collections;
 
 public class MainCamera : MonoBehaviour
 {
+    // camera mode
+    int cameraMode;
+    int robotToFollow = 0;
 
-    /*
-	EXTENDED FLYCAM
-		Desi Quintans (CowfaceGames.com), 17 August 2012.
-		Based on FlyThrough.js by Slin (http://wiki.unity3d.com/index.php/FlyThrough), 17 May 2011.
- 
-	LICENSE
-		Free as in speech, and free as in beer.
- 
-	FEATURES
-		WASD/Arrows:    Movement
-		          Q:    Climb
-		          E:    Drop
-                      Shift:    Move faster
-                    Control:    Move slower
-                        End:    Toggle cursor locking to screen (you can also press Ctrl+P to toggle play mode on and off).
-	*/
+    public RobotManager robotManager;
 
     public float cameraSensitivity = 80;
     public float climbSpeed = 10;
@@ -39,32 +27,54 @@ public class MainCamera : MonoBehaviour
         rotationY = -transform.rotation.eulerAngles.x;
         rotationX = transform.rotation.eulerAngles.y;
         rotationY = Mathf.Clamp(rotationY, -90, 90);
-
-
+        
         transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
         transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
 
+        cameraMode = Constants.CAMERA_3D_VIEW;
     }
 
-   
+
 
     void Update()
     {
-        if (Input.GetMouseButton(1))
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            rotationX += Input.GetAxis("Mouse X") * cameraSensitivity * Time.deltaTime;
-            rotationY += Input.GetAxis("Mouse Y") * cameraSensitivity * Time.deltaTime;
-            rotationY = Mathf.Clamp(rotationY, -90, 90);
-
-            transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
-            transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
+            if (cameraMode < Constants.CAMERA_MODE_LIMIT)
+            {
+                cameraMode++;
+            }
         }
 
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            if (cameraMode > 0)
+            {
+                cameraMode--;
+            }
+        }
+
+        if (cameraMode == Constants.CAMERA_ROBOT_FOLLOW)
+        {
+            transform.position = robotManager.allRobots[robotToFollow].transform.position + robotManager.allRobots[robotToFollow].transform.rotation * Constants.CAMERA_ROBOT_VIEW_OFFSET;
+            transform.rotation = robotManager.allRobots[robotToFollow].transform.rotation;
+        }
+
+            if (Input.GetMouseButton(1))
+            {
+                rotationX += Input.GetAxis("Mouse X") * cameraSensitivity * Time.deltaTime;
+                rotationY += Input.GetAxis("Mouse Y") * cameraSensitivity * Time.deltaTime;
+                rotationY = Mathf.Clamp(rotationY, -90, 90);
+
+                transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
+                transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
+            }
+
         transform.position += transform.forward * (normalMoveSpeed * fastMoveFactor * Input.GetAxis("Mouse ScrollWheel")) * Time.deltaTime;
-        
+
         if (Input.GetMouseButton(2))
         {
-            transform.position -= transform.right * normalMoveSpeed  * Input.GetAxis("Mouse X") * Time.deltaTime;
+            transform.position -= transform.right * normalMoveSpeed * Input.GetAxis("Mouse X") * Time.deltaTime;
             transform.position -= transform.up * normalMoveSpeed * Input.GetAxis("Mouse Y") * Time.deltaTime;
         }
 

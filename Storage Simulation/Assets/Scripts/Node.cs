@@ -12,6 +12,7 @@ public class Node : MonoBehaviour
     public float hCost;
     public bool occupied;
     public bool corridor;
+    public bool slot;
 
     public bool flowPosZ; // North
     public bool flowPosX; // East

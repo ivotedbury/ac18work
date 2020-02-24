@@ -29,6 +29,8 @@ public class Structure : MonoBehaviour
                     nodesArray[x, y, z].gridPos = new Vector3Int(x, y, z);
                     nodesArray[x, y, z].SetupNode();
 
+                    // 
+
                     if (x == 0
 || x == Constants.MAIN_STRUCTURE_DIMS.x - 1
 || z == 0

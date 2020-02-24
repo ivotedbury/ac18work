@@ -52,6 +52,13 @@ public class Constants : MonoBehaviour
     public static float COLLISION_DISTANCE = 0.7f;
     public static float COLLISION_PERPENDICULAR_DISTANCE = 0.2f;
 
+    // CAMERA SETTINGS
+    public static int CAMERA_3D_VIEW = 0;
+    public static int CAMERA_ROBOT_FOLLOW = 1;
+    public static int CAMERA_MODE_LIMIT = 1;
+
+    public static Vector3 CAMERA_ROBOT_VIEW_OFFSET = new Vector3(0, 0.05f, 0.25f);
+
     // GRID 
     public static Vector3 GRID_DIMS = new Vector3(0.7f, 0.5f, 0.5f);
 
@@ -66,6 +73,16 @@ public class Constants : MonoBehaviour
     // MAIN STRUCTURE
     public static Vector3Int MAIN_STRUCTURE_DIMS = new Vector3Int(10, 5, 12);
     public static Vector2Int MAIN_STRUCTURE_BASE_DIMS = new Vector2Int(MAIN_STRUCTURE_DIMS.x, MAIN_STRUCTURE_DIMS.z);
+
+    // STRUCTURE TYPES
+
+    public static int STRUCTURE_STAIRCASE = 0;
+    public static int STRUCTURE_CORRIDOR = 1;
+    public static int STRUCTURE_SLOT = 2;
+    public static int STRUCTURE_ACCESS = 3;
+
+
+    // staircase, corridor, slot, accessPoint
 
 
     public static int AISLE_WIDTH = 1;

@@ -7,7 +7,7 @@ public class RobotManager : MonoBehaviour
 
     public Robot robotReference;
     Structure structure;
-    List<Robot> allRobots = new List<Robot>();
+    public List<Robot> allRobots = new List<Robot>();
 
     Queue<Tote> pickingQueue = new Queue<Tote>();
     Queue<Tote> replenishingQueue = new Queue<Tote>();
